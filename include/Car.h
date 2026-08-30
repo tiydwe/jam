@@ -2,14 +2,20 @@
 
 #include <vector>
 #include <deque>
+#include <string>
 
 class Simulation;
 
 enum class carStatus {
   WAITING_AT_INTERSECTION,
   WAITING_FOR_NEXT_CAR,
-  TRAVELING
+  TRAVELING,
+  ARRIVING,
+  ARRIVED,
+  NO_ROUTE
 };
+
+std::string carStatusToString(carStatus s);
 
 struct scheduleItem {
   std::pair<size_t, size_t> dest;
@@ -28,12 +34,13 @@ class Car {
   void setRoute(const std::deque<size_t> &route);
 
   size_t getID() const { return _id; }
+  double getDistance() const {return _position_distance; }
 
  private:
   void _clipVelocity();
   void _decelerate(double a, double dt) { _velocity -= a * dt; _clipVelocity();}
   void _accelerate(double a, double dt) { _velocity += a * dt; _clipVelocity();}
-  void _applyVelocity(double dt){_position_distance += _velocity * dt;}
+  void _applyVelocity(double dt);
 
   Simulation* _parentSim;
 
@@ -48,7 +55,7 @@ class Car {
   std::deque<size_t> _route;
 
   // roadid, distance
-  std::pair<size_t, size_t> _current_destination;
+  std::pair<size_t, double> _current_destination;
 
   // std::vector<scheduleItem>
 

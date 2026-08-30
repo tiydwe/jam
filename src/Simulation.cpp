@@ -2,9 +2,10 @@
 
 #include "utility.h"
 
-Simulation::Simulation() {}
+Simulation::Simulation() : _time(0.0) {}
 
 void Simulation::step(double dt) {
+  _time += dt;
   for(auto& [id, car] : _cars){
     car.move(dt);
   }
@@ -98,3 +99,5 @@ Road& Simulation::getRoad(size_t id) {
 #endif
   return _roads[id];
 }
+
+double Simulation::getTime() { return _time; }

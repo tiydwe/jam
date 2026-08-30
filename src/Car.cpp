@@ -37,11 +37,18 @@ void Car::move(double dt) {
       _current_destination.second - _position_distance <=
           _minStoppingDist + _margin) {
 #ifdef DEBUG
-    utility::log("Target spotted at  " + std::to_string(_position_distance));
+    // utility::log("Target spotted at  " + std::to_string(_position_distance));
 #endif
     _decelerate(_max_acceleration, dt);
     didA = true;
     foundDestination = true;
+    if (utility::isclose(_current_destination.second, _position_distance, 10.0)) {
+      _status = carStatus::ARRIVED;
+      //remove car after arrival
+      _parentSim->getLane(_position_laneid).removeCar(_id);
+    } else {
+      _status = carStatus::ARRIVING;
+    }
   }
 
   // if car coming up at end of road, check intersection
@@ -59,6 +66,7 @@ void Car::move(double dt) {
 #endif
       // behaviour: car will not move without valid route
       _decelerate(_max_acceleration, dt);
+      _status = carStatus::NO_ROUTE;
       didA = true;
     }
     // make sure that route is in correct format, does not include current road
@@ -68,9 +76,8 @@ void Car::move(double dt) {
       _route.pop_front();
     } else {
       const auto road = _parentSim->getRoad(_route.front());
-      _route.pop_front();
-      const auto intersection =
-          _parentSim->getIntersection(_parentSim->getRoad(_position_roadid).getEndIntersection());
+      const auto intersection = _parentSim->getIntersection(
+          _parentSim->getRoad(_position_roadid).getEndIntersection());
       if (intersection.getLightByLaneID(_position_laneid) == Lights::GREEN) {
         // go to next road.
         if (std::find(intersection.getOutgoings().begin(),
@@ -86,6 +93,7 @@ void Car::move(double dt) {
           utility::exit();
 #endif
           _decelerate(_max_acceleration, dt);
+          _status = carStatus::NO_ROUTE;
           didA = true;
         } else {
           // TODO: make it so car doesn't just teleport
@@ -94,35 +102,65 @@ void Car::move(double dt) {
           size_t newLane = road.getEdgeLane();
           size_t newRoadID = road.getID();
           // make sure there arn't any cars in the way
-          if (_parentSim->getLane(newLane).minDistance().first <
-              newDist + _minStoppingDist + _margin) {
+          auto nxtCar = _parentSim->getLane(newLane).minDistance();
+          if (nxtCar.second != -1 &&
+              nxtCar.first < newDist + _minStoppingDist + _margin) {
             // stop
             didA = true;
             _decelerate(_max_acceleration, dt);
+            _status = carStatus::WAITING_FOR_NEXT_CAR;
+
           } else {
             // clear, switch to new lane, don't acclerate yet
             didA = true;
+            _parentSim->getLane(_position_laneid).removeCar(_id);
             _position_distance = newDist;
             _position_laneid = newLane;
             _position_roadid = newRoadID;
+            _route.pop_front();
+            _parentSim->getLane(newLane).addCar(newDist, _id);
+            _status = carStatus::TRAVELING;
+#ifdef DEBUG
+            utility::log(std::to_string(_id) + " - Moved to new lane " +
+                         std::to_string(_position_laneid));
+#endif
           }
         }
       } else {
         // traffic light red/yellow, stop
         didA = true;
         _decelerate(_max_acceleration, dt);
+        _status = carStatus::WAITING_AT_INTERSECTION;
       }
+    }
+  }
+
+  // check for cars ahead
+  auto nextCar = _parentSim->getLane(_position_laneid).minDistance(_id);
+  if (nextCar.second != -1) {
+    if (nextCar.first - _position_distance <= _minStoppingDist + _margin) {
+      _decelerate(_max_acceleration, dt);
+#ifdef DEBUG
+      utility::log(std::to_string(_id) + " - Next car ahead is " +
+                   std::to_string(nextCar.second) + " with distance " +
+                   std::to_string(nextCar.first));
+#endif
+      _status = carStatus::WAITING_FOR_NEXT_CAR;
+      didA = true;
     }
   }
 
   // otherwise, accelerate slower
   if (!didA) {
     _accelerate(_max_acceleration * 0.8, dt);
+    _status = carStatus::TRAVELING;
   }
   _applyVelocity(dt);
 
 #ifdef DEBUG
-  utility::log("Moved to " + std::to_string(_position_distance));
+  utility::log(std::to_string(_id) + " - Moved to " +
+               std::to_string(_position_distance) + " with status " +
+               carStatusToString(_status));
 #endif
 }
 
@@ -132,4 +170,28 @@ void Car::_clipVelocity() {
   double speedLimit = _parentSim->getRoad(_position_roadid).getSpeedLimit();
   _velocity = std::max(0.0, _velocity);
   _velocity = std::min(_velocity, speedLimit);
+}
+
+void Car::_applyVelocity(double dt) {
+  _position_distance += _velocity * dt;
+  _parentSim->getLane(_position_laneid).moveCar(_position_distance, _id);
+}
+std::string carStatusToString(carStatus s) {
+  switch (s) {
+    case carStatus::WAITING_AT_INTERSECTION:
+      return "WAITING_AT_INTERSECTION";
+    case carStatus::WAITING_FOR_NEXT_CAR:
+      return "WAITING_FOR_NEXT_CAR";
+    case carStatus::TRAVELING:
+      return "TRAVELING";
+    case carStatus::ARRIVING:
+      return "ARRIVING";
+    case carStatus::ARRIVED:
+      return "ARRIVED";
+    case carStatus::NO_ROUTE:
+      return "NO_ROUTE";
+
+    default:
+      return "not recognized";
+  }
 }

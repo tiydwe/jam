@@ -23,6 +23,7 @@ class Simulation{
   Intersection& getIntersection(size_t id);
   Lane& getLane(size_t id);
   Road& getRoad(size_t id);
+  double getTime();
 
   private:
   
@@ -30,5 +31,7 @@ class Simulation{
   std::map<size_t, Intersection> _intersections;
   std::map<size_t, Lane> _lanes;
   std::map<size_t, Road> _roads; 
+
+  double _time;
 
 };

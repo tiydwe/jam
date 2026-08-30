@@ -10,3 +10,8 @@ Intersection::Intersection() {
 Intersection::Intersection(Simulation& parent)
   : _parent(&parent),
     _id(utility::uid()) {}
+
+Lights Intersection::getLightByLaneID(size_t laneid) const {
+  // for now, always green
+  return Lights::GREEN;
+}

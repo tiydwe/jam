@@ -1,6 +1,8 @@
+#pragma once
 #include "Simulation.h"
 
 #include "utility.h"
+
 
 void test1(){
   Simulation s;

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <vector>
+#include <deque>
 
 class Simulation;
 
@@ -24,6 +25,8 @@ class Car {
 
   void move(double dt);
 
+  void setRoute(const std::deque<size_t> &route);
+
   size_t getID() const { return _id; }
 
  private:
@@ -41,7 +44,8 @@ class Car {
   size_t _position_laneid;
   double _position_distance;
 
-  std::vector<size_t> _route;
+  // roadid (not laneid)
+  std::deque<size_t> _route;
 
   // roadid, distance
   std::pair<size_t, size_t> _current_destination;

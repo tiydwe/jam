@@ -9,9 +9,12 @@ class Lane{
 
   Lane();
   Lane(Simulation& parent, double length);
+
+  std::pair<double, size_t> minDistance();
   
   size_t getID()const{return _id;}
   size_t getLength()const{return _length;}
+
 
 
   private:
@@ -20,5 +23,6 @@ class Lane{
 
   int _id;
   double _length;
-  std::vector<std::pair<size_t, size_t>> _cars;
+  //distance, carid
+  std::vector<std::pair<double, size_t>> _cars;
 };

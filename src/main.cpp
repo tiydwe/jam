@@ -1,10 +1,10 @@
 #include <SFML/Graphics.hpp>
 
-#include "t1__1car1road.cpp"
+#include "t2__1car1intersection.hpp"
 
 int main()
 {
-	test1();
+	test2();
 	/*
 	sf::RenderWindow window( sf::VideoMode( { 200, 200 } ), "SFML works!" );
 	sf::CircleShape shape( 100.f );

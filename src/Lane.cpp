@@ -10,8 +10,8 @@ Lane::Lane() {
       "This should never be called (probally something messed up in map!)");
 }
 
-Lane::Lane(Simulation& parent, double length)
-    : _parent(&parent), _id(utility::uid()), _length(length) {}
+Lane::Lane(Simulation& parent, double length, size_t road)
+    : _parent(&parent), _id(utility::uid()), _length(length), _roadid(road) {}
 
 std::pair<double, size_t> Lane::minDistance() {
   if (_cars.size() == 0) {
@@ -27,11 +27,11 @@ std::pair<double, size_t> Lane::minDistance() {
 std::pair<double, size_t> Lane::minDistance(size_t carid) {
   std::pair<double, size_t> res{-1.0, -1};
   for (const auto& car : _cars) {
-    if (car.first > _parent->getCar(carid).getDistance()) {
+    if (car.second != carid && car.first > _parent->getCar(carid).getDistance()) {
       if (res.first == -1) {
         res = car;
       } else {
-        res = max(res, car);
+        res = min(res, car);
       }
     }
   }

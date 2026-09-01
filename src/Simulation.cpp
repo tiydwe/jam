@@ -2,7 +2,7 @@
 
 #include "utility.h"
 
-Simulation::Simulation() : _time(0.0) {}
+Simulation::Simulation(unsigned int seed) : _time(0.0), _rng(seed) {}
 
 void Simulation::step(double dt) {
   _time += dt;
@@ -75,7 +75,7 @@ Intersection& Simulation::getIntersection(size_t id) {
     utility::exit();
   }
 #endif
-  return _intersections[id];
+  return _intersections.at(id);
 }
 
 Lane& Simulation::getLane(size_t id) {
@@ -101,3 +101,7 @@ Road& Simulation::getRoad(size_t id) {
 }
 
 double Simulation::getTime() { return _time; }
+
+std::mt19937& Simulation::getRNG() {
+  return _rng;
+}

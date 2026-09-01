@@ -8,7 +8,7 @@ class Lane{
   public:
 
   Lane();
-  Lane(Simulation& parent, double length);
+  Lane(Simulation& parent, double length, size_t roadid);
 
   std::pair<double, size_t> minDistance();
   // min distance after car, returns (-1, -1) if first car
@@ -20,13 +20,15 @@ class Lane{
   
   size_t getID()const{return _id;}
   size_t getLength()const{return _length;}
+  size_t getRoad()const{return _roadid;}
 
   private:
 
   Simulation* _parent;
 
-  int _id;
+  size_t _id;
   double _length;
+  size_t _roadid;
   //distance, carid
   std::vector<std::pair<double, size_t>> _cars;
 };

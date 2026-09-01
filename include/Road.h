@@ -1,23 +1,37 @@
 #pragma once
 
 #include <vector>
+#include <deque>
 
 class Simulation;
 
 
+// really shouldn't be having too many lanes, maybe max 4
 class Road{
   public:
 
   Road();
-  Road(Simulation& parent, double speedLimit, size_t endIntersection);
+  Road(Simulation& parent, double speedLimit, size_t endIntersection, double angle);
 
+  // adds lane always adds too center, not edge
   void addLane(const size_t& lane){_lanes.push_back(lane);}
-  void setEdgeLane(const size_t& lane){_edgeLane = lane;}
+
+  // returns -2 if err
+  // returns -1 if already at lane
+  // returns adjacent lane in correct direction of target lane
+  int laneToGoTo(size_t sourceLane, size_t targetLane);
+
+  // returns -2 if err
+  int closestLaneTo(size_t sourceLane, const std::vector<size_t> &targetLanes);
 
   size_t getID()const{return _id;}
   size_t getSpeedLimit()const{return _speed_limit;}
-  size_t getEdgeLane()const{return _edgeLane;}
+  const std::deque<size_t>& getLanes()const{return _lanes;}
+  size_t getEdgeLane()const{return _lanes.back();}
   size_t getEndIntersection()const{return _endIntersection;}
+  size_t getNumLanes()const{return _lanes.size();}
+  double getAngle()const{return _angle;}
+
 
   private:
   Simulation* _parent;
@@ -26,9 +40,10 @@ class Road{
 
   double _speed_limit;
 
-  std::vector<size_t> _lanes;
-
-  size_t _edgeLane;
+  // front = left (center), back = right (edge)
+  std::deque<size_t> _lanes;
 
   size_t _endIntersection;
+
+  double _angle;
 };

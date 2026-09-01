@@ -25,3 +25,11 @@ void utility::exit(std::string msg, int code){
   //std::exit(code);
 }
 
+double utility::smoothstep(double x) {
+  x = std::min(1.0, std::max(0.0, x));
+  return 6*x*x*x*x*x - 15*x*x*x*x + 10*x*x*x;
+}
+
+double utility::cumlitivePtoSlice(double (*p)(double), double t, double dt) {
+  return 1.0-(1.0-p(t+dt))/(1.0-p(t));
+}

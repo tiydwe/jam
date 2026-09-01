@@ -17,11 +17,14 @@ FetchContent_MakeAvailable(SFML)
 add_executable(main src/main.cpp)
 target_sources(main PRIVATE
     src/Car.cpp
+    src/Car_merge.cpp
+    src/Car_misc.cpp
     src/Intersection.cpp
     src/Lane.cpp
     src/Road.cpp
     src/Simulation.cpp
     src/utility.cpp
+    src/TrafficLight.cpp
     test/t1__1car1road.hpp
     test/t2__1car1intersection.hpp
     include/Car.h
@@ -30,6 +33,7 @@ target_sources(main PRIVATE
     include/Road.h
     include/Simulation.h
     include/utility.h
+    include/TrafficLight.h
 ) 
 target_include_directories(main PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/include")
 target_include_directories(main PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/test")

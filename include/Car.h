@@ -12,7 +12,8 @@ enum class carStatus {
   TRAVELING,
   ARRIVING,
   ARRIVED,
-  NO_ROUTE
+  NO_ROUTE,
+  MERGING
 };
 
 std::string carStatusToString(carStatus s);
@@ -27,7 +28,7 @@ class Car {
  public:
   Car();
   Car(Simulation& parent, size_t initRoad, size_t initLane, size_t initDist, double max_a, double margin=1.0);
-  void setDestination(const std::pair<size_t, size_t>& dest);
+  void setDestination(const std::pair<size_t, double>& dest);
 
   void move(double dt);
 
@@ -40,7 +41,15 @@ class Car {
   void _clipVelocity();
   void _decelerate(double a, double dt) { _velocity -= a * dt; _clipVelocity();}
   void _accelerate(double a, double dt) { _velocity += a * dt; _clipVelocity();}
-  void _applyVelocity(double dt);
+  double _applyVelocity(double dt);
+
+  // will automatically roll for chance
+  bool _mergeToNextLane(double dd);
+
+  void _init_merge(size_t newLaneid);
+  // false = not merged, true = merged
+  bool _check_merge();
+  bool _move_checkIntersection(double dt);
 
   Simulation* _parentSim;
 
@@ -49,6 +58,7 @@ class Car {
 
   size_t _position_roadid;
   size_t _position_laneid;
+  // back of car
   double _position_distance;
 
   // roadid (not laneid)
@@ -62,5 +72,11 @@ class Car {
   double _max_acceleration;
   double _velocity;
   double _minStoppingDist;
+
+  // car length + safe space
   double _margin;
+
+  // only valid during a merge
+  size_t _newLaneMerge;
+  double _newMergedDistance;
 };

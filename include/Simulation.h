@@ -2,6 +2,7 @@
 
 #include <vector>
 #include <map>
+#include <random>
 #include "Car.h"
 #include "Intersection.h"
 #include "Lane.h"
@@ -10,7 +11,7 @@
 
 class Simulation{
   public:
-  Simulation();
+  Simulation(unsigned int seed = 42);
 
   void step(double dt);
 
@@ -25,8 +26,13 @@ class Simulation{
   Road& getRoad(size_t id);
   double getTime();
 
+  std::mt19937& getRNG();
+
+
   private:
   
+  std::mt19937 _rng;
+
   std::map<size_t, Car> _cars;
   std::map<size_t, Intersection> _intersections;
   std::map<size_t, Lane> _lanes;

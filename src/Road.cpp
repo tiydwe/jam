@@ -64,3 +64,16 @@ int Road::closestLaneTo(size_t lane, const std::vector<size_t>& lanes) {
   }
   return bestLane;
 }
+
+int Road::getLanePosFromCenter(size_t laneid) const {
+  auto it = _lanes.begin();
+  for(int i = 0; i < _lanes.size(); ++i){
+    if(*it == laneid){
+      return i;
+    }
+    ++it;
+  }
+  utility::logErr("Road::getLanePosFromCenter - laneid not found");
+  utility::exit();
+  return 0;
+}

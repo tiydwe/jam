@@ -37,6 +37,11 @@ class Car {
   size_t getID() const { return _id; }
   double getDistance() const {return _position_distance; }
 
+  size_t getCurrRoad() const {return _position_roadid; }
+  size_t getCurrLane() const {return _position_laneid; }
+  double getCurrDist() const {return _position_distance; }
+  double getCurrDistFrac() const;
+
  private:
   void _clipVelocity();
   void _decelerate(double a, double dt) { _velocity -= a * dt; _clipVelocity();}

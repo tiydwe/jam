@@ -24,6 +24,9 @@ class Road{
   // returns -2 if err
   int closestLaneTo(size_t sourceLane, const std::vector<size_t> &targetLanes);
 
+  // 0 equals center lane
+  int getLanePosFromCenter(size_t laneid) const;
+
   size_t getID()const{return _id;}
   size_t getSpeedLimit()const{return _speed_limit;}
   const std::deque<size_t>& getLanes()const{return _lanes;}

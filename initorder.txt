@@ -1,0 +1,8 @@
+Init intersections
+Init roads
+Init lanes
+Road add lanes
+Add roads to intersections
+Add all to simulation
+Init car
+Add car to simulation

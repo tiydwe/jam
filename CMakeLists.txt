@@ -25,6 +25,8 @@ target_sources(main PRIVATE
     src/Simulation.cpp
     src/utility.cpp
     src/TrafficLight.cpp
+    src/physical/RoadPhysical.cpp
+    src/physical/CarPhysical.cpp
     test/t1__1car1road.hpp
     test/t2__1car1intersection.hpp
     include/Car.h
@@ -34,9 +36,20 @@ target_sources(main PRIVATE
     include/Simulation.h
     include/utility.h
     include/TrafficLight.h
+    include/physical/RoadPhysical.h
+    include/physical/CarPhysical.h
 ) 
 target_include_directories(main PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/include")
+target_include_directories(main PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/include/physical")
+target_include_directories(main PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/src/physical")
 target_include_directories(main PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/test")
+add_custom_command(
+    TARGET main POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+        "${CMAKE_CURRENT_SOURCE_DIR}/assets"
+        "$<TARGET_FILE_DIR:main>/assets"
+    COMMENT "Copying assets folder to build directory..."
+)
 target_compile_features(main PRIVATE cxx_std_17)
 set(SFML_DIR "C:/c++/libaries/SFML-3.1.0/lib/cmake/SFML")
 find_package(SFML 3.1 COMPONENTS Graphics Window System Audio REQUIRED)

@@ -1,6 +1,6 @@
 #include "Car.h"
-#include "utility.h"
 #include "Simulation.h"
+#include "utility.h"
 
 Car::Car() {
   utility::exit(
@@ -25,6 +25,10 @@ void Car::setDestination(const std::pair<size_t, double>& dest) {
 }
 
 void Car::setRoute(const std::deque<size_t>& route) { _route = route; }
+
+double Car::getCurrDistFrac() const {
+  return _position_distance / _parentSim->getLane(_position_laneid).getLength();
+}
 
 void Car::_clipVelocity() {
   double speedLimit = _parentSim->getRoad(_position_roadid).getSpeedLimit();

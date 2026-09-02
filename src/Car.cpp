@@ -71,11 +71,15 @@ void Car::move(double dt) {
   }
 
 #ifdef DEBUG
-  utility::log(std::to_string(_id) + " - Moved to " +
-               std::to_string(_position_distance) + " on road " +
-               std::to_string(_position_roadid) + " on lane " +
-               std::to_string(_position_laneid) + " with status " +
-               carStatusToString(_status));
+//*
+  if (_status != carStatus::ARRIVED) {
+    utility::log(std::to_string(_id) + " - Moved to " +
+                 std::to_string(_position_distance) + " on road " +
+                 std::to_string(_position_roadid) + " on lane " +
+                 std::to_string(_position_laneid) + " with status " +
+                 carStatusToString(_status));
+  }
+//*/
 #endif
 }
 

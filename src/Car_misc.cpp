@@ -26,6 +26,10 @@ void Car::setDestination(const std::pair<size_t, double>& dest) {
 
 void Car::setRoute(const std::deque<size_t>& route) { _route = route; }
 
+void Car::recalcRoute() {
+  _route = _parentSim->findRoute(_position_roadid, _current_destination.first);
+}
+
 double Car::getCurrDistFrac() const {
   return _position_distance / _parentSim->getLane(_position_laneid).getLength();
 }

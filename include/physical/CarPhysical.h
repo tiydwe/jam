@@ -4,19 +4,23 @@
 #include "RoadPhysical.h"
 #include "SFML/Graphics.hpp"
 
-/// @brief Handles physical aspects of a road, such as position, drawing, etc.
-/// Does not handle any simulation road logic
+class Game;
+
+/// @brief Handles physical aspects of a car, such as position, drawing, etc.
+/// Does not handle any simulation car logic
 class CarPhysical : public sf::Drawable, sf::Transformable {
  public:
-  CarPhysical(Car* car, RoadPhysical* rp, std::string texturePath);
+  CarPhysical(Game* game, Car* car, RoadPhysical* rp, std::string texturePath);
 
   void update();
 
   void draw(sf::RenderTarget& target, sf::RenderStates states) const override;
+  Game* getGame() {return _game;}
 
  private:
-  const Car* _car = nullptr;
-  const RoadPhysical* _road = nullptr;
+  Game* _game = nullptr;
+  Car* _car = nullptr;
+  RoadPhysical* _road = nullptr;
   sf::Texture _texture;
   sf::Sprite _base;
 

@@ -2,6 +2,7 @@
 
 #include <vector>
 #include <map>
+#include <deque>
 #include <random>
 #include "Car.h"
 #include "Intersection.h"
@@ -11,14 +12,18 @@
 
 class Simulation{
   public:
-  Simulation(unsigned int seed = 42);
+  Simulation(unsigned int seed = std::random_device()());
+  ~Simulation();
 
   void step(double dt);
 
-  void addCar(const Car& car);
-  void addIntersection(const Intersection& intersection);
-  void addLane(const Lane& lane);
-  void addRoad(const Road& road);
+  std::deque<size_t> findRoute(size_t startRoad, size_t endRoad);
+
+  // MUST BE HEAP ALLOCATED
+  void addCar(Car* car);
+  void addIntersection(Intersection* intersection);
+  void addLane(Lane* lane);
+  void addRoad(Road* road);
 
   Car& getCar(size_t id);
   Intersection& getIntersection(size_t id);
@@ -33,10 +38,10 @@ class Simulation{
   
   std::mt19937 _rng;
 
-  std::map<size_t, Car> _cars;
-  std::map<size_t, Intersection> _intersections;
-  std::map<size_t, Lane> _lanes;
-  std::map<size_t, Road> _roads; 
+  std::map<size_t, Car*> _cars;
+  std::map<size_t, Intersection*> _intersections;
+  std::map<size_t, Lane*> _lanes;
+  std::map<size_t, Road*> _roads; 
 
   double _time;
 

@@ -1,0 +1,8 @@
+I 1 100 100
+I 2 200 100
+I 3 250 50
+I 4 250 150
+SWITCH
+R2 5 assets/data/roads/generic4lane.dat 1 2 2 2 10
+R2 6 assets/data/roads/generic4lane.dat 2 3 2 2 5
+R2 7 assets/data/roads/generic4lane.dat 2 4 2 2 4

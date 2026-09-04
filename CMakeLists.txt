@@ -25,10 +25,10 @@ target_sources(main PRIVATE
     src/Simulation.cpp
     src/utility.cpp
     src/TrafficLight.cpp
+    src/Game.cpp
     src/physical/RoadPhysical.cpp
     src/physical/CarPhysical.cpp
-    test/t1__1car1road.hpp
-    test/t2__1car1intersection.hpp
+    src/physical/IntersectionPhysical.cpp
     include/Car.h
     include/Intersection.h
     include/Lane.h
@@ -36,8 +36,10 @@ target_sources(main PRIVATE
     include/Simulation.h
     include/utility.h
     include/TrafficLight.h
+    include/Game.h
     include/physical/RoadPhysical.h
     include/physical/CarPhysical.h
+    include/physical/IntersectionPhysical.h
 ) 
 target_include_directories(main PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/include")
 target_include_directories(main PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/include/physical")

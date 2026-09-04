@@ -1,0 +1,5 @@
+# R2 <id> <data path> <start intersection id> <end intersection id> <lanes lhs> <lanes rhs> <speed limit>
+# I <id> <x> <y>
+# intersections must go before roads, otherwise errors and who knows what
+# when switching between intersection and road put a line:
+# SWITCH

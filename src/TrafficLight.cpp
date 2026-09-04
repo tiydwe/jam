@@ -150,6 +150,7 @@ Lights TrafficLight::getLightToLane(size_t laneidSource, size_t laneidTarget,
 
 int TrafficLight::getLaneCanTurnOnRoad(size_t laneidSource,
                                           size_t roadidTarget, double time) {
+  //utility::log(std::to_string(time));
   size_t currScheduleItem = timeToScheduleItem(time);
   for (const auto& [path, light] : _schedule[currScheduleItem].valid) {
     if (path.first == laneidSource &&

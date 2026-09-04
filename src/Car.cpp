@@ -49,7 +49,7 @@ void Car::move(double dt) {
     // check for cars ahead
     auto nextCar = _parentSim->getLane(_position_laneid).minDistance(_id);
     if (nextCar.second != -1) {
-      if (nextCar.first - _position_distance <= _minStoppingDist + _margin) {
+      if (nextCar.first - _position_distance <= _minStoppingDist + _margin && !didA) {
         _decelerate(_max_acceleration, dt);
 #ifdef DEBUG
         utility::log(std::to_string(_id) + " - Next car ahead is " +

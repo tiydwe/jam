@@ -35,12 +35,12 @@ RoadAsset::RoadAsset(std::string filename) {
 }
 
 RoadPhysical::RoadPhysical(Road* road, Road* roadb, RoadAsset roadData,
-                           sf::Vector2<int> start, sf::Vector2<int> end)
+                           sf::Vector2<float> start, sf::Vector2<float> end)
     : _road(road),
       _roadb(roadb),
       _roadData(roadData),
       _texture(roadData.texturePath),
-      _base(_texture, sf::IntRect(start, end)),
+      _base(_texture, sf::IntRect(sf::Vector2i(start), sf::Vector2i(end))),
       _start(start),
       _end(end) {
   if (!_texture.loadFromFile(roadData.texturePath)) {
@@ -85,7 +85,7 @@ sf::Vector2f RoadPhysical::getPhysicalPosition(size_t roadid, size_t laneid,
     sf::Transform tr2;
     tr2.translate(sf::Vector2f(_start));
     auto of = offset->at(lane);
-    utility::log(std::to_string(percentDistnace));
+    //utility::log(std::to_string(percentDistnace));
     auto preT = sf::Vector2f(
         percentDistnace * sf::Vector2f(_end - _start).length(), of * mdf);
     auto res = (tr2 * tr).transformPoint(preT);

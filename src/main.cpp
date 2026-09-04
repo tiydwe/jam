@@ -1,11 +1,10 @@
 #include <SFML/Graphics.hpp>
 
-#include "t5.hpp"
-#include "t4.hpp"
+#include "t6.hpp"
 
 int main()
 {
-	test5();
+	test6();
 	/*
 	sf::RenderWindow window( sf::VideoMode( { 200, 200 } ), "SFML works!" );
 	sf::CircleShape shape( 100.f );

@@ -1,59 +1,111 @@
 #include "Simulation.h"
 
+#include <unordered_set>
+
 #include "utility.h"
 
 Simulation::Simulation(unsigned int seed) : _time(0.0), _rng(seed) {}
 
+Simulation::~Simulation() {
+  for(const auto& x : _cars){
+    delete x.second;
+  }
+  _cars.clear();
+  for(const auto& x : _roads){
+    delete x.second;
+  }
+  _cars.clear();
+  for(const auto& x : _intersections){
+    delete x.second;
+  }
+  _cars.clear();
+  for(const auto& x : _lanes){
+    delete x.second;
+  }
+  _cars.clear();
+}
+
 void Simulation::step(double dt) {
   _time += dt;
   for(auto& [id, car] : _cars){
-    car.move(dt);
+    car->move(dt);
   }
 }
 
-void Simulation::addCar(const Car& car) {
+std::deque<size_t> Simulation::findRoute(size_t startRoad, size_t endRoad) {
+  // loc, prev
+  std::map<size_t, size_t> prev;
+  std::deque<size_t> q;
+  q.push_back(startRoad);
+  std::unordered_set<size_t> visited;
+  visited.insert(startRoad);
+  while(!q.empty()){
+    size_t curr = q.front();
+    q.pop_front();
+    if(curr == endRoad){
+      break;
+    }
+    auto& outs = getIntersection(getRoad(curr).getEndIntersection()).getOutgoings();
+    for(const size_t nxt : outs){
+      if(visited.find(nxt) == visited.end()){
+        visited.insert(nxt);
+        prev[nxt] = curr;
+        q.push_back(nxt);
+      }
+    }
+  }
+  std::deque<size_t> res;
+  size_t curr = endRoad;
+  while(curr != startRoad){
+    res.push_front(curr);
+    curr = prev[curr];
+  }
+  return res;
+}
+
+void Simulation::addCar(Car* car) {
 #ifdef DEBUG
-  if (_cars.find(car.getID()) != _cars.end()) {
+  if (_cars.find(car->getID()) != _cars.end()) {
     utility::logWarn("While trying to addCar, id " +
-                     std::to_string(car.getID()) + " already existed.");
+                     std::to_string(car->getID()) + " already existed.");
     utility::exit();
   }
 #endif
-  _cars.insert_or_assign(car.getID(), car);
+  _cars.try_emplace(car->getID(), car);
 }
 
-void Simulation::addIntersection(const Intersection& intersection) {
+void Simulation::addIntersection(Intersection* intersection) {
 #ifdef DEBUG
-  if (_intersections.find(intersection.getID()) != _intersections.end()) {
+  if (_intersections.find(intersection->getID()) != _intersections.end()) {
     utility::logWarn("While trying to addIntersection, id " +
-                     std::to_string(intersection.getID()) +
+                     std::to_string(intersection->getID()) +
                      " already existed.");
     utility::exit();
   }
 #endif
-  _intersections.insert_or_assign(intersection.getID(), intersection);
+  _intersections.try_emplace(intersection->getID(), intersection);
 }
 
-void Simulation::addLane(const Lane& lane) {
+void Simulation::addLane(Lane* lane) {
 #ifdef DEBUG
-  if (_lanes.find(lane.getID()) != _lanes.end()) {
+  if (_lanes.find(lane->getID()) != _lanes.end()) {
     utility::logWarn("While trying to addLane, id " +
-                     std::to_string(lane.getID()) + " already existed.");
+                     std::to_string(lane->getID()) + " already existed.");
     utility::exit();
   }
 #endif
-  _lanes.insert_or_assign(lane.getID(), lane);
+  _lanes.try_emplace(lane->getID(), lane);
 }
 
-void Simulation::addRoad(const Road& road) {
+void Simulation::addRoad(Road* road) {
 #ifdef DEBUG
-  if (_roads.find(road.getID()) != _roads.end()) {
+  if (_roads.find(road->getID()) != _roads.end()) {
     utility::logWarn("While trying to addRoad, id " +
-                     std::to_string(road.getID()) + " already existed.");
+                     std::to_string(road->getID()) + " already existed.");
     utility::exit();
   }
 #endif
-  _roads.insert_or_assign(road.getID(), road);
+  _roads.try_emplace(road->getID(), road);
 }
 
 Car& Simulation::getCar(size_t id) {
@@ -64,7 +116,7 @@ Car& Simulation::getCar(size_t id) {
     utility::exit();
   }
 #endif
-  return _cars[id];
+  return *_cars[id];
 }
 
 Intersection& Simulation::getIntersection(size_t id) {
@@ -75,7 +127,7 @@ Intersection& Simulation::getIntersection(size_t id) {
     utility::exit();
   }
 #endif
-  return _intersections.at(id);
+  return *_intersections.at(id);
 }
 
 Lane& Simulation::getLane(size_t id) {
@@ -86,7 +138,7 @@ Lane& Simulation::getLane(size_t id) {
     utility::exit();
   }
 #endif
-  return _lanes[id];
+  return *_lanes[id];
 }
 
 Road& Simulation::getRoad(size_t id) {
@@ -97,7 +149,7 @@ Road& Simulation::getRoad(size_t id) {
     utility::exit();
   }
 #endif
-  return _roads[id];
+  return *_roads[id];
 }
 
 double Simulation::getTime() { return _time; }

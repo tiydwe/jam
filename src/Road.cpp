@@ -52,6 +52,7 @@ int Road::closestLaneTo(size_t lane, const std::vector<size_t>& lanes) {
   for (auto target : lanes) {
     auto targetIt = std::find(_lanes.begin(), _lanes.end(), target);
     if (targetIt == _lanes.end()) {
+      continue;
       utility::logWarn("Road::laneToGoTo - Target lane " +
                        std::to_string(target) + " not found.");
       return -2;

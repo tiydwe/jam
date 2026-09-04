@@ -27,12 +27,13 @@ struct scheduleItem {
 class Car {
  public:
   Car();
-  Car(Simulation& parent, size_t initRoad, size_t initLane, size_t initDist, double max_a, double margin=1.0);
+  Car(Simulation& parent, size_t initRoad, size_t initLane, size_t initDist, double max_a, double margin=10.0);
   void setDestination(const std::pair<size_t, double>& dest);
 
   void move(double dt);
 
   void setRoute(const std::deque<size_t> &route);
+  void recalcRoute();
 
   size_t getID() const { return _id; }
   double getDistance() const {return _position_distance; }
@@ -41,6 +42,8 @@ class Car {
   size_t getCurrLane() const {return _position_laneid; }
   double getCurrDist() const {return _position_distance; }
   double getCurrDistFrac() const;
+
+  Simulation* getParentSim() const {return _parentSim;}
 
  private:
   void _clipVelocity();

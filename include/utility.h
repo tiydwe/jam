@@ -4,6 +4,9 @@
 
 #define DEBUG 1
 
+#define GREEN_PHASE_TIME_DEFAULT 20
+#define YELLOW_PHASE_TIME_DEFAULT 5
+
 namespace utility {
 
 size_t uid();

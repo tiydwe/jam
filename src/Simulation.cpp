@@ -7,24 +7,22 @@
 Simulation::Simulation(unsigned int seed) : _time(0.0), _rng(seed) {}
 
 Simulation::~Simulation() {
-  for(const auto& x : _cars){
-    delete x.second;
-  }
-  _cars.clear();
-  for(const auto& x : _roads){
-    delete x.second;
-  }
-  _cars.clear();
-  for(const auto& x : _intersections){
-    delete x.second;
-  }
-  _cars.clear();
-  for(const auto& x : _lanes){
-    delete x.second;
-  }
-  _cars.clear();
-}
+    for (const auto& x : _cars)
+        delete x.second;
+    _cars.clear();
 
+    for (const auto& x : _roads)
+        delete x.second;
+    _roads.clear();
+
+    for (const auto& x : _intersections)
+        delete x.second;
+    _intersections.clear();
+
+    for (const auto& x : _lanes)
+        delete x.second;
+    _lanes.clear();
+}
 void Simulation::step(double dt) {
   _time += dt;
   for(auto& [id, car] : _cars){

@@ -11,12 +11,12 @@
 
 void test6() {
   
-  Game g("assets/presets/games/t6.dat");
 
   double timeMultiplier = 10.0;
   float clampTime = 0.0333;
 
   sf::RenderWindow window(sf::VideoMode({500, 500}), "Test 5");
+  Game g("assets/presets/games/t6.dat", window);
   sf::Clock ctime;
   sf::Time last = ctime.getElapsedTime();
   while (window.isOpen()) {

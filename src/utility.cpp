@@ -33,3 +33,4 @@ double utility::smoothstep(double x) {
 double utility::cumlitivePtoSlice(double (*p)(double), double t, double dt) {
   return 1.0-(1.0-p(t+dt))/(1.0-p(t));
 }
+

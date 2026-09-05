@@ -29,6 +29,10 @@ target_sources(main PRIVATE
     src/physical/RoadPhysical.cpp
     src/physical/CarPhysical.cpp
     src/physical/IntersectionPhysical.cpp
+    src/physical/Layout.cpp
+    src/ui/Button.cpp
+    src/ui/EditorWindow.cpp
+    src/ui/SimulateWindow.cpp
     include/Car.h
     include/Intersection.h
     include/Lane.h
@@ -40,10 +44,16 @@ target_sources(main PRIVATE
     include/physical/RoadPhysical.h
     include/physical/CarPhysical.h
     include/physical/IntersectionPhysical.h
+    include/physical/Layout.h
+    include/ui/Button.h
+    include/ui/EditorWindow.h
+    include/ui/SimulateWindow.h
 ) 
 target_include_directories(main PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/include")
 target_include_directories(main PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/include/physical")
+target_include_directories(main PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/include/ui")
 target_include_directories(main PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/src/physical")
+target_include_directories(main PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/src/ui")
 target_include_directories(main PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/test")
 add_custom_command(
     TARGET main POST_BUILD
@@ -56,5 +66,6 @@ target_compile_features(main PRIVATE cxx_std_17)
 set(SFML_DIR "C:/c++/libaries/SFML-3.1.0/lib/cmake/SFML")
 find_package(SFML 3.1 COMPONENTS Graphics Window System Audio REQUIRED)
 target_link_libraries(main PRIVATE SFML::Graphics)
+
 
 set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT main)

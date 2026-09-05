@@ -83,6 +83,13 @@ void Car::move(double dt) {
 #endif
 }
 
+void Car::reset() {
+  _position_distance = _startLocation.dist;
+  _position_laneid = _startLocation.laneid;
+  _position_roadid = _startLocation.roadid;
+  _velocity = 0;
+}
+
 bool Car::_move_checkIntersection(double dt) {
   if (_position_distance + _minStoppingDist + _margin >
       _parentSim->getLane(_position_laneid).getLength()) {

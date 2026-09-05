@@ -18,7 +18,9 @@ Car::Car(Simulation& parent, size_t initRoad, size_t initLane, size_t initDist,
       _max_acceleration(max_a),
       _velocity(0.0),
       _minStoppingDist(0.0),
-      _margin(margin) {}
+      _margin(margin) {
+        _startLocation = location{initRoad, initLane, initDist};
+      }
 
 void Car::setDestination(const std::pair<size_t, double>& dest) {
   _current_destination = dest;

@@ -24,6 +24,12 @@ struct scheduleItem {
   size_t earliestLeaving;
 };
 
+struct location{
+  size_t roadid;
+  size_t laneid;
+  size_t dist;
+};
+
 class Car {
  public:
   Car();
@@ -31,6 +37,8 @@ class Car {
   void setDestination(const std::pair<size_t, double>& dest);
 
   void move(double dt);
+
+  void reset();
 
   void setRoute(const std::deque<size_t> &route);
   void recalcRoute();
@@ -87,4 +95,6 @@ class Car {
   // only valid during a merge
   size_t _newLaneMerge;
   double _newMergedDistance;
+
+  location _startLocation;
 };

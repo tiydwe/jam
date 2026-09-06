@@ -52,11 +52,5 @@ set(SFML_DIR "C:/c++/libaries/SFML-3.1.0/lib/cmake/SFML")
 find_package(SFML 3.1 COMPONENTS Graphics Window System Audio REQUIRED)
 target_link_libraries(main PRIVATE SFML::Graphics)
 
-if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-    if(MSVC)
-    target_compile_options(main PRIVATE /fsanitize=address /Zi)
-    target_link_options(main PRIVATE /fsanitize=address)
-    endif()
-endif()
 
 set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT main)

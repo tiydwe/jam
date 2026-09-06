@@ -1,6 +1,7 @@
 #include <random>
 
 #include "Car.h"
+#include "Layout.h"
 #include "Simulation.h"
 #include "utility.h"
 
@@ -18,9 +19,10 @@ bool Car::_mergeToNextLane(double dd) {
       // probally at destination
       return false;
     }
-    auto road = _parentSim->getRoad(_position_roadid);
+    auto road = _parentSim->getLayout()->getRoad(_position_roadid);
     int nextLane = road->closestLaneTo(
-        _position_laneid, _parentSim->getIntersection(road->getEndIntersection())
+        _position_laneid, _parentSim->getLayout()
+                              ->getIntersectionFromInternalID(road->getEndIntersection())
                               ->getTrafficLight()
                               ->whereToTurn(_route.front()));
     if (nextLane == _position_laneid) {

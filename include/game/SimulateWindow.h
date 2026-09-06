@@ -22,6 +22,8 @@ class SimulateWindow : public sf::Drawable, sf::Transformable{
 
   Simulation* getSimulation() const {return _s.get();}
   
+  void step(double trueDt);
+  void update(sf::RenderWindow& rw);
   virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const override;
 
   private:
@@ -40,10 +42,10 @@ class SimulateWindow : public sf::Drawable, sf::Transformable{
   double _zoomLevel = 1.0;
 
   sf::RectangleShape _topbar;
-  
-
 
   Button _slow;
   Button _mid;
   Button _fast;
+
+  double _timeMultiplier = 5.0;
 };

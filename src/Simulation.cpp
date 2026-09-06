@@ -8,10 +8,9 @@
 #include "Layout.h"
 #include "utility.h"
 
-
 std::unique_ptr<CarPhysical> createPhysicalFromDataFile(
-    std::unique_ptr<Car> car, RoadPhysical* roadPhysical,Simulation* simulation,
-    std::string dataFilename) {
+    std::unique_ptr<Car> car, RoadPhysical* roadPhysical,
+    Simulation* simulation, std::string dataFilename) {
   std::ifstream file(dataFilename);
   if (!file.is_open()) {
     utility::logErr("Error opening data filename " + dataFilename);
@@ -20,11 +19,16 @@ std::unique_ptr<CarPhysical> createPhysicalFromDataFile(
   std::string tmp;
   std::getline(file, tmp);
   std::getline(file, tmp);
-  return std::make_unique<CarPhysical>(simulation, std::move(car), roadPhysical, tmp);
+  return std::make_unique<CarPhysical>(simulation, std::move(car), roadPhysical,
+                                       tmp);
 }
 
 Simulation::Simulation(Layout* layout, std::string filepath, unsigned int seed)
     : _layout(layout), _time(0.0), _rng(seed) {
+  for (const auto& x : _layout->getLanes()) {
+    _simulationLanes.try_emplace(
+        x.first, std::move(std::make_unique<SimulationLane>(this, x.second)));
+  }
   std::ifstream file(filepath);
   if (!file.is_open()) {
     utility::logErr("Error opening game file! " + filepath);
@@ -46,11 +50,13 @@ Simulation::Simulation(Layout* layout, std::string filepath, unsigned int seed)
       if (lrs == 'l') {
         cp = std::make_unique<Car>(
             *this, _layout->getPhysicalRoad(start)->getInternalIDL(),
-            _layout->getPhysicalRoad(start)->getRoadL()->getEdgeLane(), initDist, maxa);
+            _layout->getPhysicalRoad(start)->getRoadL()->getEdgeLane(),
+            initDist, maxa);
       } else {
         cp = std::make_unique<Car>(
             *this, _layout->getPhysicalRoad(start)->getInternalIDR(),
-            _layout->getPhysicalRoad(start)->getRoadR()->getEdgeLane(), initDist, maxa);
+            _layout->getPhysicalRoad(start)->getRoadR()->getEdgeLane(),
+            initDist, maxa);
       }
       if (lre == 'l') {
         cp->setDestination(
@@ -61,8 +67,8 @@ Simulation::Simulation(Layout* layout, std::string filepath, unsigned int seed)
       }
       cp->recalcRoute();
       size_t oldid = cp->getID();
-      std::unique_ptr<CarPhysical> cpp = createPhysicalFromDataFile(std::move(cp), _layout->getPhysicalRoad(start), this,
-                                       datafilename);
+      std::unique_ptr<CarPhysical> cpp = createPhysicalFromDataFile(
+          std::move(cp), _layout->getPhysicalRoad(start), this, datafilename);
       _cars.try_emplace(oldid, std::move(cpp));
     } else if (type == "#") {
       continue;
@@ -95,7 +101,9 @@ std::deque<size_t> Simulation::findRoute(size_t startRoad, size_t endRoad) {
       break;
     }
     auto& outs =
-        getIntersection(getRoad(curr)->getEndIntersection())->getOutgoings();
+        _layout
+            ->getIntersectionFromInternalID(_layout->getRoad(curr)->getEndIntersection())
+            ->getOutgoings();
     for (const size_t nxt : outs) {
       if (visited.find(nxt) == visited.end()) {
         visited.insert(nxt);
@@ -108,6 +116,11 @@ std::deque<size_t> Simulation::findRoute(size_t startRoad, size_t endRoad) {
   size_t curr = endRoad;
   while (curr != startRoad) {
     res.push_front(curr);
+    if (prev[curr] == curr) {
+      // uh oh
+      utility::logWarn("Simulation::findRoute - Route not found!");
+      return {};
+    }
     curr = prev[curr];
   }
   return res;
@@ -128,9 +141,6 @@ Car* Simulation::getCar(size_t id) const {
   return _cars.at(id)->getCar();
 }
 
-Intersection* Simulation::getIntersection(size_t id) const {
-  return _layout->getIntersection(id);
-}
 
 SimulationLane* Simulation::getLane(size_t id) const {
 #ifdef DEBUG
@@ -143,7 +153,6 @@ SimulationLane* Simulation::getLane(size_t id) const {
   return _simulationLanes.at(id).get();
 }
 
-Road* Simulation::getRoad(size_t id) const { return _layout->getRoad(id); }
 
 double Simulation::getTime() { return _time; }
 

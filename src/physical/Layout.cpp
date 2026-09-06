@@ -23,9 +23,11 @@ Layout::Layout(std::string filepath) {
       size_t id;
       ss >> id >> pos.x >> pos.y;
       std::unique_ptr<Intersection> i = std::make_unique<Intersection>(this);
+      size_t internalid = i->getID();
       std::unique_ptr<IntersectionPhysical> ip =
           std::make_unique<IntersectionPhysical>(std::move(i), pos);
       _physicalIntersections.try_emplace(id, std::move(ip));
+      _intersections.try_emplace(internalid, _physicalIntersections.at(id)->getIntersection());
     } else if (type == "#") {
       continue;
     } else {
@@ -113,6 +115,14 @@ void Layout::addRoad(std::unique_ptr<RoadPhysical> road) {
   _roads.try_emplace(road->getInternalIDL(), road->getRoadL());
   _roads.try_emplace(road->getInternalIDR(), road->getRoadR());
   _physicalRoads.try_emplace(road->getID(), std::move(road));
+}
+
+std::map<size_t, Lane*> Layout::getLanes() const {
+  std::map<size_t, Lane*> res;
+  for(const auto& x : _lanes){
+    res.try_emplace(x.first, x.second.get());
+  }
+  return res;
 }
 
 RoadPhysical* Layout::getPhysicalRoadFromInternalID(size_t id) {

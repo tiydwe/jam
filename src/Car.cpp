@@ -3,6 +3,7 @@
 #include <algorithm>
 
 #include "Simulation.h"
+#include "Layout.h"
 #include "utility.h"
 
 void Car::move(double dt) {
@@ -71,7 +72,7 @@ void Car::move(double dt) {
   }
 
 #ifdef DEBUG
-//*
+/*
   if (_status != carStatus::ARRIVED) {
     utility::log(std::to_string(_id) + " - Moved to " +
                  std::to_string(_position_distance) + " on road " +
@@ -111,9 +112,9 @@ bool Car::_move_checkIntersection(double dt) {
       // fix
       _route.pop_front();
     }
-    const auto road = _parentSim->getRoad(_route.front());
-    auto intersection = _parentSim->getIntersection(
-        _parentSim->getRoad(_position_roadid)->getEndIntersection());
+    const auto road = _parentSim->getLayout()->getRoad(_route.front());
+    auto intersection = _parentSim->getLayout()->getIntersectionFromInternalID(
+        _parentSim->getLayout()->getRoad(_position_roadid)->getEndIntersection());
     int laneid = intersection->getTrafficLight()->getLaneCanTurnOnRoad(
         _position_laneid, road->getID(), _parentSim->getTime());
     if (laneid != -1) {

@@ -39,9 +39,12 @@ bool Button::update(const sf::RenderWindow& window) {
   sf::Vector2f position{(float)posI.x, (float)posI.y};
   bool mouseover = sf::FloatRect(_start, _size).contains(position);
   if (!mouseover) {
+    _shape.setFillColor(_normal);
     _isPressed = false;
   } else {
+    _shape.setFillColor(_hover);
     if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)) {
+      _shape.setFillColor(_click);
       if (!_isPressed) {
         _isPressed = true;
         _onclick(_game);

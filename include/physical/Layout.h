@@ -24,17 +24,20 @@ class Layout : public sf::Drawable, sf::Transformable {
   Road* getRoad(size_t id) const { return _roads.at(id); }
   RoadPhysical* getPhysicalRoad(size_t id) const {return _physicalRoads.at(id).get();}
   Lane* getLane(size_t id) const { return _lanes.at(id).get(); }
-  Intersection* getIntersection(size_t id) const {
-    return _intersections.at(id).get();
+  std::map<size_t, Lane*> getLanes() const;
+  IntersectionPhysical* getIntersection(size_t id) const {
+    return _physicalIntersections.at(id).get();
   }
+  Intersection* getIntersectionFromInternalID(size_t id)const{ return _intersections.at(id); }
   RoadPhysical* getPhysicalRoadFromInternalID(size_t id);
+  
 
   virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const override;
 
  private:
   std::map<size_t, std::unique_ptr<Lane>> _lanes;
   std::map<size_t, Road*> _roads;
-  std::map<size_t, std::unique_ptr<Intersection>> _intersections;
+  std::map<size_t, Intersection*> _intersections;
 
   // id is NOT the same as logical ids
   std::map<size_t, std::unique_ptr<RoadPhysical>> _physicalRoads;

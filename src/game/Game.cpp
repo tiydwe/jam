@@ -17,13 +17,17 @@ Game::Game(std::string filepath) {
   std::getline(file, tmp);
   std::unique_ptr<Layout> layout = std::make_unique<Layout>(tmp);
   std::getline(file, carSetupFilepath);
-  _editor = std::make_unique<EditorWindow>(std::move(layout), this, EditorRenderWindow.getSize());
+  EditorRenderWindow = sf::RenderWindow(sf::VideoMode({600, 500}), "JAM");
+  _editor = std::make_unique<EditorWindow>(std::move(layout), this,
+                                           EditorRenderWindow.getSize());
 }
 
 void Game::beginSimulation() {
   if (simulating) {
     return;
   }
+  SimulationRenderWindow =
+      sf::RenderWindow(sf::VideoMode({600, 500}), "JAM - Simulation");
   _simulation = std::make_unique<SimulateWindow>(
       _editor->getLayout(), this, carSetupFilepath,
       SimulationRenderWindow.getSize());
@@ -31,21 +35,24 @@ void Game::beginSimulation() {
 }
 
 void Game::run() {
-  EditorRenderWindow = sf::RenderWindow(sf::VideoMode({600, 500}), "JAM");
   lastTickTime = clk.getElapsedTime();
   while (EditorRenderWindow.isOpen()) {
     if (simulating) {
       while (const std::optional event = SimulationRenderWindow.pollEvent()) {
         if (event->is<sf::Event::Closed>()) {
           _simulation.reset();
+          SimulationRenderWindow.close();
           simulating = false;
         }
         _simulation->handleEvent(*event, SimulationRenderWindow);
       }
+      if(!simulating){
+        continue;
+      }
       sf::Time nex = clk.getElapsedTime();
-      _simulation->getSimulation()->step(
-          std::min((nex - lastTickTime).asSeconds(), clampTime) *
-          timeMultiplier);
+      _simulation->step(
+          std::min((nex - lastTickTime).asSeconds(), clampTime));
+      _simulation->update(SimulationRenderWindow);
       lastTickTime = nex;
       SimulationRenderWindow.clear();
       SimulationRenderWindow.draw(*_simulation.get());
@@ -59,8 +66,9 @@ void Game::run() {
         }
         _editor->handleEvent(*event, EditorRenderWindow);
       }
+      _editor->update(EditorRenderWindow);
       EditorRenderWindow.clear();
-      EditorRenderWindow.draw(*_editor->getLayout());
+      EditorRenderWindow.draw(*_editor.get());
       EditorRenderWindow.display();
     }
   }

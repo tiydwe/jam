@@ -22,7 +22,7 @@ CarPhysical::CarPhysical(Simulation* game, std::unique_ptr<Car> car,
 void CarPhysical::move(double dt) {
   _car->move(dt);
   _road = _game->getLayout()->getPhysicalRoadFromInternalID(
-      _car->getParentSim()->getRoad(_car->getCurrRoad())->getID());
+      _car->getParentSim()->getLayout()->getRoad(_car->getCurrRoad())->getID());
   _base.setPosition(_road->getPhysicalPosition(
       _car->getCurrRoad(), _car->getCurrLane(), _car->getCurrDistFrac()));
 }

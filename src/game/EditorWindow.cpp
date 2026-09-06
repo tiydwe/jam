@@ -18,7 +18,7 @@ EditorWindow::EditorWindow(std::unique_ptr<Layout> l, Game* g, sf::Vector2u wind
   _uiview.setCenter({windowSize.x / 2.f, windowSize.y / 2.f});
 
   _topbar.setSize({(float)windowSize.x, 60.2f});
-  _topbar.setFillColor(sf::Color::Blue);
+  _topbar.setFillColor(sf::Color::Yellow);
   _topbar.setPosition({0.f, 0.f});
 
   _simulateButton.setOnclick([&](Game* game) { this->onclickSimulate(game); });
@@ -69,6 +69,10 @@ void EditorWindow::updateWindowSize(sf::Vector2f newSize) {
   _uiview.setSize(newSize);
   _uiview.setCenter({newSize.x / 2, newSize.y / 2});
   _topbar.setSize({newSize.x, 60.f});
+}
+
+void EditorWindow::update(sf::RenderWindow& rw) {
+  _simulateButton.update(rw);
 }
 
 void EditorWindow::draw(sf::RenderTarget& target,

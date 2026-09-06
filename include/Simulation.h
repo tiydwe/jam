@@ -35,10 +35,8 @@ class Simulation : public sf::Drawable, sf::Transformable{
 
   void addCar(std::unique_ptr<CarPhysical> car);
 
-  Car* getCar(size_t id) const;
-  Intersection* getIntersection(size_t id) const;
   SimulationLane* getLane(size_t id) const;
-  Road* getRoad(size_t id) const;
+  Car* getCar(size_t id) const;
   Layout* getLayout() const {return _layout;}
   double getTime();
 

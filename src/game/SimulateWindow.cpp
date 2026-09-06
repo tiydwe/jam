@@ -23,7 +23,11 @@ SimulateWindow::SimulateWindow(Layout* l, Game* g,std::string filename, sf::Vect
   _topbar.setSize({(float)windowSize.x, 60.2f});
   _topbar.setFillColor(sf::Color::Blue);
   _topbar.setPosition({0.f, 0.f});
-
+  
+  _slow.setOnclick([&](Game* gm){_timeMultiplier = 5.0;});
+  _mid.setOnclick([&](Game* gm){_timeMultiplier = 8.0;});
+  _fast.setOnclick([&](Game* gm){_timeMultiplier = 12.0;});
+  
 }
 
 void SimulateWindow::handleEvent(const sf::Event& event,
@@ -69,11 +73,22 @@ void SimulateWindow::updateWindowSize(sf::Vector2f newSize) {
   _topbar.setSize({newSize.x, 60.f});
 }
 
+void SimulateWindow::step(double trueDt) {
+  _s->step(trueDt * _timeMultiplier);
+}
+
+void SimulateWindow::update(sf::RenderWindow& rw) {
+  _slow.update(rw);
+  _mid.update(rw);
+  _fast.update(rw);
+}
+
 void SimulateWindow::draw(sf::RenderTarget& target,
                         sf::RenderStates states) const {
   sf::View origional = target.getView();
   target.setView(_worldview);
   _l->draw(target, states);
+  _s->draw(target, states);
   target.setView(_uiview);
   target.draw(_topbar, states);
   target.draw(_slow, states);

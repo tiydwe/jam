@@ -1,5 +1,7 @@
 #pragma once
 
+#include <memory>
+#include <utility>
 #include <vector>
 
 #include "Road.h"
@@ -25,8 +27,9 @@ class RoadPhysical : public sf::Drawable, sf::Transformable {
 
   RoadPhysical(RoadPhysical&&) = delete;
   RoadPhysical& operator=(RoadPhysical&&) = delete;
-  RoadPhysical(Road* road, Road* roadb, RoadAsset roadData,
-               sf::Vector2<float> start, sf::Vector2<float> end);
+  RoadPhysical(size_t id, std::unique_ptr<Road> road, std::unique_ptr<Road> roadb,
+               RoadAsset roadData, sf::Vector2<float> start,
+               sf::Vector2<float> end);
 
   void draw(sf::RenderTarget& target, sf::RenderStates states) const override;
 
@@ -37,12 +40,16 @@ class RoadPhysical : public sf::Drawable, sf::Transformable {
   sf::Vector2<float> getEnd() const { return _end; }
   size_t getInternalIDL() const { return _roadb->getID(); }
   size_t getInternalIDR() const { return _road->getID(); }
+  Road* getRoadR() const { return _road.get(); }
+  Road* getRoadL() const { return _roadb.get(); }
+  size_t getID() const {return _id;}
 
  private:
+  size_t _id;
   // on right side of road from start to end
-  const Road* _road = nullptr;
+  std::unique_ptr<Road> _road;
   // on left side from start to end
-  const Road* _roadb = nullptr;
+  std::unique_ptr<Road> _roadb;
   RoadAsset _roadData;
   sf::Texture _texture;
   sf::Sprite _base;

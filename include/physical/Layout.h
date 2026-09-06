@@ -1,0 +1,43 @@
+#pragma once
+
+#include <map>
+#include <memory>
+#include <string>
+#include <utility>
+
+#include "Car.h"
+#include "IntersectionPhysical.h"
+#include "Lane.h"
+#include "Road.h"
+#include "RoadPhysical.h"
+#include "utility.h"
+
+#include <SFML/Graphics.hpp>
+
+class Layout : public sf::Drawable, sf::Transformable {
+ public:
+  Layout(std::string filename);
+  ~Layout();
+
+  void addRoad(std::unique_ptr<RoadPhysical> road);
+
+  Road* getRoad(size_t id) const { return _roads.at(id); }
+  RoadPhysical* getPhysicalRoad(size_t id) const {return _physicalRoads.at(id).get();}
+  Lane* getLane(size_t id) const { return _lanes.at(id).get(); }
+  Intersection* getIntersection(size_t id) const {
+    return _intersections.at(id).get();
+  }
+  RoadPhysical* getPhysicalRoadFromInternalID(size_t id);
+
+  virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const override;
+
+ private:
+  std::map<size_t, std::unique_ptr<Lane>> _lanes;
+  std::map<size_t, Road*> _roads;
+  std::map<size_t, std::unique_ptr<Intersection>> _intersections;
+
+  // id is NOT the same as logical ids
+  std::map<size_t, std::unique_ptr<RoadPhysical>> _physicalRoads;
+  std::map<size_t, std::unique_ptr<IntersectionPhysical>>
+      _physicalIntersections;
+};

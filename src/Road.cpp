@@ -3,7 +3,7 @@
 #include <algorithm>
 #include <cmath>
 
-#include "Simulation.h"
+#include "Layout.h"
 #include "utility.h"
 
 Road::Road() {
@@ -11,8 +11,8 @@ Road::Road() {
       "This should never be called (probally something messed up in map!)");
 }
 
-Road::Road(Simulation& parent, double speedLimit, size_t endIntersection, double angle)
-    : _parent(&parent),
+Road::Road(Layout* parent, double speedLimit, size_t endIntersection, double angle)
+    : _parent(parent),
       _id(utility::uid()),
       _speed_limit(speedLimit),
       _endIntersection(endIntersection),

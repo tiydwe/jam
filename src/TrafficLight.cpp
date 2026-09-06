@@ -6,19 +6,20 @@
 
 #include "Simulation.h"
 #include "utility.h"
+#include "Layout.h"
 
-RoadWrapper::RoadWrapper(Simulation& s, size_t roadid)
-    : _parent(&s), _roadid(roadid) {}
+RoadWrapper::RoadWrapper(Layout* s, size_t roadid)
+    : _parent(s), _roadid(roadid) {}
 
 bool RoadWrapper::operator<(const RoadWrapper& r) const {
-  return _parent->getRoad(_roadid).getAngle() <
-         _parent->getRoad(r.getRoadID()).getAngle();
+  return _parent->getRoad(_roadid)->getAngle() <
+         _parent->getRoad(r.getRoadID())->getAngle();
 }
 
-TrafficLight::TrafficLight(Simulation& s) : _parent(&s), _totalLanes(0) {}
+TrafficLight::TrafficLight(Layout* s) : _parent(s), _totalLanes(0) {}
 
 bool TrafficLight::addIngoing(size_t roadid) {
-  if (_totalLanes + _parent->getRoad(roadid).getNumLanes() > MAX_LANES) {
+  if (_totalLanes + _parent->getRoad(roadid)->getNumLanes() > MAX_LANES) {
     utility::logWarn("TrafficLight::addIngoing - max lanes reached");
     return false;
   }
@@ -37,13 +38,13 @@ bool TrafficLight::addIngoing(size_t roadid) {
     return false;
   }
 #endif
-  _ingoingRoads.insert(RoadWrapper(*_parent, roadid));
-  _totalLanes += _parent->getRoad(roadid).getNumLanes();
+  _ingoingRoads.insert(RoadWrapper(_parent, roadid));
+  _totalLanes += _parent->getRoad(roadid)->getNumLanes();
   return true;
 }
 
 bool TrafficLight::addOutgoing(size_t roadid) {
-  if (_totalLanes + _parent->getRoad(roadid).getNumLanes() > MAX_LANES) {
+  if (_totalLanes + _parent->getRoad(roadid)->getNumLanes() > MAX_LANES) {
     utility::logWarn("TrafficLight::addOutgoing - max lanes reached");
     return false;
   }
@@ -62,8 +63,8 @@ bool TrafficLight::addOutgoing(size_t roadid) {
     return false;
   }
 #endif
-  _outgoingRoads.insert(RoadWrapper(*_parent, roadid));
-  _totalLanes += _parent->getRoad(roadid).getNumLanes();
+  _outgoingRoads.insert(RoadWrapper(_parent, roadid));
+  _totalLanes += _parent->getRoad(roadid)->getNumLanes();
   return true;
 }
 
@@ -92,8 +93,8 @@ void TrafficLight::removeRoad(size_t roadid) {
   }
   for (ScheduleItem& si : _schedule) {
     for (const auto& [path, light] : si.valid) {
-      if (_parent->getLane(path.first).getRoad() == roadid ||
-          _parent->getLane(path.second).getRoad() == roadid) {
+      if (_parent->getLane(path.first)->getRoad() == roadid ||
+          _parent->getLane(path.second)->getRoad() == roadid) {
         si.valid.erase(path);
       }
     }
@@ -134,7 +135,7 @@ std::vector<size_t> TrafficLight::whereToTurn(size_t roadid) {
   std::vector<size_t> res;
   for (const ScheduleItem& s : _schedule) {
     for (const auto& [path, light] : s.valid) {
-      if (_parent->getLane(path.second).getRoad() == roadid && light == Lights::GREEN) {
+      if (_parent->getLane(path.second)->getRoad() == roadid && light == Lights::GREEN) {
         res.push_back(path.first);
       }
     }
@@ -154,7 +155,7 @@ int TrafficLight::getLaneCanTurnOnRoad(size_t laneidSource,
   size_t currScheduleItem = timeToScheduleItem(time);
   for (const auto& [path, light] : _schedule[currScheduleItem].valid) {
     if (path.first == laneidSource &&
-        _parent->getLane(path.second).getRoad() == roadidTarget &&
+        _parent->getLane(path.second)->getRoad() == roadidTarget &&
       light == Lights::GREEN) {
       return path.second;
     }
@@ -166,15 +167,15 @@ void TrafficLight::reSchedule(double greenPhaseTime, double yellowPhaseTime) {
   _schedule.clear();
   size_t numOutgoing = 0;
   for (RoadWrapper rw : _outgoingRoads) {
-    numOutgoing += _parent->getRoad(rw.getRoadID()).getNumLanes();
+    numOutgoing += _parent->getRoad(rw.getRoadID())->getNumLanes();
   }
   for (RoadWrapper rw : _ingoingRoads) {
     ScheduleItem greenPhase;
     ScheduleItem yellowPhase;
     greenPhase.duration = greenPhaseTime;
     yellowPhase.duration = yellowPhaseTime;
-    auto lanes = _parent->getRoad(rw.getRoadID()).getLanes();
-    size_t numIn = _parent->getRoad(rw.getRoadID()).getNumLanes();
+    auto lanes = _parent->getRoad(rw.getRoadID())->getLanes();
+    size_t numIn = _parent->getRoad(rw.getRoadID())->getNumLanes();
     size_t baseLanesPerLane = numOutgoing / numIn;
     int extra = numOutgoing - baseLanesPerLane * numIn;
     // this is probally the worst way to move current lane and remaining lanes
@@ -185,7 +186,7 @@ void TrafficLight::reSchedule(double greenPhaseTime, double yellowPhaseTime) {
     // i love making hard-to-maintain codebases
     int remainingLanes = baseLanesPerLane + (extra --> 0 ? 1 : 0);
     for (RoadWrapper rwo : _outgoingRoads) {
-      for (size_t lane : _parent->getRoad(rwo.getRoadID()).getLanes()) {
+      for (size_t lane : _parent->getRoad(rwo.getRoadID())->getLanes()) {
         if (remainingLanes-- > 0) {
           greenPhase.valid[{currentLane, lane}] = Lights::GREEN;
           yellowPhase.valid[{currentLane, lane}] = Lights::YELLOW;
@@ -214,9 +215,9 @@ void TrafficLight::normalizeSchedule() {
     // ingoing -> outgoing and outgoing -> ingoing
     for (RoadWrapper rwi : _ingoingRoads) {
       for (RoadWrapper rwo : _outgoingRoads) {
-        for (const size_t& la : _parent->getRoad(rwi.getRoadID()).getLanes()) {
+        for (const size_t& la : _parent->getRoad(rwi.getRoadID())->getLanes()) {
           for (const size_t& lb :
-               _parent->getRoad(rwo.getRoadID()).getLanes()) {
+               _parent->getRoad(rwo.getRoadID())->getLanes()) {
             si.valid[{lb, la}] = Lights::INVALID;
             if (si.valid.find({la, lb}) == si.valid.end()) {
               si.valid[{la, lb}] = Lights::RED;
@@ -228,9 +229,9 @@ void TrafficLight::normalizeSchedule() {
     // ingoing -> ingoing
     for (RoadWrapper rwi : _ingoingRoads) {
       for (RoadWrapper rwi2 : _ingoingRoads) {
-        for (const size_t& la : _parent->getRoad(rwi.getRoadID()).getLanes()) {
+        for (const size_t& la : _parent->getRoad(rwi.getRoadID())->getLanes()) {
           for (const size_t& lb :
-               _parent->getRoad(rwi2.getRoadID()).getLanes()) {
+               _parent->getRoad(rwi2.getRoadID())->getLanes()) {
             si.valid[{lb, la}] = Lights::INVALID;
             si.valid[{la, lb}] = Lights::INVALID;
           }
@@ -240,9 +241,9 @@ void TrafficLight::normalizeSchedule() {
     // outgoing -> outgoing
     for (RoadWrapper rwo : _outgoingRoads) {
       for (RoadWrapper rwo2 : _outgoingRoads) {
-        for (const size_t& la : _parent->getRoad(rwo.getRoadID()).getLanes()) {
+        for (const size_t& la : _parent->getRoad(rwo.getRoadID())->getLanes()) {
           for (const size_t& lb :
-               _parent->getRoad(rwo2.getRoadID()).getLanes()) {
+               _parent->getRoad(rwo2.getRoadID())->getLanes()) {
             si.valid[{lb, la}] = Lights::INVALID;
             si.valid[{la, lb}] = Lights::INVALID;
           }

@@ -10,12 +10,14 @@ Lane::Lane() {
       "This should never be called (probally something messed up in map!)");
 }
 
-Lane::Lane(Simulation& parent, double length, size_t road)
-    : _parent(&parent), _id(utility::uid()), _length(length), _roadid(road) {}
+Lane::Lane(Layout* parent, double length, size_t road)
+    : _parent(parent), _id(utility::uid()), _length(length), _roadid(road) {}
 
-std::pair<double, size_t> Lane::minDistance() {
+SimulationLane::SimulationLane(Simulation* parentSim, Lane* lane) : _lane(lane), _parentSim(parentSim) {}
+
+std::pair<double, size_t> SimulationLane::minDistance() {
   if (_cars.size() == 0) {
-    return std::make_pair<double, size_t>(2 * this->_length, -1);
+    return std::make_pair<double, size_t>(2 * this->_lane->getLength(), -1);
   }
   return (*std::min_element(_cars.begin(), _cars.end(),
                             [](const std::pair<double, size_t>& lhs,
@@ -24,10 +26,10 @@ std::pair<double, size_t> Lane::minDistance() {
                             }));
 }
 
-std::pair<double, size_t> Lane::minDistance(size_t carid) {
+std::pair<double, size_t> SimulationLane::minDistance(size_t carid) {
   std::pair<double, size_t> res{-1.0, -1};
   for (const auto& car : _cars) {
-    if (car.second != carid && car.first > _parent->getCar(carid).getDistance()) {
+    if (car.second != carid && car.first > _parentSim->getCar(carid)->getDistance()) {
       if (res.first == -1) {
         res = car;
       } else {
@@ -38,7 +40,7 @@ std::pair<double, size_t> Lane::minDistance(size_t carid) {
   return res;
 }
 
-void Lane::removeCar(size_t car) {
+void SimulationLane::removeCar(size_t car) {
   for (auto it = _cars.begin(); it < _cars.end();) {
     if (it->second == car) {
       it =  _cars.erase(it);
@@ -48,7 +50,7 @@ void Lane::removeCar(size_t car) {
   }
 }
 
-void Lane::moveCar(double newDist, size_t car) {
+void SimulationLane::moveCar(double newDist, size_t car) {
   for (auto it = _cars.begin(); it < _cars.end();) {
     if (it->second == car) {
       it->first = newDist;

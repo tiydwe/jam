@@ -25,25 +25,20 @@ target_sources(main PRIVATE
     src/Simulation.cpp
     src/utility.cpp
     src/TrafficLight.cpp
-    src/Game.cpp
+    src/game/Game.cpp
+    src/game/EditorWindow.cpp
+    src/game/SimulateWindow.cpp
+    src/physical/Layout.cpp
     src/physical/RoadPhysical.cpp
     src/physical/CarPhysical.cpp
     src/physical/IntersectionPhysical.cpp
-    include/Car.h
-    include/Intersection.h
-    include/Lane.h
-    include/Road.h
-    include/Simulation.h
-    include/utility.h
-    include/TrafficLight.h
-    include/Game.h
-    include/physical/RoadPhysical.h
-    include/physical/CarPhysical.h
-    include/physical/IntersectionPhysical.h
+    src/ui/Button.cpp
 ) 
 target_include_directories(main PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/include")
+target_include_directories(main PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/include/game")
+target_include_directories(main PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/include/ui")
 target_include_directories(main PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/include/physical")
-target_include_directories(main PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/src/physical")
+#target_include_directories(main PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/src/physical")
 target_include_directories(main PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/test")
 add_custom_command(
     TARGET main POST_BUILD
@@ -56,5 +51,12 @@ target_compile_features(main PRIVATE cxx_std_17)
 set(SFML_DIR "C:/c++/libaries/SFML-3.1.0/lib/cmake/SFML")
 find_package(SFML 3.1 COMPONENTS Graphics Window System Audio REQUIRED)
 target_link_libraries(main PRIVATE SFML::Graphics)
+
+if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+    if(MSVC)
+    target_compile_options(main PRIVATE /fsanitize=address /Zi)
+    target_link_options(main PRIVATE /fsanitize=address)
+    endif()
+endif()
 
 set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT main)

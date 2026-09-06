@@ -1,33 +1,82 @@
 #include "Simulation.h"
 
+#include <fstream>
+#include <istream>
+#include <sstream>
 #include <unordered_set>
 
+#include "Layout.h"
 #include "utility.h"
 
-Simulation::Simulation(unsigned int seed) : _time(0.0), _rng(seed) {}
 
-Simulation::~Simulation() {
-  for(const auto& x : _cars){
-    delete x.second;
+std::unique_ptr<CarPhysical> createPhysicalFromDataFile(
+    std::unique_ptr<Car> car, RoadPhysical* roadPhysical,Simulation* simulation,
+    std::string dataFilename) {
+  std::ifstream file(dataFilename);
+  if (!file.is_open()) {
+    utility::logErr("Error opening data filename " + dataFilename);
+    return nullptr;
   }
-  _cars.clear();
-  for(const auto& x : _roads){
-    delete x.second;
-  }
-  _cars.clear();
-  for(const auto& x : _intersections){
-    delete x.second;
-  }
-  _cars.clear();
-  for(const auto& x : _lanes){
-    delete x.second;
-  }
-  _cars.clear();
+  std::string tmp;
+  std::getline(file, tmp);
+  std::getline(file, tmp);
+  return std::make_unique<CarPhysical>(simulation, std::move(car), roadPhysical, tmp);
 }
+
+Simulation::Simulation(Layout* layout, std::string filepath, unsigned int seed)
+    : _layout(layout), _time(0.0), _rng(seed) {
+  std::ifstream file(filepath);
+  if (!file.is_open()) {
+    utility::logErr("Error opening game file! " + filepath);
+    return;
+  }
+  std::string tmp;
+  while (std::getline(file, tmp)) {
+    std::stringstream ss(tmp);
+    std::string type;
+    ss >> type;
+    if (type == "C") {
+      size_t start, end;
+      char lrs, lre;
+      double initDist, finDist, maxa;
+      std::string datafilename;
+      ss >> datafilename >> start >> lrs >> end >> lre >> initDist >> finDist >>
+          maxa;
+      std::unique_ptr<Car> cp;
+      if (lrs == 'l') {
+        cp = std::make_unique<Car>(
+            *this, _layout->getPhysicalRoad(start)->getInternalIDL(),
+            _layout->getPhysicalRoad(start)->getRoadL()->getEdgeLane(), initDist, maxa);
+      } else {
+        cp = std::make_unique<Car>(
+            *this, _layout->getPhysicalRoad(start)->getInternalIDR(),
+            _layout->getPhysicalRoad(start)->getRoadR()->getEdgeLane(), initDist, maxa);
+      }
+      if (lre == 'l') {
+        cp->setDestination(
+            {_layout->getPhysicalRoad(end)->getInternalIDL(), finDist});
+      } else {
+        cp->setDestination(
+            {_layout->getPhysicalRoad(end)->getInternalIDR(), finDist});
+      }
+      cp->recalcRoute();
+      size_t oldid = cp->getID();
+      std::unique_ptr<CarPhysical> cpp = createPhysicalFromDataFile(std::move(cp), _layout->getPhysicalRoad(start), this,
+                                       datafilename);
+      _cars.try_emplace(oldid, std::move(cpp));
+    } else if (type == "#") {
+      continue;
+    } else {
+      break;
+    }
+  }
+}
+
+Simulation::~Simulation() {}
 
 void Simulation::step(double dt) {
   _time += dt;
-  for(auto& [id, car] : _cars){
+  for (auto& [id, car] : _cars) {
     car->move(dt);
   }
 }
@@ -39,15 +88,16 @@ std::deque<size_t> Simulation::findRoute(size_t startRoad, size_t endRoad) {
   q.push_back(startRoad);
   std::unordered_set<size_t> visited;
   visited.insert(startRoad);
-  while(!q.empty()){
+  while (!q.empty()) {
     size_t curr = q.front();
     q.pop_front();
-    if(curr == endRoad){
+    if (curr == endRoad) {
       break;
     }
-    auto& outs = getIntersection(getRoad(curr).getEndIntersection()).getOutgoings();
-    for(const size_t nxt : outs){
-      if(visited.find(nxt) == visited.end()){
+    auto& outs =
+        getIntersection(getRoad(curr)->getEndIntersection())->getOutgoings();
+    for (const size_t nxt : outs) {
+      if (visited.find(nxt) == visited.end()) {
         visited.insert(nxt);
         prev[nxt] = curr;
         q.push_back(nxt);
@@ -56,59 +106,18 @@ std::deque<size_t> Simulation::findRoute(size_t startRoad, size_t endRoad) {
   }
   std::deque<size_t> res;
   size_t curr = endRoad;
-  while(curr != startRoad){
+  while (curr != startRoad) {
     res.push_front(curr);
     curr = prev[curr];
   }
   return res;
 }
 
-void Simulation::addCar(Car* car) {
-#ifdef DEBUG
-  if (_cars.find(car->getID()) != _cars.end()) {
-    utility::logWarn("While trying to addCar, id " +
-                     std::to_string(car->getID()) + " already existed.");
-    utility::exit();
-  }
-#endif
-  _cars.try_emplace(car->getID(), car);
+void Simulation::addCar(std::unique_ptr<CarPhysical> car) {
+  _cars.try_emplace(car->getCar()->getID(), std::move(car));
 }
 
-void Simulation::addIntersection(Intersection* intersection) {
-#ifdef DEBUG
-  if (_intersections.find(intersection->getID()) != _intersections.end()) {
-    utility::logWarn("While trying to addIntersection, id " +
-                     std::to_string(intersection->getID()) +
-                     " already existed.");
-    utility::exit();
-  }
-#endif
-  _intersections.try_emplace(intersection->getID(), intersection);
-}
-
-void Simulation::addLane(Lane* lane) {
-#ifdef DEBUG
-  if (_lanes.find(lane->getID()) != _lanes.end()) {
-    utility::logWarn("While trying to addLane, id " +
-                     std::to_string(lane->getID()) + " already existed.");
-    utility::exit();
-  }
-#endif
-  _lanes.try_emplace(lane->getID(), lane);
-}
-
-void Simulation::addRoad(Road* road) {
-#ifdef DEBUG
-  if (_roads.find(road->getID()) != _roads.end()) {
-    utility::logWarn("While trying to addRoad, id " +
-                     std::to_string(road->getID()) + " already existed.");
-    utility::exit();
-  }
-#endif
-  _roads.try_emplace(road->getID(), road);
-}
-
-Car& Simulation::getCar(size_t id) {
+Car* Simulation::getCar(size_t id) const {
 #ifdef DEBUG
   if (_cars.find(id) == _cars.end()) {
     utility::logErr("While trying to getCar, id " + std::to_string(id) +
@@ -116,44 +125,34 @@ Car& Simulation::getCar(size_t id) {
     utility::exit();
   }
 #endif
-  return *_cars[id];
+  return _cars.at(id)->getCar();
 }
 
-Intersection& Simulation::getIntersection(size_t id) {
-#ifdef DEBUG
-  if (_intersections.find(id) == _intersections.end()) {
-    utility::logErr("While trying to getIntersection, id " +
-                    std::to_string(id) + " was not found.");
-    utility::exit();
-  }
-#endif
-  return *_intersections.at(id);
+Intersection* Simulation::getIntersection(size_t id) const {
+  return _layout->getIntersection(id);
 }
 
-Lane& Simulation::getLane(size_t id) {
+SimulationLane* Simulation::getLane(size_t id) const {
 #ifdef DEBUG
-  if (_lanes.find(id) == _lanes.end()) {
+  if (_simulationLanes.find(id) == _simulationLanes.end()) {
     utility::logErr("While trying to getLane, id " + std::to_string(id) +
                     " was not found.");
     utility::exit();
   }
 #endif
-  return *_lanes[id];
+  return _simulationLanes.at(id).get();
 }
 
-Road& Simulation::getRoad(size_t id) {
-#ifdef DEBUG
-  if (_roads.find(id) == _roads.end()) {
-    utility::logErr("While trying to getRoad, id " + std::to_string(id) +
-                    " was not found.");
-    utility::exit();
-  }
-#endif
-  return *_roads[id];
-}
+Road* Simulation::getRoad(size_t id) const { return _layout->getRoad(id); }
 
 double Simulation::getTime() { return _time; }
 
-std::mt19937& Simulation::getRNG() {
-  return _rng;
+std::mt19937& Simulation::getRNG() { return _rng; }
+
+void Simulation::draw(sf::RenderTarget& target, sf::RenderStates states) const {
+  states.transform *= getTransform();
+  _layout->draw(target, states);
+  for (const auto& x : _cars) {
+    x.second->draw(target, states);
+  }
 }

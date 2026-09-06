@@ -6,11 +6,12 @@
 
 #include <algorithm>
 
+#include "Layout.h"
 
-Intersection::Intersection(Simulation& parent)
-  : _parent(&parent),
+Intersection::Intersection(Layout* parent)
+  : _parent(parent),
     _id(utility::uid()),
-    _trafficLight(TrafficLight(*_parent)) {}
+    _trafficLight(std::make_unique<TrafficLight>(TrafficLight(_parent))) {}
 
 Lights Intersection::getLightByLaneID(size_t laneid) const {
   // for now, always green
@@ -19,7 +20,7 @@ Lights Intersection::getLightByLaneID(size_t laneid) const {
 
 void Intersection::addOutgoing(size_t road_id) {
   _outgoings.push_back(road_id);
-  _trafficLight.addOutgoing(road_id);
+  _trafficLight->addOutgoing(road_id);
 }
 
 void Intersection::removeOutgoing(size_t roadid) {
@@ -30,13 +31,13 @@ void Intersection::removeOutgoing(size_t roadid) {
   else{
     _outgoings.erase(it);
   }
-  _trafficLight.removeRoad(roadid);
+  _trafficLight->removeRoad(roadid);
 }
 
 void Intersection::addIngoing(size_t roadid) {
-  _trafficLight.addIngoing(roadid);
+  _trafficLight->addIngoing(roadid);
 }
 
 void Intersection::removeIngoing(size_t roadid) {
-  _trafficLight.removeRoad(roadid);
+  _trafficLight->removeRoad(roadid);
 }

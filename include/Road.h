@@ -3,15 +3,14 @@
 #include <vector>
 #include <deque>
 
-class Simulation;
-
+class Layout;
 
 // really shouldn't be having too many lanes, maybe max 4
 class Road{
   public:
 
   Road();
-  Road(Simulation& parent, double speedLimit, size_t endIntersection, double angle);
+  Road(Layout* parent, double speedLimit, size_t endIntersection, double angle);
 
   // adds lane always adds too center, not edge
   void addLane(const size_t& lane){_lanes.push_back(lane);}
@@ -37,7 +36,7 @@ class Road{
 
 
   private:
-  Simulation* _parent;
+  Layout* _parent;
 
   size_t _id;
 

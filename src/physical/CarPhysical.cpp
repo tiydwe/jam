@@ -1,12 +1,17 @@
 #include "CarPhysical.h"
 
-#include "Simulation.h"
 #include "Game.h"
-
+#include "Simulation.h"
 #include "utility.h"
+#include "Layout.h"
 
-CarPhysical::CarPhysical(Game* game, Car* car, RoadPhysical* rp, std::string texturePath)
-    : _game(game), _car(car), _road(rp), _texture(texturePath), _base(_texture) {
+CarPhysical::CarPhysical(Simulation* game, std::unique_ptr<Car> car,
+                         RoadPhysical* rp, std::string texturePath)
+    : _game(game),
+      _car(std::move(car)),
+      _road(rp),
+      _texture(texturePath),
+      _base(_texture) {
   if (!_texture.loadFromFile(texturePath)) {
     utility::logWarn("CarPhysical::CarPhysical - texture path not found.");
   }
@@ -14,9 +19,10 @@ CarPhysical::CarPhysical(Game* game, Car* car, RoadPhysical* rp, std::string tex
   _base.setOrigin({_texture.getSize().x / 2, _texture.getSize().y / 2});
 }
 
-void CarPhysical::update() {
-  
-  _road = _game->getLayout()->getFromInternalRoadID(_car->getParentSim()->getRoad(_car->getCurrRoad()).getID());
+void CarPhysical::move(double dt) {
+  _car->move(dt);
+  _road = _game->getLayout()->getPhysicalRoadFromInternalID(
+      _car->getParentSim()->getRoad(_car->getCurrRoad())->getID());
   _base.setPosition(_road->getPhysicalPosition(
       _car->getCurrRoad(), _car->getCurrLane(), _car->getCurrDistFrac()));
 }

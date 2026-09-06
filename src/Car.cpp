@@ -34,7 +34,7 @@ void Car::move(double dt) {
           _current_destination.first == _position_roadid) {
         _status = carStatus::ARRIVED;
         // remove car after arrival
-        _parentSim->getLane(_position_laneid).removeCar(_id);
+        _parentSim->getLane(_position_laneid)->removeCar(_id);
       } else {
         _status = carStatus::ARRIVING;
       }
@@ -47,7 +47,7 @@ void Car::move(double dt) {
     }
 
     // check for cars ahead
-    auto nextCar = _parentSim->getLane(_position_laneid).minDistance(_id);
+    auto nextCar = _parentSim->getLane(_position_laneid)->minDistance(_id);
     if (nextCar.second != -1) {
       if (nextCar.first - _position_distance <= _minStoppingDist + _margin && !didA) {
         _decelerate(_max_acceleration, dt);
@@ -85,7 +85,7 @@ void Car::move(double dt) {
 
 bool Car::_move_checkIntersection(double dt) {
   if (_position_distance + _minStoppingDist + _margin >
-      _parentSim->getLane(_position_laneid).getLength()) {
+      _parentSim->getLane(_position_laneid)->getLane()->getLength()) {
     // coming up on next intersection
     // make sure that route has next road
     if (_route.size() == 0 && _current_destination.first != _position_roadid) {
@@ -113,20 +113,20 @@ bool Car::_move_checkIntersection(double dt) {
     }
     const auto road = _parentSim->getRoad(_route.front());
     auto intersection = _parentSim->getIntersection(
-        _parentSim->getRoad(_position_roadid).getEndIntersection());
-    int laneid = intersection.getTrafficLight().getLaneCanTurnOnRoad(
-        _position_laneid, road.getID(), _parentSim->getTime());
+        _parentSim->getRoad(_position_roadid)->getEndIntersection());
+    int laneid = intersection->getTrafficLight()->getLaneCanTurnOnRoad(
+        _position_laneid, road->getID(), _parentSim->getTime());
     if (laneid != -1) {
       // go to next road.
-      if (std::find(intersection.getOutgoings().begin(),
-                    intersection.getOutgoings().end(),
-                    road.getID()) == intersection.getOutgoings().end()) {
+      if (std::find(intersection->getOutgoings().begin(),
+                    intersection->getOutgoings().end(),
+                    road->getID()) == intersection->getOutgoings().end()) {
         // intersection does not have road
         utility::logErr(
             "While trying to Car::move, intersection did not have road on "
             "route");
         utility::logErr("Outgoings was " +
-                        std::to_string(intersection.getOutgoings().size()));
+                        std::to_string(intersection->getOutgoings().size()));
 
         _decelerate(_max_acceleration, dt);
         _status = carStatus::NO_ROUTE;
@@ -135,9 +135,9 @@ bool Car::_move_checkIntersection(double dt) {
         // TODO: make it so car doesn't just teleport
         double newDist = 0.0;
         size_t newLane = laneid;
-        size_t newRoadID = road.getID();
+        size_t newRoadID = road->getID();
         // make sure there arn't any cars in the way
-        auto nxtCar = _parentSim->getLane(newLane).minDistance();
+        auto nxtCar = _parentSim->getLane(newLane)->minDistance();
         if (nxtCar.second != -1 &&
             nxtCar.first < newDist + _minStoppingDist + _margin) {
           // stop
@@ -149,13 +149,13 @@ bool Car::_move_checkIntersection(double dt) {
           // clear, switch to new lane, don't acclerate yet
           // only switch to next lane if at ned of road
           if (_position_distance >
-              _parentSim->getLane(_position_laneid).getLength()) {
-            _parentSim->getLane(_position_laneid).removeCar(_id);
+              _parentSim->getLane(_position_laneid)->getLane()->getLength()) {
+            _parentSim->getLane(_position_laneid)->removeCar(_id);
             _position_distance = newDist;
             _position_laneid = newLane;
             _position_roadid = newRoadID;
             _route.pop_front();
-            _parentSim->getLane(newLane).addCar(newDist, _id);
+            _parentSim->getLane(newLane)->addCar(newDist, _id);
             _status = carStatus::TRAVELING;
 #ifdef DEBUG
             utility::log(std::to_string(_id) +

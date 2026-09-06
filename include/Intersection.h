@@ -1,41 +1,38 @@
 #pragma once
 
-#include <vector>
 #include <map>
+#include <memory>
+#include <utility>
+#include <vector>
 
 #include "TrafficLight.h"
 
-class Simulation;
+class Layout;
 
-enum class EdgeType{
-  INGOING, OUTGOING
-};
+enum class EdgeType { INGOING, OUTGOING };
 
-class Intersection{
-  public:
+class Intersection {
+ public:
+  Intersection(Layout* parent);
 
-  Intersection(Simulation& parent);
-
-  size_t getID()const{return _id;}
+  size_t getID() const { return _id; }
 
   Lights getLightByLaneID(size_t laneid) const;
 
-  const std::vector<size_t>& getOutgoings()const{return _outgoings;}
+  const std::vector<size_t>& getOutgoings() const { return _outgoings; }
   void addOutgoing(size_t road_id);
   void removeOutgoing(size_t roadid);
 
-  void addIngoing(size_t roadid);  
-  void removeIngoing(size_t roadid); 
+  void addIngoing(size_t roadid);
+  void removeIngoing(size_t roadid);
 
-  TrafficLight& getTrafficLight(){return _trafficLight;}
-  void setTrafficLight(TrafficLight& tl){_trafficLight = tl;};
+  TrafficLight* getTrafficLight() { return _trafficLight.get(); }
+  void setTrafficLight(std::unique_ptr<TrafficLight> tl) {_trafficLight = std::move(tl);};
 
+ private:
+  Layout* _parent;
 
-
-  private:
-  Simulation* _parent;
-
-  TrafficLight _trafficLight;
+  std::unique_ptr<TrafficLight> _trafficLight;
 
   size_t _id;
 
@@ -48,4 +45,3 @@ class Intersection{
   // for now, always green
   std::vector<ScheduleItem> _schedule;
 };
-

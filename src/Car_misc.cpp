@@ -1,6 +1,7 @@
 #include "Car.h"
 #include "Simulation.h"
 #include "utility.h"
+#include "Layout.h"
 
 Car::Car() {
   utility::exit(
@@ -31,18 +32,18 @@ void Car::recalcRoute() {
 }
 
 double Car::getCurrDistFrac() const {
-  return _position_distance / _parentSim->getLane(_position_laneid).getLength();
+  return _position_distance / _parentSim->getLayout()->getLane(_position_laneid)->getLength();
 }
 
 void Car::_clipVelocity() {
-  double speedLimit = _parentSim->getRoad(_position_roadid).getSpeedLimit();
+  double speedLimit = _parentSim->getLayout()->getRoad(_position_roadid)->getSpeedLimit();
   _velocity = std::max(0.0, _velocity);
   _velocity = std::min(_velocity, speedLimit);
 }
 
 double Car::_applyVelocity(double dt) {
   _position_distance += _velocity * dt;
-  _parentSim->getLane(_position_laneid).moveCar(_position_distance, _id);
+  _parentSim->getLane(_position_laneid)->moveCar(_position_distance, _id);
   return _velocity * dt;
 }
 

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include <SFML/Graphics.hpp>
 
 #define DEBUG 1
 
@@ -25,6 +26,10 @@ double cumlitivePtoSlice(double (*p)(double), double t, double dt);
 template <class T>
 bool isclose(T a, T b, T tol = 1e-9){
   return (a-b) > -tol && (a-b) < tol;
+}
+
+namespace Constants{
+  inline const sf::Font defaultFont{"assets/fonts/arial/ARIAL.TTF"};
 }
 
 };

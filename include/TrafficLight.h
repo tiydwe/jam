@@ -8,7 +8,7 @@
 
 #define MAX_LANES 30
 
-class Simulation;
+class Layout;
 
 enum class Lights{
   RED, YELLOW, GREEN, INVALID
@@ -16,12 +16,12 @@ enum class Lights{
 
 class RoadWrapper{
   public:
-  RoadWrapper(Simulation& s, size_t roadid);
+  RoadWrapper(Layout* s, size_t roadid);
   bool operator<(const RoadWrapper &r) const;
   size_t getRoadID() const {return _roadid;}
 
   private:
-  Simulation* _parent;
+  Layout* _parent;
   size_t _roadid;
 };
 
@@ -39,7 +39,7 @@ struct ScheduleItem{
 // Handles an entire intersection lights
 class TrafficLight{
   public:
-  TrafficLight(Simulation& s);
+  TrafficLight(Layout* s);
 
   bool addIngoing(size_t roadid);
   bool addOutgoing(size_t roadid);
@@ -67,7 +67,7 @@ class TrafficLight{
   void normalizeSchedule();
 
   private:
-  Simulation* _parent;
+  Layout* _parent;
 
   // IN MEANS INTO THE INTERSECTION
   std::set<RoadWrapper> _ingoingRoads;

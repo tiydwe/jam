@@ -5,43 +5,55 @@
 #include <deque>
 #include <random>
 #include "Car.h"
+#include "CarPhysical.h"
 #include "Intersection.h"
 #include "Lane.h"
 #include "Road.h"
 #include "utility"
 
-class Simulation{
+#include <SFML/Graphics.hpp>
+
+#include <memory>
+#include <utility>
+#include <string>
+
+
+
+std::unique_ptr<CarPhysical> createPhysicalFromDataFile(
+    std::unique_ptr<Car> car, RoadPhysical* roadPhysical,
+    Simulation* simulation, std::string dataFilename);
+
+
+class Simulation : public sf::Drawable, sf::Transformable{
   public:
-  Simulation(unsigned int seed = std::random_device()());
+  Simulation(Layout* layout, std::string filepath, unsigned int seed = std::random_device()());
   ~Simulation();
 
   void step(double dt);
 
   std::deque<size_t> findRoute(size_t startRoad, size_t endRoad);
 
-  // MUST BE HEAP ALLOCATED
-  void addCar(Car* car);
-  void addIntersection(Intersection* intersection);
-  void addLane(Lane* lane);
-  void addRoad(Road* road);
+  void addCar(std::unique_ptr<CarPhysical> car);
 
-  Car& getCar(size_t id);
-  Intersection& getIntersection(size_t id);
-  Lane& getLane(size_t id);
-  Road& getRoad(size_t id);
+  Car* getCar(size_t id) const;
+  Intersection* getIntersection(size_t id) const;
+  SimulationLane* getLane(size_t id) const;
+  Road* getRoad(size_t id) const;
+  Layout* getLayout() const {return _layout;}
   double getTime();
 
   std::mt19937& getRNG();
 
+  virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const override;
+
 
   private:
+  Layout* _layout;
   
   std::mt19937 _rng;
 
-  std::map<size_t, Car*> _cars;
-  std::map<size_t, Intersection*> _intersections;
-  std::map<size_t, Lane*> _lanes;
-  std::map<size_t, Road*> _roads; 
+  std::map<size_t, std::unique_ptr<CarPhysical>> _cars;
+  std::map<size_t, std::unique_ptr<SimulationLane>> _simulationLanes;
 
   double _time;
 

@@ -33,6 +33,9 @@ class Simulation : public sf::Drawable, sf::Transformable{
 
   std::deque<size_t> findRoute(size_t startRoad, size_t endRoad);
 
+  // call when reached dest
+  void removeCar(size_t internalid);
+
   void addCar(std::unique_ptr<CarPhysical> car);
 
   SimulationLane* getLane(size_t id) const;
@@ -51,6 +54,7 @@ class Simulation : public sf::Drawable, sf::Transformable{
   std::mt19937 _rng;
 
   std::map<size_t, std::unique_ptr<CarPhysical>> _cars;
+  std::map<size_t, std::unique_ptr<CarPhysical>> _carsDone;
   std::map<size_t, std::unique_ptr<SimulationLane>> _simulationLanes;
 
   double _time;

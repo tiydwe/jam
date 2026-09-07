@@ -27,7 +27,7 @@ struct scheduleItem {
 class Car {
  public:
   Car();
-  Car(Simulation& parent, size_t initRoad, size_t initLane, size_t initDist, double max_a, double margin=10.0);
+  Car(Simulation& parent, size_t initRoad, size_t initLane, size_t initDist, double max_a, double margin=30.0);
   void setDestination(const std::pair<size_t, double>& dest);
 
   void move(double dt);
@@ -42,6 +42,7 @@ class Car {
   size_t getCurrLane() const {return _position_laneid; }
   double getCurrDist() const {return _position_distance; }
   double getCurrDistFrac() const;
+  carStatus getStatus() const {return _status;}
 
   Simulation* getParentSim() const {return _parentSim;}
 

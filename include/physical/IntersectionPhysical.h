@@ -11,16 +11,18 @@
 /// Does not handle any simulation road logic
 class IntersectionPhysical : public sf::Drawable, sf::Transformable {
  public:
-  IntersectionPhysical(std::unique_ptr<Intersection> intersection, sf::Vector2f pos);
+  IntersectionPhysical(std::unique_ptr<Intersection> intersection, sf::Vector2f pos, size_t id);
 
   void draw(sf::RenderTarget& target, sf::RenderStates states) const override;
 
   sf::Vector2f getPos() const {return _pos;}
   size_t getInternalID() const {return _intersection->getID();}
   Intersection* getIntersection() const {return _intersection.get();}
-
+  size_t getID() const {return _id;}
  private:
   std::unique_ptr<Intersection> _intersection;
 
   sf::Vector2<float> _pos;
+
+  size_t _id;
 };

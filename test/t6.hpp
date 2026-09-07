@@ -11,7 +11,7 @@
 
 void test6() {
   
-  Game g("assets/presets/games/t6.dat");
+  Game g("assets/presets/games/t1.dat");
   g.run();
 
 }

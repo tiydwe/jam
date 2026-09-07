@@ -7,6 +7,14 @@ size_t utility::uid() {
   return curr++;
 }
 
+void utility::registerPhysicalID(size_t id) {
+  _maxPhysicalID = std::max(_maxPhysicalID, id);
+}
+
+size_t utility::getNewPhysicalID() {
+  return ++_maxPhysicalID;
+}
+
 void utility::logErr(std::string msg) {
   std::cerr << "ERROR: " << msg << "\n";
 }

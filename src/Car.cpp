@@ -35,7 +35,8 @@ void Car::move(double dt) {
           _current_destination.first == _position_roadid) {
         _status = carStatus::ARRIVED;
         // remove car after arrival
-        _parentSim->getLane(_position_laneid)->removeCar(_id);
+        _parentSim->removeCar(_id);
+        
       } else {
         _status = carStatus::ARRIVING;
       }
@@ -90,10 +91,12 @@ bool Car::_move_checkIntersection(double dt) {
     // coming up on next intersection
     // make sure that route has next road
     if (_route.size() == 0 && _current_destination.first != _position_roadid) {
+      /*
       utility::logErr(
           "While trying to Car::_move_checkIntersection, route ended without "
           "finding "
           "destination.");
+      */
       // behaviour: car will not move without valid route
       _decelerate(_max_acceleration, dt);
       _status = carStatus::NO_ROUTE;

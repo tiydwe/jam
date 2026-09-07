@@ -9,13 +9,17 @@
 
 class Game;
 
+enum class ActionType{
+  NONE, DRAW_ROAD
+};
+
+std::string getDatapathFromActionType(ActionType type);
+
 class EditorWindow : public sf::Drawable, sf::Transformable{
  public:
   EditorWindow(std::unique_ptr<Layout> l, Game* game, sf::Vector2u windowSize);
 
-  void handleEvent(const sf::Event& event, const sf::RenderWindow& window);
-
-  void onclickSimulate(Game* game);
+  void handleEvent(const sf::Event& event, sf::RenderWindow& window);
 
   void updateWindowSize(sf::Vector2f newSize);
 
@@ -27,6 +31,9 @@ class EditorWindow : public sf::Drawable, sf::Transformable{
   Layout* getLayout() const {return _l.get();}
 
  private:
+  void onclickSimulate(Game* game);
+  void onclickCreateRoad(Game* game);
+  void makeRoad(sf::Vector2f pos2, std::string datapath);
   std::unique_ptr<Layout> _l;
 
   Game* _game;
@@ -41,4 +48,10 @@ class EditorWindow : public sf::Drawable, sf::Transformable{
   sf::RectangleShape _topbar;
 
   Button _simulateButton;
+
+  Button _placeRoadButton;
+  
+  sf::Vector2f _lastClickedPos;
+  size_t _clickedCtr = 0;
+  ActionType _currentAction = ActionType::NONE;
 };

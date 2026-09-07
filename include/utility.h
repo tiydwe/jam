@@ -3,14 +3,21 @@
 #include <string>
 #include <SFML/Graphics.hpp>
 
-#define DEBUG 1
+//#define DEBUG 1
 
 #define GREEN_PHASE_TIME_DEFAULT 20
 #define YELLOW_PHASE_TIME_DEFAULT 5
 
+#define INTERSESCTION_SIZE 30.f
+
+#define SNAP_DIST 40.f
+
 namespace utility {
 
 size_t uid();
+static size_t _maxPhysicalID = 0;
+void registerPhysicalID(size_t id);
+size_t getNewPhysicalID();
 void logErr(std::string msg);
 void logWarn(std::string msg);
 void log(std::string msg);

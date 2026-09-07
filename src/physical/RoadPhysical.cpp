@@ -31,6 +31,11 @@ RoadAsset::RoadAsset(std::string filename) {
     }
   }
   std::getline(file, texturePath);
+  std::getline(file, tmp);
+  {
+    std::stringstream ss(tmp);
+    ss >> speedLimit;
+  }
   file.close();
 }
 

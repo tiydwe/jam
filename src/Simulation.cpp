@@ -117,13 +117,31 @@ std::deque<size_t> Simulation::findRoute(size_t startRoad, size_t endRoad) {
   while (curr != startRoad) {
     res.push_front(curr);
     if (prev[curr] == curr) {
-      // uh oh
+      // no route
       utility::logWarn("Simulation::findRoute - Route not found!");
       return {};
     }
     curr = prev[curr];
   }
   return res;
+}
+
+void Simulation::removeCar(size_t internalid) {
+  CarPhysical* cr = nullptr;
+  auto it = _cars.begin();
+  while(it != _cars.end()){
+    if(it->second->getCar()->getID() == internalid){
+      cr = it->second.get();
+      _carsDone.try_emplace(it->first, std::move(it->second));
+      it = _cars.erase(it);
+    }
+    else{
+      ++it;
+    }
+  }
+  if(cr){
+    this->getLane(cr->getCar()->getCurrLane())->removeCar(cr->getCar()->getID());
+  }
 }
 
 void Simulation::addCar(std::unique_ptr<CarPhysical> car) {

@@ -27,6 +27,7 @@ target_sources(main PRIVATE
     src/TrafficLight.cpp
     src/game/Game.cpp
     src/game/EditorWindow.cpp
+    src/game/EditorWindowCreate.cpp
     src/game/SimulateWindow.cpp
     src/physical/Layout.cpp
     src/physical/RoadPhysical.cpp

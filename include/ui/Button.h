@@ -18,9 +18,9 @@ class Button : public sf::Drawable, sf::Transformable {
 
   // runs _onclick if clicked, returns true
   bool update(const sf::RenderWindow& window);
+  virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const override;
 
  private:
-  virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const override;
 
   Game* _game;
   std::function<void(Game*)> _onclick;

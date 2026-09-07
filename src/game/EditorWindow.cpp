@@ -11,7 +11,10 @@ EditorWindow::EditorWindow(std::unique_ptr<Layout> l, Game* g, sf::Vector2u wind
       _game(g),
       _simulateButton(g, sf::Vector2f(10, 10), sf::Vector2f(100, 40),
                       utility::Constants::defaultFont, "Simulate",
-                      sf::Color::Green, sf::Color::Blue, sf::Color::Red) {
+                      sf::Color::Green, sf::Color::Blue, sf::Color::Red),
+      _placeRoadButton(g, sf::Vector2f(120, 10), sf::Vector2f(100,40),
+                      utility::Constants::defaultFont, "ROAD",
+                    sf::Color::Green, sf::Color::Blue, sf::Color::Red) {
   _worldview.setSize({(float)windowSize.x, (float)windowSize.y});
   _worldview.setCenter({windowSize.x / 2.f, windowSize.y / 2.f});
   _uiview.setSize({(float)windowSize.x, (float)windowSize.y});
@@ -22,17 +25,41 @@ EditorWindow::EditorWindow(std::unique_ptr<Layout> l, Game* g, sf::Vector2u wind
   _topbar.setPosition({0.f, 0.f});
 
   _simulateButton.setOnclick([&](Game* game) { this->onclickSimulate(game); });
+  _placeRoadButton.setOnclick([&](Game* game) { this->onclickCreateRoad(game); });
 }
 
 void EditorWindow::handleEvent(const sf::Event& event,
-                               const sf::RenderWindow& window) {
+                               sf::RenderWindow& window) {
   if (auto mbpIf = event.getIf<sf::Event::MouseButtonPressed>()) {
     if (mbpIf->button == sf::Mouse::Button::Right) {
       _isDragging = true;
       _oldMousePos = sf::Mouse::getPosition(window);
     }
+    if(mbpIf->button == sf::Mouse::Button::Left) {
+      switch (_currentAction)
+      {
+      case ActionType::DRAW_ROAD:
+        if(_clickedCtr == 0){
+          // first click
+          ++_clickedCtr;
+          _lastClickedPos = window.mapPixelToCoords(sf::Mouse::getPosition(window));
+        }
+        else{
+          sf::View old = window.getView();
+          window.setView(_worldview);
+          auto pos = window.mapPixelToCoords(sf::Mouse::getPosition(window));
+          this->makeRoad(pos, getDatapathFromActionType(ActionType::DRAW_ROAD));
+          window.setView(old);
+          _clickedCtr=0;
+        }
+        break;
+      
+      default:
+        break;
+      }
+    }
   }
-  if (auto mbrIf = event.getIf<sf::Event::MouseButtonPressed>()) {
+  if (auto mbrIf = event.getIf<sf::Event::MouseButtonReleased>()) {
     if (mbrIf->button == sf::Mouse::Button::Right) {
       _isDragging = false;
     }
@@ -64,6 +91,11 @@ void EditorWindow::onclickSimulate(Game* game) {
   game->beginSimulation();
 }
 
+void EditorWindow::onclickCreateRoad(Game* game) {
+  _clickedCtr = 0;
+  _currentAction = ActionType::DRAW_ROAD;
+}
+
 void EditorWindow::updateWindowSize(sf::Vector2f newSize) {
   _worldview.setSize(newSize);
   _uiview.setSize(newSize);
@@ -73,6 +105,7 @@ void EditorWindow::updateWindowSize(sf::Vector2f newSize) {
 
 void EditorWindow::update(sf::RenderWindow& rw) {
   _simulateButton.update(rw);
+  _placeRoadButton.update(rw);
 }
 
 void EditorWindow::draw(sf::RenderTarget& target,
@@ -82,7 +115,20 @@ void EditorWindow::draw(sf::RenderTarget& target,
   _l->draw(target, states);
   target.setView(_uiview);
   target.draw(_topbar, states);
+
   target.draw(_simulateButton, states);
+  target.draw(_placeRoadButton, states);
 
   target.setView(origional);
+}
+
+std::string getDatapathFromActionType(ActionType type) {
+  switch (type)
+  {
+  case ActionType::DRAW_ROAD:
+    return "assets/data/roads/generic4lane.dat";
+  
+  default:
+    return "";
+  }
 }

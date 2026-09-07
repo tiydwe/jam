@@ -17,7 +17,7 @@ Game::Game(std::string filepath) {
   std::getline(file, tmp);
   std::unique_ptr<Layout> layout = std::make_unique<Layout>(tmp);
   std::getline(file, carSetupFilepath);
-  EditorRenderWindow = sf::RenderWindow(sf::VideoMode({600, 500}), "JAM");
+  EditorRenderWindow = sf::RenderWindow(sf::VideoMode({800, 600}), "JAM");
   _editor = std::make_unique<EditorWindow>(std::move(layout), this,
                                            EditorRenderWindow.getSize());
 }
@@ -27,7 +27,7 @@ void Game::beginSimulation() {
     return;
   }
   SimulationRenderWindow =
-      sf::RenderWindow(sf::VideoMode({600, 500}), "JAM - Simulation");
+      sf::RenderWindow(sf::VideoMode({800, 600}), "JAM - Simulation");
   _simulation = std::make_unique<SimulateWindow>(
       _editor->getLayout(), this, carSetupFilepath,
       SimulationRenderWindow.getSize());

@@ -19,7 +19,11 @@ class Layout : public sf::Drawable, sf::Transformable {
   Layout(std::string filename);
   ~Layout();
 
-  void addRoad(std::unique_ptr<RoadPhysical> road);
+  IntersectionPhysical* createIntersection(sf::Vector2f& position);
+  RoadPhysical* createRoad(IntersectionPhysical& start, IntersectionPhysical& end, std::string datapath);
+
+  // returns nullptr if no intersections
+  std::pair<IntersectionPhysical*, double> findClosest(sf::Vector2f& pos);
 
   Road* getRoad(size_t id) const { return _roads.at(id); }
   RoadPhysical* getPhysicalRoad(size_t id) const {return _physicalRoads.at(id).get();}

@@ -1,9 +1,9 @@
 #include "CarPhysical.h"
 
 #include "Game.h"
+#include "Layout.h"
 #include "Simulation.h"
 #include "utility.h"
-#include "Layout.h"
 
 CarPhysical::CarPhysical(Simulation* game, std::unique_ptr<Car> car,
                          RoadPhysical* rp, std::string texturePath)
@@ -30,5 +30,7 @@ void CarPhysical::move(double dt) {
 void CarPhysical::draw(sf::RenderTarget& target,
                        sf::RenderStates states) const {
   states.transform *= getTransform();
-  target.draw(_base);
+  if (_car->getStatus() != carStatus::ARRIVED) {
+    target.draw(_base);
+  }
 }

@@ -68,3 +68,20 @@ std::string carStatusToString(carStatus s) {
       return "not recognized, " + std::to_string(static_cast<int>(s));
   }
 }
+
+void Car::_updateResults(double dt, double dx)
+{
+  if(!_results._arrived){
+    _results._distanceTravled += dx;
+    _results._timeToArrival += dt;
+    if(_status == carStatus::ARRIVED){
+      _results._arrived = true;
+    }
+    else if(_status == carStatus::WAITING_FOR_NEXT_CAR){
+      _results._timeWastedForNextCar += dt;
+    }
+    else if(_status == carStatus::WAITING_AT_INTERSECTION){
+      _results._timeWastedAtIntersection += dt;
+    }
+  }
+}

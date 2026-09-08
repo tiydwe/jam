@@ -10,7 +10,7 @@
 
 #define INTERSESCTION_SIZE 30.f
 
-#define SNAP_DIST 40.f
+#define SNAP_DIST 50.f
 
 namespace utility {
 

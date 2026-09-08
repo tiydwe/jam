@@ -22,7 +22,7 @@ void Car::move(double dt) {
     bool foundDestination = false;
     if (_position_roadid == _current_destination.first &&
         _current_destination.second - _position_distance <=
-            _minStoppingDist + _margin) {
+            _minStoppingDist) {
 #ifdef DEBUG
       // utility::log("Target spotted at  " +
       // std::to_string(_position_distance));

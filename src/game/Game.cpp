@@ -17,59 +17,123 @@ Game::Game(std::string filepath) {
   std::getline(file, tmp);
   std::unique_ptr<Layout> layout = std::make_unique<Layout>(tmp);
   std::getline(file, carSetupFilepath);
-  EditorRenderWindow = sf::RenderWindow(sf::VideoMode({800, 600}), "JAM");
+  MainWindow = sf::RenderWindow(sf::VideoMode({800, 600}), "JAM");
   _editor = std::make_unique<EditorWindow>(std::move(layout), this,
-                                           EditorRenderWindow.getSize());
+                                           MainWindow.getSize());
 }
 
 void Game::beginSimulation() {
-  if (simulating) {
-    return;
+  if (currentMode == GameScreenMode::EDIT) {
+    _simulation = std::make_unique<SimulateWindow>(
+        _editor->getLayout(), this, carSetupFilepath, MainWindow.getSize());
+    currentMode = GameScreenMode::SIMULATE;
   }
-  SimulationRenderWindow =
-      sf::RenderWindow(sf::VideoMode({800, 600}), "JAM - Simulation");
-  _simulation = std::make_unique<SimulateWindow>(
-      _editor->getLayout(), this, carSetupFilepath,
-      SimulationRenderWindow.getSize());
-  simulating = true;
+}
+
+void Game::endSimulation() {
+  if (currentMode == GameScreenMode::SIMULATE) {
+    _statsWindow = std::make_unique<StatsWindow>(this, _simulation->getResults(), MainWindow.getSize());
+    currentMode = GameScreenMode::STATS;
+  }
+}
+
+void Game::endStatsScreen() {
+  if (currentMode == GameScreenMode::STATS){
+    currentMode = GameScreenMode::EDIT;
+  }
 }
 
 void Game::run() {
   lastTickTime = clk.getElapsedTime();
-  while (EditorRenderWindow.isOpen()) {
+  while (MainWindow.isOpen()) {
+    while (const std::optional event = MainWindow.pollEvent()) {
+      if (event->is<sf::Event::Closed>()) {
+        MainWindow.close();
+        return;
+      }
+      if (const auto* resizeEvent = event->getIf<sf::Event::Resized>()) {
+        auto view = MainWindow.getView();
+        sf::Vector2f newSize = {static_cast<float>(resizeEvent->size.x),
+                                static_cast<float>(resizeEvent->size.y)};
+        view.setSize(newSize);
+        MainWindow.setView(view);
+        if (currentMode == GameScreenMode::SIMULATE) {
+          _simulation->updateWindowSize(newSize);
+        } else if (currentMode == GameScreenMode::EDIT) {
+          _editor->updateWindowSize(newSize);
+        }
+        else if(currentMode == GameScreenMode::STATS){
+          _statsWindow->updateWindowSize(newSize);
+        }
+      }
+      if (currentMode == GameScreenMode::SIMULATE) {
+        _simulation->handleEvent(*event, MainWindow);
+      } else if (currentMode == GameScreenMode::EDIT) {
+        _editor->handleEvent(*event, MainWindow);
+      } else if (currentMode == GameScreenMode::STATS) {
+        // intentionally blank
+      }
+    }
+    sf::Time nex = clk.getElapsedTime();
+    double dt = std::min((nex - lastTickTime).asSeconds(), clampTime);
+    if (currentMode == GameScreenMode::SIMULATE) {
+      _simulation->step(dt);
+      _simulation->update(MainWindow);
+    } else if (currentMode == GameScreenMode::EDIT) {
+      _editor->update(MainWindow);
+    } else if (currentMode == GameScreenMode::STATS){
+      _statsWindow->update(MainWindow);
+    }
+    lastTickTime = nex;
+    MainWindow.clear();
+    if (currentMode == GameScreenMode::SIMULATE) {
+      MainWindow.draw(*_simulation.get());
+    } else if (currentMode == GameScreenMode::EDIT) {
+      MainWindow.draw(*_editor.get());
+    } else if(currentMode == GameScreenMode::STATS) {
+      MainWindow.draw(*_statsWindow.get());
+    }
+    MainWindow.display();
+  }
+}
+
+/*
+void Game::run() {
+  lastTickTime = clk.getElapsedTime();
+  while (MainWindow.isOpen()) {
     if (simulating) {
-      while (const std::optional event = SimulationRenderWindow.pollEvent()) {
+      while (const std::optional event = MainWindow.pollEvent()) {
         if (event->is<sf::Event::Closed>()) {
           _simulation.reset();
-          SimulationRenderWindow.close();
+          // SimulationRenderWindow.close();
           simulating = false;
         }
-        _simulation->handleEvent(*event, SimulationRenderWindow);
+        _simulation->handleEvent(*event, MainWindow);
       }
-      if(!simulating){
+      if (!simulating) {
         continue;
       }
       sf::Time nex = clk.getElapsedTime();
-      _simulation->step(
-          std::min((nex - lastTickTime).asSeconds(), clampTime));
-      _simulation->update(SimulationRenderWindow);
+      _simulation->step(std::min((nex - lastTickTime).asSeconds(), clampTime));
+      _simulation->update(MainWindow);
       lastTickTime = nex;
-      SimulationRenderWindow.clear();
-      SimulationRenderWindow.draw(*_simulation.get());
-      SimulationRenderWindow.display();
+      MainWindow.clear();
+      MainWindow.draw(*_simulation.get());
+      MainWindow.display();
     } else {
-      while (const std::optional event = EditorRenderWindow.pollEvent()) {
+      while (const std::optional event = MainWindow.pollEvent()) {
         if (event->is<sf::Event::Closed>()) {
-          EditorRenderWindow.close();
+          MainWindow.close();
           _editor.reset();
           return;
         }
-        _editor->handleEvent(*event, EditorRenderWindow);
+        _editor->handleEvent(*event, MainWindow);
       }
-      _editor->update(EditorRenderWindow);
-      EditorRenderWindow.clear();
-      EditorRenderWindow.draw(*_editor.get());
-      EditorRenderWindow.display();
+      _editor->update(MainWindow);
+      MainWindow.clear();
+      MainWindow.draw(*_editor.get());
+      MainWindow.display();
     }
   }
 }
+//*/

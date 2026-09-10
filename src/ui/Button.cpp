@@ -25,13 +25,31 @@ Button::Button(Game* game, sf::Vector2f start, sf::Vector2f size, sf::Font font,
   _text.setFillColor(sf::Color::Black);
 
   sf::FloatRect textRect = _text.getLocalBounds();
-  _text.setOrigin({textRect.position.x + textRect.size.x/2, textRect.position.y + textRect.size.y/2});
-  _text.setPosition({start.x + size.x/2, start.y + start.y/2});
-
+  _text.setOrigin({textRect.position.x + textRect.size.x / 2,
+                   textRect.position.y + textRect.size.y / 2});
+  _text.setPosition({start.x + size.x / 2, start.y + start.y / 2});
 }
 
 void Button::setOnclick(const std::function<void(Game*)>& onclick) {
   _onclick = onclick;
+}
+
+void Button::setStart(sf::Vector2f newStart) {
+  _start = newStart;
+  sf::FloatRect textRect = _text.getLocalBounds();
+  _shape.setPosition(newStart);
+  _text.setOrigin({textRect.position.x + textRect.size.x / 2,
+                   textRect.position.y + textRect.size.y / 2});
+  _text.setPosition({newStart.x + _size.x / 2, newStart.y + _size.y / 2});
+}
+
+void Button::setSize(sf::Vector2f newsize) {
+  _size = newsize;
+  sf::FloatRect textRect = _text.getLocalBounds();
+  _shape.setSize(newsize);
+  _text.setOrigin({textRect.position.x + textRect.size.x / 2,
+                   textRect.position.y + textRect.size.y / 2});
+  _text.setPosition({_start.x + newsize.x / 2, _start.y + newsize.y / 2});
 }
 
 bool Button::update(const sf::RenderWindow& window) {

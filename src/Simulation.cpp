@@ -118,7 +118,7 @@ std::deque<size_t> Simulation::findRoute(size_t startRoad, size_t endRoad) {
     res.push_front(curr);
     if (prev[curr] == curr) {
       // no route
-      utility::logWarn("Simulation::findRoute - Route not found!");
+      //utility::logWarn("Simulation::findRoute - Route not found!");
       return {};
     }
     curr = prev[curr];
@@ -132,6 +132,7 @@ void Simulation::removeCar(size_t internalid) {
   while(it != _cars.end()){
     if(it->second->getCar()->getID() == internalid){
       cr = it->second.get();
+      _overall.addStat(cr->getCar()->getResults());
       _carsDone.try_emplace(it->first, std::move(it->second));
       it = _cars.erase(it);
     }
@@ -174,6 +175,13 @@ SimulationLane* Simulation::getLane(size_t id) const {
 
 double Simulation::getTime() { return _time; }
 
+OverallStats Simulation::getStats()  {
+  _overall.numberOfCars = _cars.size() + _carsDone.size();
+  return _overall;
+}
+
+bool Simulation::isDone() const { return _cars.empty(); }
+
 std::mt19937& Simulation::getRNG() { return _rng; }
 
 void Simulation::draw(sf::RenderTarget& target, sf::RenderStates states) const {
@@ -182,4 +190,13 @@ void Simulation::draw(sf::RenderTarget& target, sf::RenderStates states) const {
   for (const auto& x : _cars) {
     x.second->draw(target, states);
   }
+}
+
+void OverallStats::addStat(ResultStats result) {
+  numberOfCars++;
+  numberArrived += result._arrived;
+  totalTimeTraveled += result._timeToArrival;
+  totalDistanceTraveled += result._distanceTravled;
+  totalTimeAtIntersection += result._timeWastedAtIntersection;
+  totalTimeWaitingNextCar += result._timeWastedForNextCar;
 }

@@ -27,7 +27,7 @@ Button::Button(Game* game, sf::Vector2f start, sf::Vector2f size, sf::Font font,
   sf::FloatRect textRect = _text.getLocalBounds();
   _text.setOrigin({textRect.position.x + textRect.size.x / 2,
                    textRect.position.y + textRect.size.y / 2});
-  _text.setPosition({start.x + size.x / 2, start.y + start.y / 2});
+  _text.setPosition({start.x + size.x / 2, start.y + size.y / 2});
 }
 
 void Button::setOnclick(const std::function<void(Game*)>& onclick) {

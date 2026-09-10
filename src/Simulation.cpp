@@ -82,8 +82,15 @@ Simulation::~Simulation() {}
 
 void Simulation::step(double dt) {
   _time += dt;
-  for (auto& [id, car] : _cars) {
-    car->move(dt);
+  for (auto it = _cars.begin(); it != _cars.end(); ) {
+    it->second->move(dt);
+    if(_needsFixing){
+      it = _fixDelete;
+      _needsFixing = false;
+    }
+    else{
+      ++it;
+    }
   }
 }
 
@@ -135,6 +142,8 @@ void Simulation::removeCar(size_t internalid) {
       _overall.addStat(cr->getCar()->getResults());
       _carsDone.try_emplace(it->first, std::move(it->second));
       it = _cars.erase(it);
+      _needsFixing = true;
+      _fixDelete = it;
     }
     else{
       ++it;

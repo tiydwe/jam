@@ -6,7 +6,8 @@
 
 class Simulation;
 
-enum class carStatus {
+enum class carStatus
+{
   WAITING_AT_INTERSECTION,
   WAITING_FOR_NEXT_CAR,
   TRAVELING,
@@ -18,17 +19,29 @@ enum class carStatus {
 
 std::string carStatusToString(carStatus s);
 
-struct scheduleItem {
+struct scheduleItem
+{
   std::pair<size_t, size_t> dest;
   size_t targetArrival;
   size_t earliestLeaving;
 };
 
-class Car {
- public:
+class ResultStats
+{
+public:
+  bool _arrived = false;
+  double _timeToArrival = 0.0;
+  double _distanceTravled = 0.0;
+  double _timeWastedForNextCar = 0.0;
+  double _timeWastedAtIntersection = 0.0;
+};
+
+class Car
+{
+public:
   Car();
-  Car(Simulation& parent, size_t initRoad, size_t initLane, size_t initDist, double max_a, double margin=30.0);
-  void setDestination(const std::pair<size_t, double>& dest);
+  Car(Simulation &parent, size_t initRoad, size_t initLane, size_t initDist, double max_a, double margin = 30.0);
+  void setDestination(const std::pair<size_t, double> &dest);
 
   void move(double dt);
 
@@ -36,20 +49,31 @@ class Car {
   void recalcRoute();
 
   size_t getID() const { return _id; }
-  double getDistance() const {return _position_distance; }
+  double getDistance() const { return _position_distance; }
 
-  size_t getCurrRoad() const {return _position_roadid; }
-  size_t getCurrLane() const {return _position_laneid; }
-  double getCurrDist() const {return _position_distance; }
+  size_t getCurrRoad() const { return _position_roadid; }
+  size_t getCurrLane() const { return _position_laneid; }
+  double getCurrDist() const { return _position_distance; }
   double getCurrDistFrac() const;
-  carStatus getStatus() const {return _status;}
+  carStatus getStatus() const { return _status; }
 
-  Simulation* getParentSim() const {return _parentSim;}
+  Simulation *getParentSim() const { return _parentSim; }
 
- private:
+  ResultStats getResults() const {return _results;}
+  double getTimeSinceLastMove() const {return _timeSinseLastMove;}
+
+private:
   void _clipVelocity();
-  void _decelerate(double a, double dt) { _velocity -= a * dt; _clipVelocity();}
-  void _accelerate(double a, double dt) { _velocity += a * dt; _clipVelocity();}
+  void _decelerate(double a, double dt)
+  {
+    _velocity -= a * dt;
+    _clipVelocity();
+  }
+  void _accelerate(double a, double dt)
+  {
+    _velocity += a * dt;
+    _clipVelocity();
+  }
   double _applyVelocity(double dt);
 
   // will automatically roll for chance
@@ -60,7 +84,9 @@ class Car {
   bool _check_merge();
   bool _move_checkIntersection(double dt);
 
-  Simulation* _parentSim;
+  void _updateResults(double dt, double dx);
+
+  Simulation *_parentSim;
 
   size_t _id;
   carStatus _status;
@@ -88,4 +114,9 @@ class Car {
   // only valid during a merge
   size_t _newLaneMerge;
   double _newMergedDistance;
+
+  ResultStats _results;
+
+  // for removing after inactivity
+  double _timeSinseLastMove = 0.0;
 };

@@ -7,11 +7,10 @@
 #include "utility.h"
 
 void Car::move(double dt) {
+  // todo do this on a random basis to improve preformance if this gets slow
+  this->recalcRoute();
+
   // Priority #1 is merging
-  if (!(_status == carStatus::MERGING)) {
-    // random chance to merge into required lane, increases closer to
-    // intersection
-  }
   if (_status == carStatus::MERGING) {
     _check_merge();
   } else {
@@ -22,7 +21,7 @@ void Car::move(double dt) {
     bool foundDestination = false;
     if (_position_roadid == _current_destination.first &&
         _current_destination.second - _position_distance <=
-            _minStoppingDist + _margin) {
+            _minStoppingDist) {
 #ifdef DEBUG
       // utility::log("Target spotted at  " +
       // std::to_string(_position_distance));
@@ -34,8 +33,10 @@ void Car::move(double dt) {
                            10.0) &&
           _current_destination.first == _position_roadid) {
         _status = carStatus::ARRIVED;
+        _results._arrived = true;
         // remove car after arrival
         _parentSim->removeCar(_id);
+        return;
         
       } else {
         _status = carStatus::ARRIVING;

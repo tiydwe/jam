@@ -80,6 +80,7 @@ sf::Vector2f RoadPhysical::getPhysicalPosition(size_t roadid, size_t laneid,
     r = _roadb.get();
     mdf = -1;
     offset = &_roadData.leftCenterOffset;
+    percentDistnace = 1-percentDistnace;
   }
   if (r == nullptr) {
     utility::logErr("RoadPhysical::getPhysicalPosition - roadid not found");

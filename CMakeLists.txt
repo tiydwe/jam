@@ -29,6 +29,7 @@ target_sources(main PRIVATE
     src/game/EditorWindow.cpp
     src/game/EditorWindowCreate.cpp
     src/game/SimulateWindow.cpp
+    src/game/StatsWindow.cpp
     src/physical/Layout.cpp
     src/physical/RoadPhysical.cpp
     src/physical/CarPhysical.cpp

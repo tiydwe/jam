@@ -59,6 +59,9 @@ public:
 
   Simulation *getParentSim() const { return _parentSim; }
 
+  ResultStats getResults() const {return _results;}
+  double getTimeSinceLastMove() const {return _timeSinseLastMove;}
+
 private:
   void _clipVelocity();
   void _decelerate(double a, double dt)
@@ -115,4 +118,5 @@ private:
   ResultStats _results;
 
   // for removing after inactivity
+  double _timeSinseLastMove = 0.0;
 };

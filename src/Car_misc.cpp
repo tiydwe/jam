@@ -42,6 +42,24 @@ void Car::_clipVelocity() {
 }
 
 double Car::_applyVelocity(double dt) {
+  if(utility::isclose(_velocity, 0.0)){
+    _timeSinseLastMove += dt;
+    if(_timeSinseLastMove > TIMOUT_LIMIT_NO_MOVE_CAR){
+      _parentSim->removeCar(_id);
+      return 0.0;
+    }
+  }
+  else{
+    _timeSinseLastMove = 0;
+  }
+  _results._distanceTravled += _velocity * dt;
+  _results._timeToArrival += dt;
+  if(_status == carStatus::WAITING_AT_INTERSECTION){
+    _results._timeWastedAtIntersection += dt;
+  }
+  if(_status == carStatus::WAITING_FOR_NEXT_CAR){
+    _results._timeWastedForNextCar += dt;
+  }
   _position_distance += _velocity * dt;
   _parentSim->getLane(_position_laneid)->moveCar(_position_distance, _id);
   return _velocity * dt;
@@ -66,5 +84,22 @@ std::string carStatusToString(carStatus s) {
 
     default:
       return "not recognized, " + std::to_string(static_cast<int>(s));
+  }
+}
+
+void Car::_updateResults(double dt, double dx)
+{
+  if(!_results._arrived){
+    _results._distanceTravled += dx;
+    _results._timeToArrival += dt;
+    if(_status == carStatus::ARRIVED){
+      _results._arrived = true;
+    }
+    else if(_status == carStatus::WAITING_FOR_NEXT_CAR){
+      _results._timeWastedForNextCar += dt;
+    }
+    else if(_status == carStatus::WAITING_AT_INTERSECTION){
+      _results._timeWastedAtIntersection += dt;
+    }
   }
 }

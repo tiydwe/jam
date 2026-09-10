@@ -18,6 +18,16 @@
 #include <string>
 
 
+class OverallStats{
+  public:
+  void addStat(ResultStats result);
+  size_t numberOfCars = 0;
+  size_t numberArrived = 0;
+  double totalTimeTraveled = 0.0;
+  double totalDistanceTraveled = 0.0;
+  double totalTimeAtIntersection = 0.0;
+  double totalTimeWaitingNextCar = 0.0;
+};
 
 std::unique_ptr<CarPhysical> createPhysicalFromDataFile(
     std::unique_ptr<Car> car, RoadPhysical* roadPhysical,
@@ -42,11 +52,12 @@ class Simulation : public sf::Drawable, sf::Transformable{
   Car* getCar(size_t id) const;
   Layout* getLayout() const {return _layout;}
   double getTime();
+  OverallStats getStats();
+  bool isDone() const;
 
   std::mt19937& getRNG();
 
   virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const override;
-
 
   private:
   Layout* _layout;
@@ -56,6 +67,8 @@ class Simulation : public sf::Drawable, sf::Transformable{
   std::map<size_t, std::unique_ptr<CarPhysical>> _cars;
   std::map<size_t, std::unique_ptr<CarPhysical>> _carsDone;
   std::map<size_t, std::unique_ptr<SimulationLane>> _simulationLanes;
+
+  OverallStats _overall;
 
   double _time;
 

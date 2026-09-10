@@ -10,7 +10,9 @@
 
 #define INTERSESCTION_SIZE 30.f
 
-#define SNAP_DIST 40.f
+#define SNAP_DIST 50.f
+
+#define TIMOUT_LIMIT_NO_MOVE_CAR 100.f
 
 namespace utility {
 

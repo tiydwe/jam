@@ -126,7 +126,7 @@ IntersectionPhysical* Layout::createIntersection(sf::Vector2f& position) {
   Intersection* intersectionptr = ip->getIntersection();
   size_t id = ip->getID();
   _physicalIntersections.try_emplace(ip->getID(), std::move(ip));
-  _intersections.try_emplace(id, intersectionptr);
+  _intersections.try_emplace(intersectionptr->getID(), intersectionptr);
   return _physicalIntersections.at(id).get();
 }
 
@@ -169,6 +169,7 @@ RoadPhysical* Layout::createRoad(IntersectionPhysical& start,
   _roads.try_emplace(rp->getInternalIDL(), rp->getRoadL());
   _physicalRoads.try_emplace(rp->getID(), std::move(rp));
 
+  utility::log(std::to_string(endid));
   _physicalIntersections.at(endid)->getIntersection()->addIngoing(r_rhsID);
   _physicalIntersections.at(endid)->getIntersection()->addOutgoing(r_lhsID);
   _physicalIntersections.at(endid)

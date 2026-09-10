@@ -12,6 +12,8 @@
 
 #define SNAP_DIST 50.f
 
+#define TIMOUT_LIMIT_NO_MOVE_CAR 100.f
+
 namespace utility {
 
 size_t uid();

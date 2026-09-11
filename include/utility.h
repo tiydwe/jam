@@ -4,16 +4,17 @@
 #include <SFML/Graphics.hpp>
 
 //#define DEBUG 1
-
+/*
 #define GREEN_PHASE_TIME_DEFAULT 20
 #define YELLOW_PHASE_TIME_DEFAULT 5
 
-#define INTERSESCTION_SIZE 30.f
+#define INTERSESCTION_SIZE 50.f
 
-#define SNAP_DIST 50.f
+#define SNAP_DIST 60.f
+#define MIN_ROAD_DIST 150.f
 
-#define TIMOUT_LIMIT_NO_MOVE_CAR 100.f
-
+#define TIMOUT_LIMIT_NO_MOVE_CAR 75.f
+//*/
 namespace utility {
 
 size_t uid();
@@ -39,6 +40,12 @@ bool isclose(T a, T b, T tol = 1e-9){
 
 namespace Constants{
   inline const sf::Font defaultFont{"assets/fonts/arial/ARIAL.TTF"};
+  extern const float GREEN_PHASE_TIME_DEFAULT;
+  extern const float YELLOW_PHASE_TIME_DEFAULT;
+  extern const float INTERSESCTION_SIZE;
+  extern const float SNAP_DIST;
+  extern const float MIN_ROAD_DIST;
+  extern const float TIMOUT_LIMIT_NO_MOVE_CAR;
 }
 
 };

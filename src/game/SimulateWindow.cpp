@@ -62,8 +62,8 @@ void SimulateWindow::handleEvent(const sf::Event& event,
       double zoomFactor = (mws->delta > 0) ? 0.9 : 1.1;
 
       // clip max zoom
-      if ((_zoomLevel > 0.3 && zoomFactor < 1.0) ||
-          (_zoomLevel < 3.0 && zoomFactor > 1.0)) {
+      if ((_zoomLevel > 0.2 && zoomFactor < 1.0) ||
+          (_zoomLevel < 4.0 && zoomFactor > 1.0)) {
         _worldview.zoom(zoomFactor);
         _zoomLevel *= zoomFactor;
       }
@@ -78,7 +78,12 @@ void SimulateWindow::updateWindowSize(sf::Vector2f newSize) {
   _topbar.setSize({newSize.x, 60.f});
 }
 
-void SimulateWindow::step(double trueDt) { _s->step(trueDt * _timeMultiplier); }
+void SimulateWindow::step(double trueDt) {
+  _s->step(trueDt * _timeMultiplier);
+  if (_s->isDone()) {
+    _exitSim.setNormal(sf::Color::Green);
+  }
+}
 
 void SimulateWindow::update(sf::RenderWindow& rw) {
   _slow.update(rw);

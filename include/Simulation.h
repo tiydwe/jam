@@ -72,4 +72,6 @@ class Simulation : public sf::Drawable, sf::Transformable{
 
   double _time;
 
+  bool _needsFixing = false;
+  std::map<size_t, std::unique_ptr<CarPhysical>>::iterator _fixDelete;
 };

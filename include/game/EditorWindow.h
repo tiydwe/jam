@@ -34,6 +34,9 @@ class EditorWindow : public sf::Drawable, sf::Transformable{
   void onclickSimulate(Game* game);
   void onclickCreateRoad(Game* game);
   void makeRoad(sf::Vector2f pos2, std::string datapath);
+  // will not do snapping
+  bool isRoadValid(sf::Vector2f start, sf::Vector2f end) const;
+  sf::Vector2f getSnappedPos(sf::Vector2f pos) const;
   std::unique_ptr<Layout> _l;
 
   Game* _game;
@@ -54,4 +57,5 @@ class EditorWindow : public sf::Drawable, sf::Transformable{
   sf::Vector2f _lastClickedPos;
   size_t _clickedCtr = 0;
   ActionType _currentAction = ActionType::NONE;
+  sf::Vector2f _mouseWorldPos;
 };

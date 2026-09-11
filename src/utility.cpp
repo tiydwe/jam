@@ -41,3 +41,10 @@ double utility::smoothstep(double x) {
 double utility::cumlitivePtoSlice(double (*p)(double), double t, double dt) {
   return 1.0-(1.0-p(t+dt))/(1.0-p(t));
 }
+
+const float utility::Constants::GREEN_PHASE_TIME_DEFAULT = 20;
+const float utility::Constants::YELLOW_PHASE_TIME_DEFAULT = 5;
+const float utility::Constants::INTERSESCTION_SIZE = 50.f;
+const float utility::Constants::SNAP_DIST = 60.f;
+const float utility::Constants::MIN_ROAD_DIST = 125.f;
+const float utility::Constants::TIMOUT_LIMIT_NO_MOVE_CAR = 75.f;

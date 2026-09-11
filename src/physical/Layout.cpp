@@ -84,7 +84,7 @@ Layout::Layout(std::string filepath) {
       size_t r_rhsID = r_rhs->getID();
       size_t r_lhsID = r_lhs->getID();
       auto delta = endpos - startpos;
-      auto correctionVector = delta.normalized() * INTERSESCTION_SIZE;
+      auto correctionVector = delta.normalized() * utility::Constants::INTERSESCTION_SIZE;
       std::unique_ptr<RoadPhysical> rp = std::make_unique<RoadPhysical>(
           id, std::move(r_rhs), std::move(r_lhs), ra,
           startpos + correctionVector, endpos - correctionVector);
@@ -97,7 +97,7 @@ Layout::Layout(std::string filepath) {
       _physicalIntersections.at(endid)
           ->getIntersection()
           ->getTrafficLight()
-          ->reSchedule(GREEN_PHASE_TIME_DEFAULT, YELLOW_PHASE_TIME_DEFAULT);
+          ->reSchedule(utility::Constants::GREEN_PHASE_TIME_DEFAULT, utility::Constants::YELLOW_PHASE_TIME_DEFAULT);
 
       _physicalIntersections.at(startid)->getIntersection()->addOutgoing(
           r_rhsID);
@@ -106,7 +106,7 @@ Layout::Layout(std::string filepath) {
       _physicalIntersections.at(startid)
           ->getIntersection()
           ->getTrafficLight()
-          ->reSchedule(GREEN_PHASE_TIME_DEFAULT, YELLOW_PHASE_TIME_DEFAULT);
+          ->reSchedule(utility::Constants::GREEN_PHASE_TIME_DEFAULT, utility::Constants::YELLOW_PHASE_TIME_DEFAULT);
 
     } else if (type == "#") {
       continue;
@@ -160,7 +160,7 @@ RoadPhysical* Layout::createRoad(IntersectionPhysical& start,
   size_t r_rhsID = r_rhs->getID();
   size_t r_lhsID = r_lhs->getID();
   auto delta = endpos - startpos;
-  auto correctionVector = delta.normalized() * INTERSESCTION_SIZE;
+  auto correctionVector = delta.normalized() * utility::Constants::INTERSESCTION_SIZE;
   std::unique_ptr<RoadPhysical> rp = std::make_unique<RoadPhysical>(
       utility::getNewPhysicalID(), std::move(r_rhs), std::move(r_lhs), ra,
       startpos + correctionVector, endpos - correctionVector);
@@ -175,14 +175,14 @@ RoadPhysical* Layout::createRoad(IntersectionPhysical& start,
   _physicalIntersections.at(endid)
       ->getIntersection()
       ->getTrafficLight()
-      ->reSchedule(GREEN_PHASE_TIME_DEFAULT, YELLOW_PHASE_TIME_DEFAULT);
+      ->reSchedule(utility::Constants::GREEN_PHASE_TIME_DEFAULT, utility::Constants::YELLOW_PHASE_TIME_DEFAULT);
 
   _physicalIntersections.at(startid)->getIntersection()->addOutgoing(r_rhsID);
   _physicalIntersections.at(startid)->getIntersection()->addIngoing(r_lhsID);
   _physicalIntersections.at(startid)
       ->getIntersection()
       ->getTrafficLight()
-      ->reSchedule(GREEN_PHASE_TIME_DEFAULT, YELLOW_PHASE_TIME_DEFAULT);
+      ->reSchedule(utility::Constants::GREEN_PHASE_TIME_DEFAULT, utility::Constants::YELLOW_PHASE_TIME_DEFAULT);
   return rpp;
 }
 

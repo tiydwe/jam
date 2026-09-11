@@ -44,7 +44,7 @@ void Car::_clipVelocity() {
 double Car::_applyVelocity(double dt) {
   if(utility::isclose(_velocity, 0.0)){
     _timeSinseLastMove += dt;
-    if(_timeSinseLastMove > TIMOUT_LIMIT_NO_MOVE_CAR){
+    if(_timeSinseLastMove > utility::Constants::TIMOUT_LIMIT_NO_MOVE_CAR){
       _parentSim->removeCar(_id);
       return 0.0;
     }

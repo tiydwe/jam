@@ -52,6 +52,10 @@ void Button::setSize(sf::Vector2f newsize) {
   _text.setPosition({_start.x + newsize.x / 2, _start.y + newsize.y / 2});
 }
 
+void Button::setNormal(sf::Color color) {
+  _normal=color;
+}
+
 bool Button::update(const sf::RenderWindow& window) {
   auto posI = sf::Mouse::getPosition(window);
   sf::Vector2f position{(float)posI.x, (float)posI.y};

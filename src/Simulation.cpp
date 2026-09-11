@@ -58,6 +58,8 @@ Simulation::Simulation(Layout* layout, std::string filepath, unsigned int seed)
             _layout->getPhysicalRoad(start)->getRoadR()->getEdgeLane(),
             initDist, maxa);
       }
+      _simulationLanes[cp->getCurrLane()]->addCar(cp->getCurrDist(),
+                                                  cp->getID());
       if (lre == 'l') {
         cp->setDestination(
             {_layout->getPhysicalRoad(end)->getInternalIDL(), finDist});
@@ -82,13 +84,12 @@ Simulation::~Simulation() {}
 
 void Simulation::step(double dt) {
   _time += dt;
-  for (auto it = _cars.begin(); it != _cars.end(); ) {
+  for (auto it = _cars.begin(); it != _cars.end();) {
     it->second->move(dt);
-    if(_needsFixing){
+    if (_needsFixing) {
       it = _fixDelete;
       _needsFixing = false;
-    }
-    else{
+    } else {
       ++it;
     }
   }
@@ -107,10 +108,10 @@ std::deque<size_t> Simulation::findRoute(size_t startRoad, size_t endRoad) {
     if (curr == endRoad) {
       break;
     }
-    auto& outs =
-        _layout
-            ->getIntersectionFromInternalID(_layout->getRoad(curr)->getEndIntersection())
-            ->getOutgoings();
+    auto& outs = _layout
+                     ->getIntersectionFromInternalID(
+                         _layout->getRoad(curr)->getEndIntersection())
+                     ->getOutgoings();
     for (const size_t nxt : outs) {
       if (visited.find(nxt) == visited.end()) {
         visited.insert(nxt);
@@ -125,7 +126,7 @@ std::deque<size_t> Simulation::findRoute(size_t startRoad, size_t endRoad) {
     res.push_front(curr);
     if (prev[curr] == curr) {
       // no route
-      //utility::logWarn("Simulation::findRoute - Route not found!");
+      // utility::logWarn("Simulation::findRoute - Route not found!");
       return {};
     }
     curr = prev[curr];
@@ -136,25 +137,27 @@ std::deque<size_t> Simulation::findRoute(size_t startRoad, size_t endRoad) {
 void Simulation::removeCar(size_t internalid) {
   CarPhysical* cr = nullptr;
   auto it = _cars.begin();
-  while(it != _cars.end()){
-    if(it->second->getCar()->getID() == internalid){
+  while (it != _cars.end()) {
+    if (it->second->getCar()->getID() == internalid) {
       cr = it->second.get();
       _overall.addStat(cr->getCar()->getResults());
       _carsDone.try_emplace(it->first, std::move(it->second));
       it = _cars.erase(it);
       _needsFixing = true;
       _fixDelete = it;
-    }
-    else{
+    } else {
       ++it;
     }
   }
-  if(cr){
-    this->getLane(cr->getCar()->getCurrLane())->removeCar(cr->getCar()->getID());
+  if (cr) {
+    this->getLane(cr->getCar()->getCurrLane())
+        ->removeCar(cr->getCar()->getID());
   }
 }
 
 void Simulation::addCar(std::unique_ptr<CarPhysical> car) {
+  _simulationLanes[car->getCar()->getCurrLane()]->addCar(
+      car->getCar()->getCurrDist(), car->getCar()->getID());
   _cars.try_emplace(car->getCar()->getID(), std::move(car));
 }
 
@@ -169,7 +172,6 @@ Car* Simulation::getCar(size_t id) const {
   return _cars.at(id)->getCar();
 }
 
-
 SimulationLane* Simulation::getLane(size_t id) const {
 #ifdef DEBUG
   if (_simulationLanes.find(id) == _simulationLanes.end()) {
@@ -181,10 +183,9 @@ SimulationLane* Simulation::getLane(size_t id) const {
   return _simulationLanes.at(id).get();
 }
 
-
 double Simulation::getTime() { return _time; }
 
-OverallStats Simulation::getStats()  {
+OverallStats Simulation::getStats() {
   _overall.numberOfCars = _cars.size() + _carsDone.size();
   return _overall;
 }

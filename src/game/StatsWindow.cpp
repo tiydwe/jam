@@ -58,7 +58,7 @@ void StatsWindow::updateWindowSize(sf::Vector2f newSize)
                         textRect.position.y + textRect.size.y / 2});
   _statsText.setPosition(center);
   _continue.setStart({center.x - newSize.x / 6.f, center.y + d.y - 50.f});
-  _continue.setSize({newSize.x / 3.f, 40});
+  _continue.setSize({newSize.x / 3.f, 40.f});
 }
 
 void StatsWindow::update(sf::RenderWindow &rw) { _continue.update(rw); }

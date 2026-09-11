@@ -56,6 +56,7 @@ void Game::run() {
         sf::Vector2f newSize = {static_cast<float>(resizeEvent->size.x),
                                 static_cast<float>(resizeEvent->size.y)};
         view.setSize(newSize);
+        view.setCenter(newSize / 2.f);
         MainWindow.setView(view);
         if (currentMode == GameScreenMode::SIMULATE) {
           _simulation->updateWindowSize(newSize);
@@ -63,7 +64,7 @@ void Game::run() {
           _editor->updateWindowSize(newSize);
         }
         else if(currentMode == GameScreenMode::STATS){
-          _statsWindow->updateWindowSize(newSize);
+          _statsWindow->updateWindowSize({MainWindow.getSize().x, MainWindow.getSize().y});
         }
       }
       if (currentMode == GameScreenMode::SIMULATE) {

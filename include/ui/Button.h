@@ -17,6 +17,7 @@ class Button : public sf::Drawable, sf::Transformable {
   void setOnclick(const std::function<void(Game*)>& onclick);
   void setStart(sf::Vector2f newStart);
   void setSize(sf::Vector2f newsize);
+  void setNormal(sf::Color color);
 
   // runs _onclick if clicked, returns true
   bool update(const sf::RenderWindow& window);

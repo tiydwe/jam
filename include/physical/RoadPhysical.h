@@ -51,6 +51,7 @@ class RoadPhysical : public sf::Drawable, sf::Transformable {
   size_t getID() const { return _id; }
   double getLength() const { return (_start - _end).length(); }
   const RoadAsset* getRoadAsset() const {return &_roadData;}
+  bool isRHSRoad(size_t id) const {return _road->getID() == id;}
 
  private:
   size_t _id;

@@ -4,8 +4,11 @@
 #include <utility>
 #include <vector>
 
+#include "Lane.h"
 #include "Road.h"
 #include "SFML/Graphics.hpp"
+
+class CarPhysical;
 
 // preset road data
 class RoadAsset {
@@ -35,7 +38,9 @@ class RoadPhysical : public sf::Drawable, sf::Transformable {
   void draw(sf::RenderTarget& target, sf::RenderStates states) const override;
 
   sf::Vector2f getPhysicalPosition(size_t roadid, size_t laneid,
-                                   double percentDistance) const;
+                                   double trueDistance, CarPhysical* cp,
+                                   RoadPhysical* lastRoad,
+                                   const Lane* lastLane) const;
 
   sf::Vector2<float> getStart() const { return _start; }
   sf::Vector2<float> getEnd() const { return _end; }
@@ -45,6 +50,7 @@ class RoadPhysical : public sf::Drawable, sf::Transformable {
   Road* getRoadL() const { return _roadb.get(); }
   size_t getID() const { return _id; }
   double getLength() const { return (_start - _end).length(); }
+  const RoadAsset* getRoadAsset() const {return &_roadData;}
 
  private:
   size_t _id;

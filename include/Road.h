@@ -3,6 +3,8 @@
 #include <vector>
 #include <deque>
 
+#include "Lane.h"
+
 class Layout;
 
 // really shouldn't be having too many lanes, maybe max 4
@@ -33,7 +35,7 @@ class Road{
   size_t getEndIntersection()const{return _endIntersection;}
   size_t getNumLanes()const{return _lanes.size();}
   double getAngle()const{return _angle;}
-
+  Lane* getLaneByID(size_t laneid) const;
 
   private:
   Layout* _parent;

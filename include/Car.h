@@ -5,6 +5,8 @@
 #include <string>
 
 class Simulation;
+class Lane;
+class Road;
 
 enum class carStatus
 {
@@ -62,6 +64,9 @@ public:
   ResultStats getResults() const {return _results;}
   double getTimeSinceLastMove() const {return _timeSinseLastMove;}
 
+  const Lane* getLastLane() const {return _lastLane;}
+  const Road* getLastRoad() const {return _lastRoad;}
+
 private:
   void _clipVelocity();
   void _decelerate(double a, double dt)
@@ -95,6 +100,9 @@ private:
   size_t _position_laneid;
   // back of car
   double _position_distance;
+
+  Lane* _lastLane = nullptr;
+  Road* _lastRoad = nullptr;
 
   // roadid (not laneid)
   std::deque<size_t> _route;

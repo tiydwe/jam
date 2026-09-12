@@ -2,6 +2,7 @@
 
 #include "Game.h"
 #include "Layout.h"
+#include "Road.h"
 #include "Simulation.h"
 #include "utility.h"
 
@@ -24,7 +25,12 @@ void CarPhysical::move(double dt) {
   _road = _game->getLayout()->getPhysicalRoadFromInternalID(
       _car->getParentSim()->getLayout()->getRoad(_car->getCurrRoad())->getID());
   _base.setPosition(_road->getPhysicalPosition(
-      _car->getCurrRoad(), _car->getCurrLane(), _car->getCurrDistFrac()));
+      _car->getCurrRoad(), _car->getCurrLane(), _car->getCurrDist(), this,
+      _car->getLastRoad() == nullptr
+          ? nullptr
+          : _game->getLayout()->getPhysicalRoadFromInternalID(
+                _car->getLastRoad()->getID()),
+      _car->getLastLane()));
 }
 
 void CarPhysical::draw(sf::RenderTarget& target,

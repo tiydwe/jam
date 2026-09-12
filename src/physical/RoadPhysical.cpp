@@ -4,6 +4,8 @@
 #include <iostream>
 #include <sstream>
 
+#include "CarPhysical.h"
+#include "Lane.h"
 #include "utility.h"
 
 RoadAsset::RoadAsset(std::string filename) {
@@ -67,7 +69,10 @@ RoadPhysical::RoadPhysical(size_t id, std::unique_ptr<Road> road,
 }
 
 sf::Vector2f RoadPhysical::getPhysicalPosition(size_t roadid, size_t laneid,
-                                               double percentDistnace) const {
+                                               double trueDistance,
+                                               CarPhysical* cp,
+                                               RoadPhysical* lastRoad,
+                                               const Lane* lastLane) const {
   const Road* r = nullptr;
   int mdf = 0;
   const std::vector<int>* offset;
@@ -80,7 +85,6 @@ sf::Vector2f RoadPhysical::getPhysicalPosition(size_t roadid, size_t laneid,
     r = _roadb.get();
     mdf = -1;
     offset = &_roadData.leftCenterOffset;
-    percentDistnace = 1-percentDistnace;
   }
   if (r == nullptr) {
     utility::logErr("RoadPhysical::getPhysicalPosition - roadid not found");
@@ -88,16 +92,67 @@ sf::Vector2f RoadPhysical::getPhysicalPosition(size_t roadid, size_t laneid,
   }
   int lane = r->getLanePosFromCenter(laneid);
   if (lane != -1) {
-    sf::Transform tr;
-    tr.rotate(sf::Vector2f(_end - _start).angle());
-    sf::Transform tr2;
-    tr2.translate(sf::Vector2f(_start));
+    double trueBegin = utility::Constants::INTERSECTION_TRANSITION_LENGTH;
+    Lane* lanetrue = r->getLaneByID(laneid);
+    if (_roadb->getID() == roadid) {
+    }
+    float percent = (trueDistance) / (lanetrue->getLength());
+    if (_roadb->getID() == roadid) {
+      percent = 1 - percent;
+    }
     auto of = offset->at(lane);
-    // utility::log(std::to_string(percentDistnace));
-    auto preT = sf::Vector2f(
-        percentDistnace * sf::Vector2f(_end - _start).length(), of * mdf);
-    auto res = (tr2 * tr).transformPoint(preT);
-    return res;
+    sf::Vector2f start = _start;
+    sf::Vector2f end = _end;
+    sf::Vector2f delta = _end - _start;
+    delta *= (isRHSRoad(roadid) ? 1.f : -1.f);
+
+    // Right to direction car is traveling
+    sf::Vector2f startOffsetNorm{-delta.y, delta.x};
+    startOffsetNorm =
+        startOffsetNorm.normalized();
+    sf::Vector2f endOffsetNorm{-delta.y, delta.x};
+    endOffsetNorm =
+        endOffsetNorm.normalized();
+    if(!isRHSRoad(roadid)){
+      std::swap(startOffsetNorm, endOffsetNorm);
+    }
+
+    double startOffset = offset->at(lane);
+    double endOffset = offset->at(lane);
+
+    if (trueDistance < trueBegin && lastRoad != nullptr &&
+        lastLane != nullptr) {
+      percent = trueDistance/trueBegin;
+      Road* last = lastRoad->isRHSRoad(lastLane->getRoad())
+                       ? lastRoad->getRoadR()
+                       : lastRoad->getRoadL();
+
+      // inside of start intersection
+      if (isRHSRoad(roadid)) {
+        end = _start;
+      } else {
+        end = _end;
+      }
+
+      if (lastRoad->isRHSRoad(lastLane->getRoad())) {
+        start = lastRoad->getEnd();
+        startOffsetNorm = (lastRoad->getEnd() - lastRoad->getStart());
+        startOffsetNorm =
+            sf::Vector2f(-startOffsetNorm.y, startOffsetNorm.x).normalized();
+        startOffset =
+            lastRoad->getRoadAsset()->rightCenterOffset.at(last->getLanePosFromCenter(lastLane->getID()));
+      } else {
+        start = lastRoad->getStart();
+        startOffsetNorm = (lastRoad->getStart() - lastRoad->getEnd());
+        startOffsetNorm =
+            sf::Vector2f(-startOffsetNorm.y, startOffsetNorm.x).normalized();
+        startOffset =
+            lastRoad->getRoadAsset()->leftCenterOffset.at(last->getLanePosFromCenter(lastLane->getID()));
+      }
+    }
+    sf::Vector2f trueStart = start + static_cast<float>(startOffset) * startOffsetNorm;
+    sf::Vector2f trueEnd = end + static_cast<float>(endOffset) * endOffsetNorm;
+    return trueStart + percent * (trueEnd - trueStart);
   }
   utility::logErr("RoadPhysical::getPhysicalPosition - laneid not found");
   utility::exit();

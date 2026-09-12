@@ -206,7 +206,16 @@ std::map<size_t, Lane*> Layout::getLanes() const {
   return res;
 }
 
-RoadPhysical* Layout::getPhysicalRoadFromInternalID(size_t id) {
+std::map<size_t, IntersectionPhysical*> Layout::getPhysicalIntersections()
+    const {
+  std::map<size_t, IntersectionPhysical*> res;
+  for (const auto& x : _physicalIntersections) {
+    res.try_emplace(x.first, x.second.get());
+  }
+  return res;
+}
+
+RoadPhysical* Layout::getPhysicalRoadFromInternalID(size_t id) const {
   for (auto& x : _physicalRoads) {
     if (x.second->getInternalIDL() == id || x.second->getInternalIDR() == id) {
       return x.second.get();
@@ -214,6 +223,28 @@ RoadPhysical* Layout::getPhysicalRoadFromInternalID(size_t id) {
   }
   utility::logWarn(
       "Layout::getPhysicalRoadFromInternalID - internalRoadID not found!");
+  return nullptr;
+}
+
+IntersectionPhysical* Layout::getBeginIntersectionFromInternalRoadID(
+    size_t id) const {
+  for(const auto& x : _physicalIntersections){
+    for(auto o : x.second->getIntersection()->getOutgoings()){
+      if(o == id){
+        return x.second.get();
+      }
+    }
+  }
+  return nullptr;
+}
+
+Road* Layout::getRoadBetweenTwoIntersectionsFromInternalID(size_t begin,
+                                                           size_t end) const {
+  for(const auto& x : getIntersectionFromInternalID(begin)->getOutgoings()){
+    if(getRoad(x)->getEndIntersection() == end){
+      return getRoad(x);
+    }
+  }
   return nullptr;
 }
 

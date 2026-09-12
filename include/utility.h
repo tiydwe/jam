@@ -46,6 +46,7 @@ namespace Constants{
   extern const float SNAP_DIST;
   extern const float MIN_ROAD_DIST;
   extern const float TIMOUT_LIMIT_NO_MOVE_CAR;
+  extern const float INTERSECTION_TRANSITION_LENGTH;
 }
 
 };

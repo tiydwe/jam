@@ -5,6 +5,8 @@
 #include "Simulation.h"
 #include "Layout.h"
 #include "utility.h"
+#include "Lane.h"
+#include "Road.h"
 
 void Car::move(double dt) {
   // todo do this on a random basis to improve preformance if this gets slow
@@ -156,6 +158,8 @@ bool Car::_move_checkIntersection(double dt) {
           if (_position_distance >
               _parentSim->getLane(_position_laneid)->getLane()->getLength()) {
             _parentSim->getLane(_position_laneid)->removeCar(_id);
+            _lastLane = _parentSim->getLane(_position_laneid)->getLane();
+            _lastRoad = _parentSim->getLayout()->getRoad(_position_roadid);
             _position_distance = newDist;
             _position_laneid = newLane;
             _position_roadid = newRoadID;

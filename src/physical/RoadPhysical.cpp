@@ -96,44 +96,63 @@ sf::Vector2f RoadPhysical::getPhysicalPosition(size_t roadid, size_t laneid,
     Lane* lanetrue = r->getLaneByID(laneid);
     if (_roadb->getID() == roadid) {
     }
-    double percent =
-        (trueDistance) / (lanetrue->getLength());
+    float percent = (trueDistance) / (lanetrue->getLength());
     if (_roadb->getID() == roadid) {
-      percent = 1-percent;
+      percent = 1 - percent;
     }
     auto of = offset->at(lane);
     sf::Vector2f start = _start;
     sf::Vector2f end = _end;
-    if (trueDistance < trueBegin && lastRoad != nullptr && lastLane != nullptr) {
-      // inside of start intersection
-      percent = trueDistance/trueBegin;
-      if (lastRoad->getRoadL()->getLaneByID(lastLane->getID()) != nullptr) {
-        of = lastRoad->getRoadAsset()->rightCenterOffset.at(
-            lastRoad->getRoadL()->getLanePosFromCenter(lastLane->getID()));
-        start = lastRoad->getStart();
-      } else if (lastRoad->getRoadR()->getLaneByID(lastLane->getID()) !=
-                 nullptr) {
-        of = lastRoad->getRoadAsset()->rightCenterOffset.at(
-            lastRoad->getRoadR()->getLanePosFromCenter(lastLane->getID()));
-        start = lastRoad->getEnd();
-      }
-      if(_road->getID() == roadid){
-        end = _start;
-      }
-      else{
-        end = _end;
-      }
+    sf::Vector2f delta = _end - _start;
+    delta *= (isRHSRoad(roadid) ? 1.f : -1.f);
+
+    // Right to direction car is traveling
+    sf::Vector2f startOffsetNorm{-delta.y, delta.x};
+    startOffsetNorm =
+        startOffsetNorm.normalized();
+    sf::Vector2f endOffsetNorm{-delta.y, delta.x};
+    endOffsetNorm =
+        endOffsetNorm.normalized();
+    if(!isRHSRoad(roadid)){
+      std::swap(startOffsetNorm, endOffsetNorm);
     }
 
-    sf::Transform tr;
-    tr.rotate(start == end ? sf::radians(0) : sf::Vector2f(end - start).angle());
-    sf::Transform tr2;
-    tr2.translate(sf::Vector2f(start));
-    // utility::log(std::to_string(percentDistnace));
-    auto preT =
-        sf::Vector2f(percent * sf::Vector2f(end - start).length(), of * mdf);
-    auto res = (tr2 * tr).transformPoint(preT);
-    return res;
+    double startOffset = offset->at(lane);
+    double endOffset = offset->at(lane);
+
+    if (trueDistance < trueBegin && lastRoad != nullptr &&
+        lastLane != nullptr) {
+      percent = trueDistance/trueBegin;
+      Road* last = lastRoad->isRHSRoad(lastLane->getRoad())
+                       ? lastRoad->getRoadR()
+                       : lastRoad->getRoadL();
+
+      // inside of start intersection
+      if (isRHSRoad(roadid)) {
+        end = _start;
+      } else {
+        end = _end;
+      }
+
+      if (lastRoad->isRHSRoad(lastLane->getRoad())) {
+        start = lastRoad->getEnd();
+        startOffsetNorm = (lastRoad->getEnd() - lastRoad->getStart());
+        startOffsetNorm =
+            sf::Vector2f(-startOffsetNorm.y, startOffsetNorm.x).normalized();
+        startOffset =
+            lastRoad->getRoadAsset()->rightCenterOffset.at(last->getLanePosFromCenter(lastLane->getID()));
+      } else {
+        start = lastRoad->getStart();
+        startOffsetNorm = (lastRoad->getStart() - lastRoad->getEnd());
+        startOffsetNorm =
+            sf::Vector2f(-startOffsetNorm.y, startOffsetNorm.x).normalized();
+        startOffset =
+            lastRoad->getRoadAsset()->leftCenterOffset.at(last->getLanePosFromCenter(lastLane->getID()));
+      }
+    }
+    sf::Vector2f trueStart = start + static_cast<float>(startOffset) * startOffsetNorm;
+    sf::Vector2f trueEnd = end + static_cast<float>(endOffset) * endOffsetNorm;
+    return trueStart + percent * (trueEnd - trueStart);
   }
   utility::logErr("RoadPhysical::getPhysicalPosition - laneid not found");
   utility::exit();

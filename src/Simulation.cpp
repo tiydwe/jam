@@ -1,7 +1,10 @@
 #include "Simulation.h"
 
 #include <fstream>
+#include <functional>
 #include <istream>
+#include <numeric>
+#include <queue>
 #include <sstream>
 #include <unordered_set>
 
@@ -98,39 +101,62 @@ void Simulation::step(double dt) {
 std::deque<size_t> Simulation::findRoute(size_t startRoad, size_t endRoad) {
   // loc, prev
   std::map<size_t, size_t> prev;
-  std::deque<size_t> q;
-  q.push_back(startRoad);
-  std::unordered_set<size_t> visited;
-  visited.insert(startRoad);
+  std::map<size_t, double> dist;
+  std::priority_queue<std::pair<double, size_t>,
+                      std::vector<std::pair<double, size_t>>,
+                      std::greater<std::pair<double, size_t>>>
+      q;
+  for (const auto& x : _layout->getPhysicalIntersections()) {
+    dist[x.second->getInternalID()] = std::numeric_limits<double>::infinity();
+    prev[x.second->getInternalID()] = std::numeric_limits<size_t>::max();
+  }
+  auto startIntersection = _layout->getRoad(startRoad)->getEndIntersection();
+  dist[startIntersection] = 0;
+  q.push({0.0, startIntersection});
+  auto endIntersection =
+      _layout->getBeginIntersectionFromInternalRoadID(endRoad);
+  if (endIntersection == nullptr) {
+    return {};
+  }
   while (!q.empty()) {
-    size_t curr = q.front();
-    q.pop_front();
-    if (curr == endRoad) {
+    auto curr = q.top();
+    q.pop();
+    if (curr.second == endIntersection->getInternalID()) {
       break;
     }
-    auto& outs = _layout
-                     ->getIntersectionFromInternalID(
-                         _layout->getRoad(curr)->getEndIntersection())
-                     ->getOutgoings();
+    auto& outs =
+        _layout->getIntersectionFromInternalID(curr.second)->getOutgoings();
     for (const size_t nxt : outs) {
-      if (visited.find(nxt) == visited.end()) {
-        visited.insert(nxt);
-        prev[nxt] = curr;
-        q.push_back(nxt);
+      size_t nexti = _layout->getRoad(nxt)->getEndIntersection();
+      if (std::isfinite(dist[curr.second])) {
+        double newDist =
+            dist[curr.second] +
+            _layout->getPhysicalRoadFromInternalID(nxt)->getLength();
+        if (newDist < dist[nexti]) {
+          dist[nexti] = newDist;
+          prev[nexti] = curr.second;
+          q.push({newDist, nexti});
+        }
       }
     }
   }
-  std::deque<size_t> res;
-  size_t curr = endRoad;
-  while (curr != startRoad) {
-    res.push_front(curr);
-    if (prev[curr] == curr) {
-      // no route
-      // utility::logWarn("Simulation::findRoute - Route not found!");
+  std::deque<size_t> res = {endRoad};
+  size_t curr = endIntersection->getInternalID();
+  size_t previ = prev[curr];
+  while (curr != startIntersection) {
+    if (prev[curr] == std::numeric_limits<size_t>::max()) {
+      return {};  // no route
+    }
+    size_t previ = prev[curr];
+    auto road =
+        _layout->getRoadBetweenTwoIntersectionsFromInternalID(previ, curr);
+    if (road == nullptr) {
       return {};
     }
-    curr = prev[curr];
+    res.push_front(road->getID());
+    curr = previ;
   }
+
   return res;
 }
 

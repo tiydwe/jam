@@ -28,9 +28,9 @@ class RoadPhysical : public sf::Drawable, sf::Transformable {
 
   RoadPhysical(RoadPhysical&&) = delete;
   RoadPhysical& operator=(RoadPhysical&&) = delete;
-  RoadPhysical(size_t id, std::unique_ptr<Road> road, std::unique_ptr<Road> roadb,
-               RoadAsset roadData, sf::Vector2<float> start,
-               sf::Vector2<float> end);
+  RoadPhysical(size_t id, std::unique_ptr<Road> road,
+               std::unique_ptr<Road> roadb, RoadAsset roadData,
+               sf::Vector2<float> start, sf::Vector2<float> end);
 
   void draw(sf::RenderTarget& target, sf::RenderStates states) const override;
 
@@ -43,7 +43,8 @@ class RoadPhysical : public sf::Drawable, sf::Transformable {
   size_t getInternalIDR() const { return _road->getID(); }
   Road* getRoadR() const { return _road.get(); }
   Road* getRoadL() const { return _roadb.get(); }
-  size_t getID() const {return _id;}
+  size_t getID() const { return _id; }
+  double getLength() const { return (_start - _end).length(); }
 
  private:
   size_t _id;

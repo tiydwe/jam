@@ -4,6 +4,8 @@
 #include <iostream>
 #include <sstream>
 
+#include "CarPhysical.h"
+#include "Lane.h"
 #include "utility.h"
 
 RoadAsset::RoadAsset(std::string filename) {
@@ -67,7 +69,10 @@ RoadPhysical::RoadPhysical(size_t id, std::unique_ptr<Road> road,
 }
 
 sf::Vector2f RoadPhysical::getPhysicalPosition(size_t roadid, size_t laneid,
-                                               double percentDistnace) const {
+                                               double trueDistance,
+                                               CarPhysical* cp,
+                                               RoadPhysical* lastRoad,
+                                               const Lane* lastLane) const {
   const Road* r = nullptr;
   int mdf = 0;
   const std::vector<int>* offset;
@@ -80,7 +85,6 @@ sf::Vector2f RoadPhysical::getPhysicalPosition(size_t roadid, size_t laneid,
     r = _roadb.get();
     mdf = -1;
     offset = &_roadData.leftCenterOffset;
-    percentDistnace = 1-percentDistnace;
   }
   if (r == nullptr) {
     utility::logErr("RoadPhysical::getPhysicalPosition - roadid not found");
@@ -88,14 +92,46 @@ sf::Vector2f RoadPhysical::getPhysicalPosition(size_t roadid, size_t laneid,
   }
   int lane = r->getLanePosFromCenter(laneid);
   if (lane != -1) {
-    sf::Transform tr;
-    tr.rotate(sf::Vector2f(_end - _start).angle());
-    sf::Transform tr2;
-    tr2.translate(sf::Vector2f(_start));
+    double trueBegin = utility::Constants::INTERSECTION_TRANSITION_LENGTH;
+    Lane* lanetrue = r->getLaneByID(laneid);
+    if (_roadb->getID() == roadid) {
+    }
+    double percent =
+        (trueDistance) / (lanetrue->getLength());
+    if (_roadb->getID() == roadid) {
+      percent = 1-percent;
+    }
     auto of = offset->at(lane);
+    sf::Vector2f start = _start;
+    sf::Vector2f end = _end;
+    if (trueDistance < trueBegin && lastRoad != nullptr && lastLane != nullptr) {
+      // inside of start intersection
+      percent = trueDistance/trueBegin;
+      if (lastRoad->getRoadL()->getLaneByID(lastLane->getID()) != nullptr) {
+        of = lastRoad->getRoadAsset()->rightCenterOffset.at(
+            lastRoad->getRoadL()->getLanePosFromCenter(lastLane->getID()));
+        start = lastRoad->getStart();
+      } else if (lastRoad->getRoadR()->getLaneByID(lastLane->getID()) !=
+                 nullptr) {
+        of = lastRoad->getRoadAsset()->rightCenterOffset.at(
+            lastRoad->getRoadR()->getLanePosFromCenter(lastLane->getID()));
+        start = lastRoad->getEnd();
+      }
+      if(_road->getID() == roadid){
+        end = _start;
+      }
+      else{
+        end = _end;
+      }
+    }
+
+    sf::Transform tr;
+    tr.rotate(start == end ? sf::radians(0) : sf::Vector2f(end - start).angle());
+    sf::Transform tr2;
+    tr2.translate(sf::Vector2f(start));
     // utility::log(std::to_string(percentDistnace));
-    auto preT = sf::Vector2f(
-        percentDistnace * sf::Vector2f(_end - _start).length(), of * mdf);
+    auto preT =
+        sf::Vector2f(percent * sf::Vector2f(end - start).length(), of * mdf);
     auto res = (tr2 * tr).transformPoint(preT);
     return res;
   }

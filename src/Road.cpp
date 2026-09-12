@@ -78,3 +78,12 @@ int Road::getLanePosFromCenter(size_t laneid) const {
   utility::exit();
   return 0;
 }
+
+Lane* Road::getLaneByID(size_t laneid) const {
+  for(auto it = _lanes.begin(); it < _lanes.end(); ++it){
+    if(*it == laneid){
+      return _parent->getLane(*it);
+    }
+  }
+  return nullptr;
+}

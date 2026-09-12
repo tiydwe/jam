@@ -32,8 +32,11 @@ class Layout : public sf::Drawable, sf::Transformable {
   IntersectionPhysical* getIntersection(size_t id) const {
     return _physicalIntersections.at(id).get();
   }
+  std::map<size_t, IntersectionPhysical*> getPhysicalIntersections() const;
   Intersection* getIntersectionFromInternalID(size_t id)const{ return _intersections.at(id); }
-  RoadPhysical* getPhysicalRoadFromInternalID(size_t id);
+  RoadPhysical* getPhysicalRoadFromInternalID(size_t id) const;
+  IntersectionPhysical* getBeginIntersectionFromInternalRoadID(size_t id) const;
+  Road* getRoadBetweenTwoIntersectionsFromInternalID(size_t begin, size_t end) const;
   
 
   virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const override;

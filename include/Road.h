@@ -6,6 +6,7 @@
 #include "Lane.h"
 
 class Layout;
+class RoadPhysical;
 
 // really shouldn't be having too many lanes, maybe max 4
 class Road{
@@ -36,6 +37,7 @@ class Road{
   size_t getNumLanes()const{return _lanes.size();}
   double getAngle()const{return _angle;}
   Lane* getLaneByID(size_t laneid) const;
+  RoadPhysical* getRoadPhysical()const;
 
   private:
   Layout* _parent;

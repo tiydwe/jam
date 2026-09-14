@@ -159,6 +159,20 @@ sf::Vector2f RoadPhysical::getPhysicalPosition(size_t roadid, size_t laneid,
   return {};
 }
 
+sf::Vector2f RoadPhysical::getOffestVectorR() const {
+  sf::Vector2f delta = _end - _start;
+  sf::Vector2f offsetNorm = {-delta.y, delta.x};
+  offsetNorm = offsetNorm.normalized();
+  return offsetNorm * static_cast<float>(_roadData.rightCenterOffset.at(_road->getLanePosFromCenter(_road->getEdgeLane())));
+}
+
+sf::Vector2f RoadPhysical::getOffestVectorL() const {
+  sf::Vector2f delta = _start-_end;
+  sf::Vector2f offsetNorm = {-delta.y, delta.x};
+  offsetNorm = offsetNorm.normalized();
+  return offsetNorm * static_cast<float>(_roadData.leftCenterOffset.at(_roadb->getLanePosFromCenter(_roadb->getEdgeLane())));
+}
+
 void RoadPhysical::draw(sf::RenderTarget& target,
                         sf::RenderStates states) const {
   states.transform *= getTransform();

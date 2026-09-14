@@ -27,7 +27,10 @@ class Intersection {
   void removeIngoing(size_t roadid);
 
   TrafficLight* getTrafficLight() { return _trafficLight.get(); }
-  void setTrafficLight(std::unique_ptr<TrafficLight> tl) {_trafficLight = std::move(tl);};
+  void setTrafficLight(std::unique_ptr<TrafficLight> tl) {
+    _trafficLight = std::move(tl);
+  };
+  std::vector<std::pair<Road*, EdgeType>> getRoads() const;
 
  private:
   Layout* _parent;

@@ -5,6 +5,7 @@
 
 #include "Layout.h"
 #include "utility.h"
+#include "RoadPhysical.h"
 
 Road::Road() {
   utility::exit(
@@ -86,4 +87,8 @@ Lane* Road::getLaneByID(size_t laneid) const {
     }
   }
   return nullptr;
+}
+
+RoadPhysical* Road::getRoadPhysical() const {
+  return _parent->getPhysicalRoadFromInternalID(_id);
 }

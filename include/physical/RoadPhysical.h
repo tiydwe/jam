@@ -52,6 +52,9 @@ class RoadPhysical : public sf::Drawable, sf::Transformable {
   double getLength() const { return (_start - _end).length(); }
   const RoadAsset* getRoadAsset() const {return &_roadData;}
   bool isRHSRoad(size_t id) const {return _road->getID() == id;}
+  // Returns a vector from start to edge at start
+  sf::Vector2f getOffestVectorR() const;
+  sf::Vector2f getOffestVectorL() const;
 
  private:
   size_t _id;

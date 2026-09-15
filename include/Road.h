@@ -7,6 +7,7 @@
 
 class Layout;
 class RoadPhysical;
+class Intersection;
 
 // really shouldn't be having too many lanes, maybe max 4
 class Road{
@@ -15,7 +16,7 @@ class Road{
   Road();
   Road(Layout* parent, double speedLimit, size_t endIntersection, double angle);
 
-  // adds lane always adds too center, not edge
+  // adds lane always adds to edge
   void addLane(const size_t& lane){_lanes.push_back(lane);}
 
   // returns -2 if err
@@ -34,10 +35,14 @@ class Road{
   const std::deque<size_t>& getLanes()const{return _lanes;}
   size_t getEdgeLane()const{return _lanes.back();}
   size_t getEndIntersection()const{return _endIntersection;}
+  Intersection* getTrueEndIntersection() const;
   size_t getNumLanes()const{return _lanes.size();}
   double getAngle()const{return _angle;}
   Lane* getLaneByID(size_t laneid) const;
   RoadPhysical* getRoadPhysical()const;
+
+  // someday, refactor this so this stupid stuff doesn't need to be used
+  Layout* getLayout() const {return _parent;}
 
   private:
   Layout* _parent;

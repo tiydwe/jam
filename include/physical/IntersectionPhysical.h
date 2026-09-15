@@ -12,6 +12,7 @@
 class IntersectionPhysical : public sf::Drawable, sf::Transformable {
  public:
   IntersectionPhysical(std::unique_ptr<Intersection> intersection, sf::Vector2f pos, size_t id);
+  ~IntersectionPhysical();
 
   void draw(sf::RenderTarget& target, sf::RenderStates states) const override;
 

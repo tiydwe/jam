@@ -4,17 +4,7 @@
 #include <SFML/Graphics.hpp>
 
 //#define DEBUG 1
-/*
-#define GREEN_PHASE_TIME_DEFAULT 20
-#define YELLOW_PHASE_TIME_DEFAULT 5
 
-#define INTERSESCTION_SIZE 50.f
-
-#define SNAP_DIST 60.f
-#define MIN_ROAD_DIST 150.f
-
-#define TIMOUT_LIMIT_NO_MOVE_CAR 75.f
-//*/
 namespace utility {
 
 size_t uid();
@@ -43,10 +33,11 @@ namespace Constants{
   extern const float GREEN_PHASE_TIME_DEFAULT;
   extern const float YELLOW_PHASE_TIME_DEFAULT;
   extern const float INTERSESCTION_SIZE;
-  extern const float SNAP_DIST;
+  extern const float INTERSECTION_SNAP_DIST;
   extern const float MIN_ROAD_DIST;
   extern const float TIMOUT_LIMIT_NO_MOVE_CAR;
   extern const float INTERSECTION_TRANSITION_LENGTH;
+  extern const float ROAD_SELECT_SNAP_DIST;
 }
 
 };

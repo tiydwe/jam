@@ -5,8 +5,10 @@
 #include <sstream>
 
 #include "CarPhysical.h"
+#include "Intersection.h"
 #include "Lane.h"
 #include "utility.h"
+#include "Layout.h"
 
 RoadAsset::RoadAsset(std::string filename) {
   std::ifstream file(filename);
@@ -43,7 +45,8 @@ RoadAsset::RoadAsset(std::string filename) {
 
 RoadPhysical::RoadPhysical(size_t id, std::unique_ptr<Road> road,
                            std::unique_ptr<Road> roadb, RoadAsset roadData,
-                           sf::Vector2<float> start, sf::Vector2<float> end)
+                           sf::Vector2<float> start, sf::Vector2<float> end,
+                           bool locked)
     : _id(id),
       _road(std::move(road)),
       _roadb(std::move(roadb)),
@@ -51,7 +54,8 @@ RoadPhysical::RoadPhysical(size_t id, std::unique_ptr<Road> road,
       _texture(roadData.texturePath),
       _base(_texture, sf::IntRect(sf::Vector2i(start), sf::Vector2i(end))),
       _start(start),
-      _end(end) {
+      _end(end),
+      _locked(locked) {
   if (!_texture.loadFromFile(roadData.texturePath)) {
     utility::logWarn(
         "RoadPhysical1Way::RoadPhysical1Way - texture path not found.");
@@ -66,6 +70,9 @@ RoadPhysical::RoadPhysical(size_t id, std::unique_ptr<Road> road,
   // std::to_string(sf::Vector2f(_end-_start).angle().asDegrees()));
   _base.setRotation(sf::Vector2f(_end - _start).angle());
   _base.setPosition(sf::Vector2f(_start));
+}
+
+RoadPhysical::~RoadPhysical() {
 }
 
 sf::Vector2f RoadPhysical::getPhysicalPosition(size_t roadid, size_t laneid,
@@ -108,12 +115,10 @@ sf::Vector2f RoadPhysical::getPhysicalPosition(size_t roadid, size_t laneid,
 
     // Right to direction car is traveling
     sf::Vector2f startOffsetNorm{-delta.y, delta.x};
-    startOffsetNorm =
-        startOffsetNorm.normalized();
+    startOffsetNorm = startOffsetNorm.normalized();
     sf::Vector2f endOffsetNorm{-delta.y, delta.x};
-    endOffsetNorm =
-        endOffsetNorm.normalized();
-    if(!isRHSRoad(roadid)){
+    endOffsetNorm = endOffsetNorm.normalized();
+    if (!isRHSRoad(roadid)) {
       std::swap(startOffsetNorm, endOffsetNorm);
     }
 
@@ -122,7 +127,7 @@ sf::Vector2f RoadPhysical::getPhysicalPosition(size_t roadid, size_t laneid,
 
     if (trueDistance < trueBegin && lastRoad != nullptr &&
         lastLane != nullptr) {
-      percent = trueDistance/trueBegin;
+      percent = trueDistance / trueBegin;
       Road* last = lastRoad->isRHSRoad(lastLane->getRoad())
                        ? lastRoad->getRoadR()
                        : lastRoad->getRoadL();
@@ -139,18 +144,19 @@ sf::Vector2f RoadPhysical::getPhysicalPosition(size_t roadid, size_t laneid,
         startOffsetNorm = (lastRoad->getEnd() - lastRoad->getStart());
         startOffsetNorm =
             sf::Vector2f(-startOffsetNorm.y, startOffsetNorm.x).normalized();
-        startOffset =
-            lastRoad->getRoadAsset()->rightCenterOffset.at(last->getLanePosFromCenter(lastLane->getID()));
+        startOffset = lastRoad->getRoadAsset()->rightCenterOffset.at(
+            last->getLanePosFromCenter(lastLane->getID()));
       } else {
         start = lastRoad->getStart();
         startOffsetNorm = (lastRoad->getStart() - lastRoad->getEnd());
         startOffsetNorm =
             sf::Vector2f(-startOffsetNorm.y, startOffsetNorm.x).normalized();
-        startOffset =
-            lastRoad->getRoadAsset()->leftCenterOffset.at(last->getLanePosFromCenter(lastLane->getID()));
+        startOffset = lastRoad->getRoadAsset()->leftCenterOffset.at(
+            last->getLanePosFromCenter(lastLane->getID()));
       }
     }
-    sf::Vector2f trueStart = start + static_cast<float>(startOffset) * startOffsetNorm;
+    sf::Vector2f trueStart =
+        start + static_cast<float>(startOffset) * startOffsetNorm;
     sf::Vector2f trueEnd = end + static_cast<float>(endOffset) * endOffsetNorm;
     return trueStart + percent * (trueEnd - trueStart);
   }
@@ -163,14 +169,16 @@ sf::Vector2f RoadPhysical::getOffestVectorR() const {
   sf::Vector2f delta = _end - _start;
   sf::Vector2f offsetNorm = {-delta.y, delta.x};
   offsetNorm = offsetNorm.normalized();
-  return offsetNorm * static_cast<float>(_roadData.rightCenterOffset.at(_road->getLanePosFromCenter(_road->getEdgeLane())));
+  return offsetNorm * static_cast<float>(_roadData.rightCenterOffset.at(
+                          _road->getLanePosFromCenter(_road->getEdgeLane())));
 }
 
 sf::Vector2f RoadPhysical::getOffestVectorL() const {
-  sf::Vector2f delta = _start-_end;
+  sf::Vector2f delta = _start - _end;
   sf::Vector2f offsetNorm = {-delta.y, delta.x};
   offsetNorm = offsetNorm.normalized();
-  return offsetNorm * static_cast<float>(_roadData.leftCenterOffset.at(_roadb->getLanePosFromCenter(_roadb->getEdgeLane())));
+  return offsetNorm * static_cast<float>(_roadData.leftCenterOffset.at(
+                          _roadb->getLanePosFromCenter(_roadb->getEdgeLane())));
 }
 
 void RoadPhysical::draw(sf::RenderTarget& target,

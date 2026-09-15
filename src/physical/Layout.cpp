@@ -2,8 +2,8 @@
 
 #include <fstream>
 #include <istream>
-#include <sstream>
 #include <limits>
+#include <sstream>
 
 Layout::Layout(std::string filepath) {
   std::ifstream file(filepath);
@@ -84,7 +84,8 @@ Layout::Layout(std::string filepath) {
       size_t r_rhsID = r_rhs->getID();
       size_t r_lhsID = r_lhs->getID();
       auto delta = endpos - startpos;
-      auto correctionVector = delta.normalized() * utility::Constants::INTERSESCTION_SIZE;
+      auto correctionVector =
+          delta.normalized() * utility::Constants::INTERSESCTION_SIZE;
       std::unique_ptr<RoadPhysical> rp = std::make_unique<RoadPhysical>(
           id, std::move(r_rhs), std::move(r_lhs), ra,
           startpos + correctionVector, endpos - correctionVector);
@@ -97,7 +98,8 @@ Layout::Layout(std::string filepath) {
       _physicalIntersections.at(endid)
           ->getIntersection()
           ->getTrafficLight()
-          ->reSchedule(utility::Constants::GREEN_PHASE_TIME_DEFAULT, utility::Constants::YELLOW_PHASE_TIME_DEFAULT);
+          ->reSchedule(utility::Constants::GREEN_PHASE_TIME_DEFAULT,
+                       utility::Constants::YELLOW_PHASE_TIME_DEFAULT);
 
       _physicalIntersections.at(startid)->getIntersection()->addOutgoing(
           r_rhsID);
@@ -106,7 +108,8 @@ Layout::Layout(std::string filepath) {
       _physicalIntersections.at(startid)
           ->getIntersection()
           ->getTrafficLight()
-          ->reSchedule(utility::Constants::GREEN_PHASE_TIME_DEFAULT, utility::Constants::YELLOW_PHASE_TIME_DEFAULT);
+          ->reSchedule(utility::Constants::GREEN_PHASE_TIME_DEFAULT,
+                       utility::Constants::YELLOW_PHASE_TIME_DEFAULT);
 
     } else if (type == "#") {
       continue;
@@ -160,7 +163,8 @@ RoadPhysical* Layout::createRoad(IntersectionPhysical& start,
   size_t r_rhsID = r_rhs->getID();
   size_t r_lhsID = r_lhs->getID();
   auto delta = endpos - startpos;
-  auto correctionVector = delta.normalized() * utility::Constants::INTERSESCTION_SIZE;
+  auto correctionVector =
+      delta.normalized() * utility::Constants::INTERSESCTION_SIZE;
   std::unique_ptr<RoadPhysical> rp = std::make_unique<RoadPhysical>(
       utility::getNewPhysicalID(), std::move(r_rhs), std::move(r_lhs), ra,
       startpos + correctionVector, endpos - correctionVector);
@@ -169,29 +173,95 @@ RoadPhysical* Layout::createRoad(IntersectionPhysical& start,
   _roads.try_emplace(rp->getInternalIDL(), rp->getRoadL());
   _physicalRoads.try_emplace(rp->getID(), std::move(rp));
 
-  utility::log(std::to_string(endid));
+  // utility::log(std::to_string(endid));
   _physicalIntersections.at(endid)->getIntersection()->addIngoing(r_rhsID);
   _physicalIntersections.at(endid)->getIntersection()->addOutgoing(r_lhsID);
   _physicalIntersections.at(endid)
       ->getIntersection()
       ->getTrafficLight()
-      ->reSchedule(utility::Constants::GREEN_PHASE_TIME_DEFAULT, utility::Constants::YELLOW_PHASE_TIME_DEFAULT);
+      ->reSchedule(utility::Constants::GREEN_PHASE_TIME_DEFAULT,
+                   utility::Constants::YELLOW_PHASE_TIME_DEFAULT);
 
   _physicalIntersections.at(startid)->getIntersection()->addOutgoing(r_rhsID);
   _physicalIntersections.at(startid)->getIntersection()->addIngoing(r_lhsID);
   _physicalIntersections.at(startid)
       ->getIntersection()
       ->getTrafficLight()
-      ->reSchedule(utility::Constants::GREEN_PHASE_TIME_DEFAULT, utility::Constants::YELLOW_PHASE_TIME_DEFAULT);
+      ->reSchedule(utility::Constants::GREEN_PHASE_TIME_DEFAULT,
+                   utility::Constants::YELLOW_PHASE_TIME_DEFAULT);
   return rpp;
 }
 
-std::pair<IntersectionPhysical*, double> Layout::findClosest(sf::Vector2f& pos) {
+void Layout::removeRoad(size_t id) {
+  std::unique_ptr<RoadPhysical> rp = std::move(_physicalRoads.at(id));
+  _physicalRoads.erase(id);
+  Road* roadr = rp->getRoadR();
+  Road* roadl = rp->getRoadL();
+
+  Intersection* startIntersection =
+      this->getIntersectionFromInternalID(roadl->getEndIntersection());
+  Intersection* endIntersection =
+      this->getIntersectionFromInternalID(roadr->getEndIntersection());
+  startIntersection->removeOutgoing(roadr->getID());
+  startIntersection->removeIngoing(roadl->getID());
+  startIntersection->getTrafficLight()->reSchedule(
+      utility::Constants::GREEN_PHASE_TIME_DEFAULT,
+      utility::Constants::YELLOW_PHASE_TIME_DEFAULT);
+  endIntersection->removeOutgoing(roadl->getID());
+  endIntersection->removeIngoing(roadr->getID());
+  endIntersection->getTrafficLight()->reSchedule(
+      utility::Constants::GREEN_PHASE_TIME_DEFAULT,
+      utility::Constants::YELLOW_PHASE_TIME_DEFAULT);
+  if (startIntersection->getRoads().empty()) {
+    _physicalIntersections.erase(this->getIntersectionPhysicalFromInternalID(roadl->getEndIntersection())->getID());
+  }
+  if (endIntersection->getRoads().empty()) {
+    _physicalIntersections.erase(this->getIntersectionPhysicalFromInternalID(roadr->getEndIntersection())->getID());
+  }
+
+  for (size_t id : roadr->getLanes()) {
+    _lanes.erase(id);
+  }
+  for (size_t id : roadl->getLanes()) {
+    _lanes.erase(id);
+  }
+
+  rp.reset();
+}
+
+std::pair<IntersectionPhysical*, double> Layout::findClosestIntersection(
+    sf::Vector2f pos) {
   IntersectionPhysical* closest = nullptr;
   double bestDist = std::numeric_limits<double>::max();
   for (const auto& x : _physicalIntersections) {
     if ((pos - x.second->getPos()).length() < bestDist) {
       bestDist = (pos - x.second->getPos()).length();
+      closest = x.second.get();
+    }
+  }
+  return {closest, bestDist};
+}
+
+std::pair<RoadPhysical*, double> Layout::findClosestRoad(sf::Vector2f pos) {
+  RoadPhysical* closest = nullptr;
+  double bestDist = std::numeric_limits<double>::max();
+  for (const auto& x : _physicalRoads){
+    auto a = x.second->getStart();
+    auto b = x.second->getEnd();
+    float t = (a - pos).dot(b-a) / (a-b).lengthSquared();
+    double newDist = 0;
+    if(t <= 0){
+      newDist = (pos - a).length();
+    }
+    else if(t >= 1){
+      newDist = (pos - b).length();
+    }
+    else{
+      sf::Vector2f pt = a + (b - a) * t;
+      newDist = (pt - pos).length();
+    }
+    if(newDist < bestDist){
+      bestDist = newDist;
       closest = x.second.get();
     }
   }
@@ -215,6 +285,15 @@ std::map<size_t, IntersectionPhysical*> Layout::getPhysicalIntersections()
   return res;
 }
 
+IntersectionPhysical* Layout::getIntersectionPhysicalFromInternalID(size_t id) const {
+  for(const auto& x : _physicalIntersections){
+    if(x.second->getInternalID() == id){
+      return x.second.get();
+    }
+  }
+  return nullptr;
+}
+
 RoadPhysical* Layout::getPhysicalRoadFromInternalID(size_t id) const {
   for (auto& x : _physicalRoads) {
     if (x.second->getInternalIDL() == id || x.second->getInternalIDR() == id) {
@@ -228,9 +307,9 @@ RoadPhysical* Layout::getPhysicalRoadFromInternalID(size_t id) const {
 
 IntersectionPhysical* Layout::getBeginIntersectionFromInternalRoadID(
     size_t id) const {
-  for(const auto& x : _physicalIntersections){
-    for(auto o : x.second->getIntersection()->getOutgoings()){
-      if(o == id){
+  for (const auto& x : _physicalIntersections) {
+    for (auto o : x.second->getIntersection()->getOutgoings()) {
+      if (o == id) {
         return x.second.get();
       }
     }
@@ -240,8 +319,8 @@ IntersectionPhysical* Layout::getBeginIntersectionFromInternalRoadID(
 
 Road* Layout::getRoadBetweenTwoIntersectionsFromInternalID(size_t begin,
                                                            size_t end) const {
-  for(const auto& x : getIntersectionFromInternalID(begin)->getOutgoings()){
-    if(getRoad(x)->getEndIntersection() == end){
+  for (const auto& x : getIntersectionFromInternalID(begin)->getOutgoings()) {
+    if (getRoad(x)->getEndIntersection() == end) {
       return getRoad(x);
     }
   }

@@ -14,7 +14,10 @@ EditorWindow::EditorWindow(std::unique_ptr<Layout> l, Game* g,
                       sf::Color::Green, sf::Color::Blue, sf::Color::Red),
       _placeRoadButton(g, sf::Vector2f(120, 10), sf::Vector2f(100, 40),
                        utility::Constants::defaultFont, "ROAD",
-                       sf::Color::Green, sf::Color::Blue, sf::Color::Red) {
+                       sf::Color::Green, sf::Color::Blue, sf::Color::Red),
+      _removeRoadButton(g, sf::Vector2f(500, 10), sf::Vector2f(100, 40),
+                        utility::Constants::defaultFont, "DEMOLISH",
+                        sf::Color::Green, sf::Color::Blue, sf::Color::Red) {
   _worldview.setSize({(float)windowSize.x, (float)windowSize.y});
   _worldview.setCenter({windowSize.x / 2.f, windowSize.y / 2.f});
   _uiview.setSize({(float)windowSize.x, (float)windowSize.y});
@@ -27,6 +30,8 @@ EditorWindow::EditorWindow(std::unique_ptr<Layout> l, Game* g,
   _simulateButton.setOnclick([&](Game* game) { this->onclickSimulate(game); });
   _placeRoadButton.setOnclick(
       [&](Game* game) { this->onclickCreateRoad(game); });
+  _removeRoadButton.setOnclick(
+      [&](Game* game) { this->onclickDemolishRoad(game); });
 }
 
 void EditorWindow::handleEvent(const sf::Event& event,
@@ -40,7 +45,7 @@ void EditorWindow::handleEvent(const sf::Event& event,
       }
       if (mbpIf->button == sf::Mouse::Button::Left) {
         switch (_currentAction) {
-          case ActionType::DRAW_ROAD:
+          case ActionType::DRAW_ROAD: {
             if (_clickedCtr == 0) {
               // first click
               ++_clickedCtr;
@@ -50,8 +55,7 @@ void EditorWindow::handleEvent(const sf::Event& event,
                   window.mapPixelToCoords(sf::Mouse::getPosition(window));
               window.setView(old);
             } else {
-              if (isRoadValid(_mouseWorldPos,
-                              _lastClickedPos)) {
+              if (isRoadValid(_mouseWorldPos, _lastClickedPos)) {
                 sf::View old = window.getView();
                 window.setView(_worldview);
                 auto pos =
@@ -63,7 +67,16 @@ void EditorWindow::handleEvent(const sf::Event& event,
               }
             }
             break;
-
+          }
+          case ActionType::REMOVE_ROAD: {
+            auto road = _l->findClosestRoad(
+                window.mapPixelToCoords(sf::Mouse::getPosition(window)));
+            if (road.first != nullptr &&
+                road.second < utility::Constants::ROAD_SELECT_SNAP_DIST) {
+              _l->removeRoad(road.first->getID());
+            }
+            break;
+          }
           default:
             break;
         }
@@ -98,18 +111,26 @@ void EditorWindow::handleEvent(const sf::Event& event,
       }
     }
   }
-  if(auto kps = event.getIf<sf::Event::KeyPressed>()){
-    if(kps->code == sf::Keyboard::Key::Escape){
+  if (auto kps = event.getIf<sf::Event::KeyPressed>()) {
+    if (kps->code == sf::Keyboard::Key::Escape) {
       _clickedCtr = 0;
     }
   }
 }
 
-void EditorWindow::onclickSimulate(Game* game) { game->beginSimulation(); }
+void EditorWindow::onclickSimulate(Game* game) {
+  _clickedCtr = 0;
+  game->beginSimulation();
+}
 
 void EditorWindow::onclickCreateRoad(Game* game) {
   _clickedCtr = 0;
   _currentAction = ActionType::DRAW_ROAD;
+}
+
+void EditorWindow::onclickDemolishRoad(Game* game) {
+  _clickedCtr = 0;
+  _currentAction = ActionType::REMOVE_ROAD;
 }
 
 void EditorWindow::updateWindowSize(sf::Vector2f newSize) {
@@ -122,6 +143,7 @@ void EditorWindow::updateWindowSize(sf::Vector2f newSize) {
 void EditorWindow::update(sf::RenderWindow& rw) {
   _simulateButton.update(rw);
   _placeRoadButton.update(rw);
+  _removeRoadButton.update(rw);
 }
 
 void EditorWindow::draw(sf::RenderTarget& target,
@@ -157,6 +179,7 @@ void EditorWindow::draw(sf::RenderTarget& target,
 
   target.draw(_simulateButton, states);
   target.draw(_placeRoadButton, states);
+  target.draw(_removeRoadButton, states);
 
   target.setView(origional);
 }
@@ -169,11 +192,12 @@ bool EditorWindow::isRoadValid(sf::Vector2f start, sf::Vector2f end) const {
 }
 
 sf::Vector2f EditorWindow::getSnappedPos(sf::Vector2f pos) const {
-  auto x = _l->findClosest(pos);
+  auto x = _l->findClosestIntersection(pos);
   if (x.first == nullptr) {
     return pos;
   } else {
-    if ((x.first->getPos() - pos).length() > utility::Constants::SNAP_DIST) {
+    if ((x.first->getPos() - pos).length() >
+        utility::Constants::INTERSECTION_SNAP_DIST) {
       return pos;
     } else {
       return x.first->getPos();

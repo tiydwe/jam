@@ -18,5 +18,5 @@ void EditorWindow::makeRoad(sf::Vector2f pos2, std::string datapath) {
     // create new
     end.first = _l->createIntersection(pos2);
   }
-  _l->createRoad(*start.first, *end.first, datapath);
+  _l->createRoad(*start.first, *end.first, datapath, false);
 }

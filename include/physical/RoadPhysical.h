@@ -33,7 +33,10 @@ class RoadPhysical : public sf::Drawable, sf::Transformable {
   RoadPhysical& operator=(RoadPhysical&&) = delete;
   RoadPhysical(size_t id, std::unique_ptr<Road> road,
                std::unique_ptr<Road> roadb, RoadAsset roadData,
-               sf::Vector2<float> start, sf::Vector2<float> end);
+               sf::Vector2<float> start, sf::Vector2<float> end, bool locked = true);
+  
+  // auto deletes intersections
+  ~RoadPhysical();
 
   void draw(sf::RenderTarget& target, sf::RenderStates states) const override;
 
@@ -55,6 +58,7 @@ class RoadPhysical : public sf::Drawable, sf::Transformable {
   // Returns a vector from start to edge at start
   sf::Vector2f getOffestVectorR() const;
   sf::Vector2f getOffestVectorL() const;
+  bool isLocked() const {return _locked;}
 
  private:
   size_t _id;
@@ -68,4 +72,6 @@ class RoadPhysical : public sf::Drawable, sf::Transformable {
 
   sf::Vector2<float> _start;
   sf::Vector2<float> _end;
+
+  bool _locked;
 };

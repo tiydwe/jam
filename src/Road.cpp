@@ -5,6 +5,7 @@
 
 #include "Layout.h"
 #include "utility.h"
+#include "Intersection.h"
 #include "RoadPhysical.h"
 
 Road::Road() {
@@ -78,6 +79,10 @@ int Road::getLanePosFromCenter(size_t laneid) const {
   utility::logErr("Road::getLanePosFromCenter - laneid not found");
   utility::exit();
   return 0;
+}
+
+Intersection* Road::getTrueEndIntersection() const {
+  return _parent->getIntersectionFromInternalID(_endIntersection);
 }
 
 Lane* Road::getLaneByID(size_t laneid) const {

@@ -1,6 +1,7 @@
 #include "IntersectionPhysical.h"
 
 #include <set>
+#include <algorithm>
 #include <vector>
 
 #include "utility.h"

@@ -69,8 +69,8 @@ void EditorWindow::handleEvent(const sf::Event& event,
             break;
           }
           case ActionType::REMOVE_ROAD: {
-            auto road = _l->findClosestRoad(
-                window.mapPixelToCoords(sf::Mouse::getPosition(window)));
+            // already checks for locked
+            auto road = _l->findClosestRoadUnlocked(_mouseWorldPos);
             if (road.first != nullptr &&
                 road.second < utility::Constants::ROAD_SELECT_SNAP_DIST) {
               _l->removeRoad(road.first->getID());
@@ -171,6 +171,20 @@ void EditorWindow::draw(sf::RenderTarget& target,
       } else {
         rectangle.setFillColor(sf::Color::Red);
       }
+      target.draw(rectangle);
+    }
+  }
+  if(_currentAction == ActionType::REMOVE_ROAD){
+    auto road = _l->findClosestRoadUnlocked(_mouseWorldPos);
+    if(road.first != nullptr && road.second < utility::Constants::ROAD_SELECT_SNAP_DIST){
+      auto start = road.first->getStart();
+      auto end = road.first->getEnd();
+      float width = road.first->getRoadAsset()->leftCenterOffset.back() + road.first->getRoadAsset()->rightCenterOffset.back();
+      sf::RectangleShape rectangle(sf::Vector2f{(start-end).length(), width});
+      rectangle.setOrigin({0.f, width/2});
+      rectangle.setRotation((end-start).angle());
+      rectangle.setPosition(start);
+      rectangle.setFillColor(sf::Color(255,0,0,32));
       target.draw(rectangle);
     }
   }

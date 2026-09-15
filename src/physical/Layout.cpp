@@ -135,7 +135,7 @@ IntersectionPhysical* Layout::createIntersection(sf::Vector2f& position) {
 
 RoadPhysical* Layout::createRoad(IntersectionPhysical& start,
                                  IntersectionPhysical& end,
-                                 std::string datapath) {
+                                 std::string datapath, bool locked) {
   auto startpos = start.getPos();
   auto endpos = end.getPos();
   auto startid = start.getID();
@@ -167,7 +167,7 @@ RoadPhysical* Layout::createRoad(IntersectionPhysical& start,
       delta.normalized() * utility::Constants::INTERSESCTION_SIZE;
   std::unique_ptr<RoadPhysical> rp = std::make_unique<RoadPhysical>(
       utility::getNewPhysicalID(), std::move(r_rhs), std::move(r_lhs), ra,
-      startpos + correctionVector, endpos - correctionVector);
+      startpos + correctionVector, endpos - correctionVector, locked);
   RoadPhysical* rpp = rp.get();
   _roads.try_emplace(rp->getInternalIDR(), rp->getRoadR());
   _roads.try_emplace(rp->getInternalIDL(), rp->getRoadL());
@@ -242,13 +242,16 @@ std::pair<IntersectionPhysical*, double> Layout::findClosestIntersection(
   return {closest, bestDist};
 }
 
-std::pair<RoadPhysical*, double> Layout::findClosestRoad(sf::Vector2f pos) {
+std::pair<RoadPhysical*, double> Layout::findClosestRoadUnlocked(sf::Vector2f pos) {
   RoadPhysical* closest = nullptr;
   double bestDist = std::numeric_limits<double>::max();
   for (const auto& x : _physicalRoads){
+    if(x.second->isLocked()){
+      continue;
+    }
     auto a = x.second->getStart();
     auto b = x.second->getEnd();
-    float t = (a - pos).dot(b-a) / (a-b).lengthSquared();
+    float t = (pos-a).dot(b-a) / (a-b).lengthSquared();
     double newDist = 0;
     if(t <= 0){
       newDist = (pos - a).length();

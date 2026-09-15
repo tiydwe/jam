@@ -45,7 +45,8 @@ double utility::cumlitivePtoSlice(double (*p)(double), double t, double dt) {
 const float utility::Constants::GREEN_PHASE_TIME_DEFAULT = 20;
 const float utility::Constants::YELLOW_PHASE_TIME_DEFAULT = 5;
 const float utility::Constants::INTERSESCTION_SIZE = 50.f;
-const float utility::Constants::SNAP_DIST = 60.f;
+const float utility::Constants::INTERSECTION_SNAP_DIST = 60.f;
 const float utility::Constants::MIN_ROAD_DIST = 150.f;
 const float utility::Constants::TIMOUT_LIMIT_NO_MOVE_CAR = 75.f;
 const float utility::Constants::INTERSECTION_TRANSITION_LENGTH = 50.f;
+const float utility::Constants::ROAD_SELECT_SNAP_DIST = 150.f;

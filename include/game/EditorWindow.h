@@ -10,7 +10,7 @@
 class Game;
 
 enum class ActionType{
-  NONE, DRAW_ROAD
+  NONE, DRAW_ROAD, REMOVE_ROAD
 };
 
 std::string getDatapathFromActionType(ActionType type);
@@ -33,6 +33,7 @@ class EditorWindow : public sf::Drawable, sf::Transformable{
  private:
   void onclickSimulate(Game* game);
   void onclickCreateRoad(Game* game);
+  void onclickDemolishRoad(Game* game);
   void makeRoad(sf::Vector2f pos2, std::string datapath);
   // will not do snapping
   bool isRoadValid(sf::Vector2f start, sf::Vector2f end) const;
@@ -53,6 +54,7 @@ class EditorWindow : public sf::Drawable, sf::Transformable{
   Button _simulateButton;
 
   Button _placeRoadButton;
+  Button _removeRoadButton;
   
   sf::Vector2f _lastClickedPos;
   size_t _clickedCtr = 0;

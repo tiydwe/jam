@@ -71,16 +71,22 @@ bool TrafficLight::addOutgoing(size_t roadid) {
 void TrafficLight::removeRoad(size_t roadid) {
   bool inIn = false;
   bool inOut = false;
-  for (auto it = _ingoingRoads.begin(); it != _ingoingRoads.end(); ++it) {
+  for (auto it = _ingoingRoads.begin(); it != _ingoingRoads.end();) {
     if (it->getRoadID() == roadid) {
       it = _ingoingRoads.erase(it);
       inIn = true;
     }
+    else{
+      ++it;
+    }
   }
-  for (auto it = _outgoingRoads.begin(); it != _outgoingRoads.end(); ++it) {
+  for (auto it = _outgoingRoads.begin(); it != _outgoingRoads.end();) {
     if (it->getRoadID() == roadid) {
       it = _outgoingRoads.erase(it);
       inOut = true;
+    }
+    else{
+      ++it;
     }
   }
   if (!inIn && !inOut) {
@@ -91,11 +97,14 @@ void TrafficLight::removeRoad(size_t roadid) {
                      std::to_string(roadid) +
                      " but was found in both in and out.");
   }
-  for (ScheduleItem& si : _schedule) {
-    for (const auto& [path, light] : si.valid) {
-      if (_parent->getLane(path.first)->getRoad() == roadid ||
-          _parent->getLane(path.second)->getRoad() == roadid) {
-        si.valid.erase(path);
+  for (auto it = _schedule.begin(); it != _schedule.end(); ++it) {
+    for (auto it2 = it->valid.begin(); it2 != it->valid.end();) {
+      if (_parent->getLane(it2->first.first)->getRoad() == roadid ||
+          _parent->getLane(it2->first.second)->getRoad() == roadid) {
+        it2 = it->valid.erase(it2);
+      }
+      else{
+        ++it2;
       }
     }
   }
@@ -170,6 +179,9 @@ void TrafficLight::reSchedule(double greenPhaseTime, double yellowPhaseTime) {
     numOutgoing += _parent->getRoad(rw.getRoadID())->getNumLanes();
   }
   for (RoadWrapper rw : _ingoingRoads) {
+    if(_parent->getRoad(rw.getRoadID())->getNumLanes() == 0){
+      continue;
+    }
     ScheduleItem greenPhase;
     ScheduleItem yellowPhase;
     greenPhase.duration = greenPhaseTime;

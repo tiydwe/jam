@@ -38,12 +38,6 @@ class SaveWindow : public sf::Drawable, sf::Transformable {
 
   Button _choose;
 
-  Button _recent1;
-  Button _recent2;
-  Button _recent3;
-  Button _recent4;
-  Button _recent5;
-
   Button _ok;
   Button _cancel;
 

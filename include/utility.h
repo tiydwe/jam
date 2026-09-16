@@ -32,6 +32,8 @@ bool isclose(T a, T b, T tol = 1e-9){
 std::filesystem::path getSaveFileDirectory();
 std::filesystem::path getSaveFilePath(const std::string& gameName, const std::string& fileName);
 
+std::string truncateText(sf::Text &textObj, const std::string &str, float maxWidth);
+
 namespace Constants{
   inline const sf::Font defaultFont{"assets/fonts/arial/ARIAL.TTF"};
   extern const float GREEN_PHASE_TIME_DEFAULT;

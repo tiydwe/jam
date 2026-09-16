@@ -144,7 +144,7 @@ void Layout::saveToFile(std::filesystem::path fpath) {
     auto l = x.second->getRoadL();
     auto r = x.second->getRoadR();
     layoutFile
-        << "R2 " << x.first << " " << x.second->getRoadAsset()->filename
+        << "R2 " << x.first << " " << x.second->getRoadAsset()->filename << " "
         << this->getIntersectionPhysicalFromInternalID(l->getEndIntersection())
                ->getID()
         << " "

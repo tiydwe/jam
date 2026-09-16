@@ -15,8 +15,8 @@ Game::Game(std::string filepath) {
   }
   std::string tmp;
   std::getline(file, tmp);
-  std::unique_ptr<Layout> layout = std::make_unique<Layout>(std::filesystem::path(tmp));
   std::getline(file, carSetupFilepath);
+  std::unique_ptr<Layout> layout = std::make_unique<Layout>(std::filesystem::path(tmp), std::filesystem::path(carSetupFilepath));
   MainWindow = sf::RenderWindow(sf::VideoMode({1000, 800}), "JAM");
   _editor = std::make_unique<EditorWindow>(std::move(layout), this,
                                            MainWindow.getSize());
@@ -79,11 +79,11 @@ void Game::run() {
     double dt = std::min((nex - lastTickTime).asSeconds(), clampTime);
     if (currentMode == GameScreenMode::SIMULATE) {
       _simulation->step(dt);
-      _simulation->update(MainWindow);
+      _simulation->update(MainWindow.mapPixelToCoords(sf::Mouse::getPosition(MainWindow)));
     } else if (currentMode == GameScreenMode::EDIT) {
-      _editor->update(MainWindow);
+      _editor->update(MainWindow.mapPixelToCoords(sf::Mouse::getPosition(MainWindow)));
     } else if (currentMode == GameScreenMode::STATS){
-      _statsWindow->update(MainWindow);
+      _statsWindow->update(MainWindow.mapPixelToCoords(sf::Mouse::getPosition(MainWindow)));
     }
     lastTickTime = nex;
     MainWindow.clear();

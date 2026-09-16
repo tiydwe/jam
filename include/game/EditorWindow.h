@@ -3,6 +3,7 @@
 #include <SFML/Graphics.hpp>
 #include "Layout.h"
 #include "Button.h"
+#include "SaveWindow.h"
 
 #include <memory>
 #include <utility>
@@ -34,6 +35,7 @@ class EditorWindow : public sf::Drawable, sf::Transformable{
   void onclickSimulate(Game* game);
   void onclickCreateRoad(Game* game);
   void onclickDemolishRoad(Game* game);
+  void onclickSaveGame(Game* game);
   void makeRoad(sf::Vector2f pos2, std::string datapath);
   // will not do snapping
   bool isRoadValid(sf::Vector2f start, sf::Vector2f end) const;
@@ -55,9 +57,13 @@ class EditorWindow : public sf::Drawable, sf::Transformable{
 
   Button _placeRoadButton;
   Button _removeRoadButton;
+  Button _saveButton;
+
   
   sf::Vector2f _lastClickedPos;
   size_t _clickedCtr = 0;
   ActionType _currentAction = ActionType::NONE;
   sf::Vector2f _mouseWorldPos;
+
+  std::unique_ptr<SaveWindow> _saveWindow;
 };

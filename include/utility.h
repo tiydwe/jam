@@ -2,6 +2,7 @@
 
 #include <string>
 #include <SFML/Graphics.hpp>
+#include <filesystem>
 
 //#define DEBUG 1
 
@@ -27,6 +28,9 @@ template <class T>
 bool isclose(T a, T b, T tol = 1e-9){
   return (a-b) > -tol && (a-b) < tol;
 }
+
+std::filesystem::path getSaveFileDirectory();
+std::filesystem::path getSaveFilePath(const std::string& gameName, const std::string& fileName);
 
 namespace Constants{
   inline const sf::Font defaultFont{"assets/fonts/arial/ARIAL.TTF"};

@@ -18,9 +18,9 @@ enum class SaveWindowStatus{
 class SaveWindow : public sf::Drawable, sf::Transformable {
  public:
   SaveWindow(Layout* layout);
-  void setSize(sf::Vector2f& size);
+  void setSize(sf::Vector2f size);
   void handleEvent(const sf::Event& event, sf::RenderWindow& window);
-  void update(sf::RenderWindow& rw);
+  void update(sf::Vector2f mousePosition);
   virtual void draw(sf::RenderTarget& target,
                     sf::RenderStates states) const override;
   SaveWindowStatus getStatus() const;

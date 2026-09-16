@@ -56,10 +56,8 @@ void Button::setNormal(sf::Color color) {
   _normal=color;
 }
 
-bool Button::update(const sf::RenderWindow& window) {
-  auto posI = window.mapPixelToCoords(sf::Mouse::getPosition(window));
-  sf::Vector2f position{(float)posI.x, (float)posI.y};
-  bool mouseover = sf::FloatRect(_start, _size).contains(position);
+bool Button::update(sf::Vector2f mousePosition) {
+  bool mouseover = sf::FloatRect(_start, _size).contains(mousePosition);
   if (!mouseover) {
     _shape.setFillColor(_normal);
     _isPressed = false;

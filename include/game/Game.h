@@ -27,6 +27,8 @@ class Game {
 
   void run();
 
+  const sf::RenderWindow* getMainWindow() const {return &MainWindow;}
+
  private:
   float clampTime = 0.33;
   double timeMultiplier = 5.0;

@@ -36,12 +36,12 @@ EditorWindow::EditorWindow(std::unique_ptr<Layout> l, Game* g,
       [&](Game* game) { this->onclickCreateRoad(game); });
   _removeRoadButton.setOnclick(
       [&](Game* game) { this->onclickDemolishRoad(game); });
-  _saveButton.setOnclick([this](Game* game){this->onclickSaveGame(game);});
+  _saveButton.setOnclick([this](Game* game) { this->onclickSaveGame(game); });
 }
 
 void EditorWindow::handleEvent(const sf::Event& event,
                                sf::RenderWindow& window) {
-  if(_saveWindow.get() != nullptr){
+  if (_saveWindow.get() != nullptr) {
     _saveWindow->handleEvent(event, window);
     return;
   }
@@ -144,10 +144,12 @@ void EditorWindow::onclickDemolishRoad(Game* game) {
 
 void EditorWindow::onclickSaveGame(Game* game) {
   _saveWindow = std::make_unique<SaveWindow>(_l.get());
+  _saveWindow->setSize({(float)game->getMainWindow()->getSize().x,
+                        (float)game->getMainWindow()->getSize().y});
 }
 
 void EditorWindow::updateWindowSize(sf::Vector2f newSize) {
-  if(_saveWindow.get() != nullptr){
+  if (_saveWindow.get() != nullptr) {
     _saveWindow->setSize(newSize);
   }
   _worldview.setSize(newSize);
@@ -156,25 +158,24 @@ void EditorWindow::updateWindowSize(sf::Vector2f newSize) {
   _topbar.setSize({newSize.x, 60.f});
 }
 
-void EditorWindow::update(sf::RenderWindow& rw) {
-  _simulateButton.update(rw);
-  _placeRoadButton.update(rw);
-  _removeRoadButton.update(rw);
-  _saveButton.update(rw);
-  if(_saveWindow.get() != nullptr){
-    _saveWindow->update(rw);
-    switch (_saveWindow->getStatus())
-    {
-    case SaveWindowStatus::EXIT_CANCEL:
-      _saveWindow.reset(nullptr);
-      break;
-    case SaveWindowStatus::EXIT_DONE:
-      _l->saveToFile(_saveWindow->getResult());
-      _saveWindow.reset(nullptr);
-      break;
-    
-    default:
-      break;
+void EditorWindow::update(sf::Vector2f mousePosition) {
+  _simulateButton.update(mousePosition);
+  _placeRoadButton.update(mousePosition);
+  _removeRoadButton.update(mousePosition);
+  _saveButton.update(mousePosition);
+  if (_saveWindow.get() != nullptr) {
+    _saveWindow->update(mousePosition);
+    switch (_saveWindow->getStatus()) {
+      case SaveWindowStatus::EXIT_CANCEL:
+        _saveWindow.reset(nullptr);
+        break;
+      case SaveWindowStatus::EXIT_DONE:
+        _l->saveToFile(_saveWindow->getResult());
+        _saveWindow.reset(nullptr);
+        break;
+
+      default:
+        break;
     }
   }
 }
@@ -183,7 +184,7 @@ void EditorWindow::draw(sf::RenderTarget& target,
                         sf::RenderStates states) const {
   sf::View origional = target.getView();
   target.setView(_worldview);
-  if(_saveWindow.get() != nullptr){
+  if (_saveWindow.get() != nullptr) {
     _saveWindow->draw(target, states);
     return;
   }

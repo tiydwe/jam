@@ -52,7 +52,8 @@ Layout::Layout(std::filesystem::path filepath, std::filesystem::path carpath)
       size_t endid;
       size_t id;
       size_t laneslhs, lanesrhs;
-      ss >> id >> datapath >> startid >> endid >> laneslhs >> lanesrhs;
+      char locked;
+      ss >> id >> datapath >> startid >> endid >> laneslhs >> lanesrhs >> locked;
       auto ra = RoadAsset(datapath);
       double speedlimit = ra.speedLimit;
       utility::registerPhysicalID(id);
@@ -90,7 +91,7 @@ Layout::Layout(std::filesystem::path filepath, std::filesystem::path carpath)
           delta.normalized() * utility::Constants::INTERSESCTION_SIZE;
       std::unique_ptr<RoadPhysical> rp = std::make_unique<RoadPhysical>(
           id, std::move(r_rhs), std::move(r_lhs), ra,
-          startpos + correctionVector, endpos - correctionVector);
+          startpos + correctionVector, endpos - correctionVector, locked=='l');
       _roads.try_emplace(rp->getInternalIDR(), rp->getRoadR());
       _roads.try_emplace(rp->getInternalIDL(), rp->getRoadL());
       _physicalRoads.try_emplace(id, std::move(rp));
@@ -152,7 +153,7 @@ void Layout::saveToFile(std::filesystem::path fpath) {
                ->getID()
         << " " << x.second->getRoadAsset()->leftCenterOffset.size() << " "
         << x.second->getRoadAsset()->rightCenterOffset.size() << " "
-        << r->getSpeedLimit() << "\n";
+        << (x.second->isLocked() ? 'l' : 'u') << "\n";
   }
 
   // CAR, just copies path

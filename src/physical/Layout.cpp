@@ -6,7 +6,8 @@
 #include <limits>
 #include <sstream>
 
-Layout::Layout(std::filesystem::path filepath) {
+Layout::Layout(std::filesystem::path filepath, std::filesystem::path carpath)
+    : _carfpath(carpath) {
   std::ifstream file(filepath);
 
   if (!file.is_open()) {
@@ -138,22 +139,28 @@ void Layout::saveToFile(std::filesystem::path fpath) {
     layoutFile << "I " << x.first << " " << x.second->getPos().x << " "
                << x.second->getPos().y << "\n";
   }
-  layoutFile << "SW";
+  layoutFile << "SW\n";
   for (const auto& x : _physicalRoads) {
     auto l = x.second->getRoadL();
     auto r = x.second->getRoadR();
     layoutFile
         << "R2 " << x.first << " " << x.second->getRoadAsset()->filename
         << this->getIntersectionPhysicalFromInternalID(l->getEndIntersection())
+               ->getID()
+        << " "
         << this->getIntersectionPhysicalFromInternalID(r->getEndIntersection())
-        << x.second->getRoadAsset()->leftCenterOffset.size()
-        << x.second->getRoadAsset()->rightCenterOffset.size()
+               ->getID()
+        << " " << x.second->getRoadAsset()->leftCenterOffset.size() << " "
+        << x.second->getRoadAsset()->rightCenterOffset.size() << " "
         << r->getSpeedLimit() << "\n";
   }
 
   // CAR, just copies path
   std::filesystem::path carPath = saveDir / "car.dat";
   try {
+    if (carPath.has_parent_path()) {
+      std::filesystem::create_directories(carPath.parent_path());
+    }
     std::filesystem::copy_file(
         this->_carfpath, carPath,
         std::filesystem::copy_options::overwrite_existing);

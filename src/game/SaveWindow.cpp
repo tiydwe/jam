@@ -39,27 +39,29 @@ SaveWindow::SaveWindow(Layout* layout)
   _ok.setOnclick([this](Game* gm) { this->onclickOk(); });
   _cancel.setOnclick([this](Game* gm) { this->onclickCancel(); });
   _background.setSize({360, 100});
-  this->setOrigin(sf::Vector2f{_background.getSize().x, _background.getSize().y}/2.f);
+  _fpathText.setCharacterSize(10);
+  _fpathText.setFillColor(sf::Color::Black);
+  this->setOrigin(
+      sf::Vector2f{_background.getSize().x, _background.getSize().y} / 2.f);
 }
 
-void SaveWindow::setSize(sf::Vector2f& size) { this->setPosition(size / 2.f); }
+void SaveWindow::setSize(sf::Vector2f size) { this->setPosition(size / 2.f); }
 
 void SaveWindow::handleEvent(const sf::Event& event, sf::RenderWindow& window) {
   if (auto e = event.getIf<sf::Event::MouseButtonPressed>()) {
   }
 }
 
-void SaveWindow::update(sf::RenderWindow& rw) {
-  auto pos = rw.getView().getSize() / 2.f;
-  this->setPosition(pos);
-  _choose.update(rw);
-  _recent1.update(rw);
-  _recent2.update(rw);
-  _recent3.update(rw);
-  _recent4.update(rw);
-  _recent5.update(rw);
-  _ok.update(rw);
-  _cancel.update(rw);
+void SaveWindow::update(sf::Vector2f mousePosition) {
+  mousePosition = getInverseTransform().transformPoint(mousePosition);
+  _choose.update(mousePosition);
+  _recent1.update(mousePosition);
+  _recent2.update(mousePosition);
+  _recent3.update(mousePosition);
+  _recent4.update(mousePosition);
+  _recent5.update(mousePosition);
+  _ok.update(mousePosition);
+  _cancel.update(mousePosition);
 }
 
 void SaveWindow::draw(sf::RenderTarget& target, sf::RenderStates states) const {

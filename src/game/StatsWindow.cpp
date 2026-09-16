@@ -61,7 +61,7 @@ void StatsWindow::updateWindowSize(sf::Vector2f newSize)
   _continue.setSize({newSize.x / 3.f, 40.f});
 }
 
-void StatsWindow::update(sf::RenderWindow &rw) { _continue.update(rw); }
+void StatsWindow::update(sf::Vector2f mousePosition) { _continue.update(mousePosition); }
 
 void StatsWindow::draw(sf::RenderTarget &target,
                        sf::RenderStates states) const

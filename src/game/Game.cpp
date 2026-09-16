@@ -15,9 +15,9 @@ Game::Game(std::string filepath) {
   }
   std::string tmp;
   std::getline(file, tmp);
-  std::unique_ptr<Layout> layout = std::make_unique<Layout>(tmp);
+  std::unique_ptr<Layout> layout = std::make_unique<Layout>(std::filesystem::path(tmp));
   std::getline(file, carSetupFilepath);
-  MainWindow = sf::RenderWindow(sf::VideoMode({800, 600}), "JAM");
+  MainWindow = sf::RenderWindow(sf::VideoMode({1000, 800}), "JAM");
   _editor = std::make_unique<EditorWindow>(std::move(layout), this,
                                            MainWindow.getSize());
 }

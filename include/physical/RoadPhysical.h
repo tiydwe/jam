@@ -20,6 +20,7 @@ class RoadAsset {
   std::vector<int> leftCenterOffset;
   std::string texturePath;
   double speedLimit;
+  std::string filename;
 };
 
 /// @brief Handles physical aspects of a two road, such as position, drawing,

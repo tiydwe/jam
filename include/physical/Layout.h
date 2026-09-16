@@ -5,6 +5,7 @@
 #include <memory>
 #include <string>
 #include <utility>
+#include <filesystem>
 
 #include "Car.h"
 #include "IntersectionPhysical.h"
@@ -16,8 +17,11 @@
 class Layout : public sf::Drawable, sf::Transformable
 {
 public:
-  Layout(std::string filename);
+  Layout(std::filesystem::path filename);
   ~Layout();
+
+  // FOLDER relative to save directory
+  void saveToFile(std::filesystem::path fpath);
 
   IntersectionPhysical *createIntersection(sf::Vector2f &position);
   RoadPhysical *createRoad(IntersectionPhysical &start,
@@ -65,4 +69,7 @@ private:
   std::map<size_t, std::unique_ptr<RoadPhysical>> _physicalRoads;
   std::map<size_t, std::unique_ptr<IntersectionPhysical>>
       _physicalIntersections;
+  
+  // absolute
+  std::filesystem::path _carfpath;
 };

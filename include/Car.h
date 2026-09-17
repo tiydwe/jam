@@ -34,6 +34,7 @@ public:
   bool _arrived = false;
   double _timeToArrival = 0.0;
   double _distanceTravled = 0.0;
+  double _distanceFromSourceToDest = 0.0;
   double _timeWastedForNextCar = 0.0;
   double _timeWastedAtIntersection = 0.0;
 };

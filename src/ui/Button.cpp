@@ -56,6 +56,10 @@ void Button::setNormal(sf::Color color) {
   _normal=color;
 }
 
+void Button::setHover(sf::Color color) {
+  _hover = color;
+}
+
 bool Button::update(sf::Vector2f mousePosition) {
   bool mouseover = sf::FloatRect(_start, _size).contains(mousePosition);
   if (!mouseover) {

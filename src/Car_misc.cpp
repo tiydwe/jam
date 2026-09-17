@@ -1,7 +1,9 @@
+#include <SFML/Graphics.hpp>
+
 #include "Car.h"
+#include "Layout.h"
 #include "Simulation.h"
 #include "utility.h"
-#include "Layout.h"
 
 Car::Car() {
   utility::exit(
@@ -23,6 +25,14 @@ Car::Car(Simulation& parent, size_t initRoad, size_t initLane, size_t initDist,
 
 void Car::setDestination(const std::pair<size_t, double>& dest) {
   _current_destination = dest;
+  auto r = _parentSim->getLayout()->getRoad(dest.first);
+  auto pr = _parentSim->getLayout()->getPhysicalRoadFromInternalID(dest.first);
+  auto prstart = _parentSim->getLayout()->getPhysicalRoadFromInternalID(_position_roadid);
+  _results._distanceFromSourceToDest =
+      (pr->getPhysicalPosition(dest.first, r->getEdgeLane(), dest.second,
+                              nullptr, nullptr, nullptr) -
+      prstart->getPhysicalPosition(_position_roadid, _position_laneid, _position_distance,
+                              nullptr, nullptr, nullptr)).length();
 }
 
 void Car::setRoute(const std::deque<size_t>& route) { _route = route; }
@@ -32,32 +42,33 @@ void Car::recalcRoute() {
 }
 
 double Car::getCurrDistFrac() const {
-  return _position_distance / _parentSim->getLayout()->getLane(_position_laneid)->getLength();
+  return _position_distance /
+         _parentSim->getLayout()->getLane(_position_laneid)->getLength();
 }
 
 void Car::_clipVelocity() {
-  double speedLimit = _parentSim->getLayout()->getRoad(_position_roadid)->getSpeedLimit();
+  double speedLimit =
+      _parentSim->getLayout()->getRoad(_position_roadid)->getSpeedLimit();
   _velocity = std::max(0.0, _velocity);
   _velocity = std::min(_velocity, speedLimit);
 }
 
 double Car::_applyVelocity(double dt) {
-  if(utility::isclose(_velocity, 0.0)){
+  if (utility::isclose(_velocity, 0.0)) {
     _timeSinseLastMove += dt;
-    if(_timeSinseLastMove > utility::Constants::TIMOUT_LIMIT_NO_MOVE_CAR){
+    if (_timeSinseLastMove > utility::Constants::TIMOUT_LIMIT_NO_MOVE_CAR) {
       _parentSim->removeCar(_id);
       return 0.0;
     }
-  }
-  else{
+  } else {
     _timeSinseLastMove = 0;
   }
   _results._distanceTravled += _velocity * dt;
   _results._timeToArrival += dt;
-  if(_status == carStatus::WAITING_AT_INTERSECTION){
+  if (_status == carStatus::WAITING_AT_INTERSECTION) {
     _results._timeWastedAtIntersection += dt;
   }
-  if(_status == carStatus::WAITING_FOR_NEXT_CAR){
+  if (_status == carStatus::WAITING_FOR_NEXT_CAR) {
     _results._timeWastedForNextCar += dt;
   }
   _position_distance += _velocity * dt;
@@ -87,18 +98,15 @@ std::string carStatusToString(carStatus s) {
   }
 }
 
-void Car::_updateResults(double dt, double dx)
-{
-  if(!_results._arrived){
+void Car::_updateResults(double dt, double dx) {
+  if (!_results._arrived) {
     _results._distanceTravled += dx;
     _results._timeToArrival += dt;
-    if(_status == carStatus::ARRIVED){
+    if (_status == carStatus::ARRIVED) {
       _results._arrived = true;
-    }
-    else if(_status == carStatus::WAITING_FOR_NEXT_CAR){
+    } else if (_status == carStatus::WAITING_FOR_NEXT_CAR) {
       _results._timeWastedForNextCar += dt;
-    }
-    else if(_status == carStatus::WAITING_AT_INTERSECTION){
+    } else if (_status == carStatus::WAITING_AT_INTERSECTION) {
       _results._timeWastedAtIntersection += dt;
     }
   }

@@ -18,6 +18,7 @@ class Button : public sf::Drawable, sf::Transformable {
   void setStart(sf::Vector2f newStart);
   void setSize(sf::Vector2f newsize);
   void setNormal(sf::Color color);
+  void setHover(sf::Color color);
 
   // runs _onclick if clicked, returns true
   bool update(sf::Vector2f mousePosition);

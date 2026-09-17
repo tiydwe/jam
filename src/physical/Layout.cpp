@@ -1,15 +1,17 @@
 #include "Layout.h"
 
+#include <filesystem>
 #include <fstream>
 #include <istream>
 #include <limits>
 #include <sstream>
 
-Layout::Layout(std::string filepath) {
+Layout::Layout(std::filesystem::path filepath, std::filesystem::path carpath)
+    : _carfpath(carpath) {
   std::ifstream file(filepath);
 
   if (!file.is_open()) {
-    utility::logErr("Error opening layout file! " + filepath);
+    utility::logErr("Error opening layout file! " + filepath.string());
     return;
   }
   std::string tmp;
@@ -50,7 +52,8 @@ Layout::Layout(std::string filepath) {
       size_t endid;
       size_t id;
       size_t laneslhs, lanesrhs;
-      ss >> id >> datapath >> startid >> endid >> laneslhs >> lanesrhs;
+      char locked;
+      ss >> id >> datapath >> startid >> endid >> laneslhs >> lanesrhs >> locked;
       auto ra = RoadAsset(datapath);
       double speedlimit = ra.speedLimit;
       utility::registerPhysicalID(id);
@@ -88,7 +91,7 @@ Layout::Layout(std::string filepath) {
           delta.normalized() * utility::Constants::INTERSESCTION_SIZE;
       std::unique_ptr<RoadPhysical> rp = std::make_unique<RoadPhysical>(
           id, std::move(r_rhs), std::move(r_lhs), ra,
-          startpos + correctionVector, endpos - correctionVector);
+          startpos + correctionVector, endpos - correctionVector, locked=='l');
       _roads.try_emplace(rp->getInternalIDR(), rp->getRoadR());
       _roads.try_emplace(rp->getInternalIDL(), rp->getRoadL());
       _physicalRoads.try_emplace(id, std::move(rp));
@@ -120,6 +123,65 @@ Layout::Layout(std::string filepath) {
 }
 
 Layout::~Layout() {}
+
+void Layout::saveToFile(std::filesystem::path fpath) {
+  std::filesystem::path saveDir =
+      std::filesystem::absolute(std::filesystem::weakly_canonical(fpath));
+
+  // LAYOUT FILE
+  auto layoutPath = saveDir / "layout.dat";
+  std::ofstream layoutFile(layoutPath);
+  if (!layoutFile) {
+    utility::logErr("Layout::saveToFile - error opening file " +
+                    layoutPath.string());
+    return;
+  }
+  for (const auto& x : _physicalIntersections) {
+    layoutFile << "I " << x.first << " " << x.second->getPos().x << " "
+               << x.second->getPos().y << "\n";
+  }
+  layoutFile << "SW\n";
+  for (const auto& x : _physicalRoads) {
+    auto l = x.second->getRoadL();
+    auto r = x.second->getRoadR();
+    layoutFile
+        << "R2 " << x.first << " " << x.second->getRoadAsset()->filename << " "
+        << this->getIntersectionPhysicalFromInternalID(l->getEndIntersection())
+               ->getID()
+        << " "
+        << this->getIntersectionPhysicalFromInternalID(r->getEndIntersection())
+               ->getID()
+        << " " << x.second->getRoadAsset()->leftCenterOffset.size() << " "
+        << x.second->getRoadAsset()->rightCenterOffset.size() << " "
+        << (x.second->isLocked() ? 'l' : 'u') << "\n";
+  }
+
+  // CAR, just copies path
+  std::filesystem::path carPath = saveDir / "car.dat";
+  try {
+    if (carPath.has_parent_path()) {
+      std::filesystem::create_directories(carPath.parent_path());
+    }
+    std::filesystem::copy_file(
+        this->_carfpath, carPath,
+        std::filesystem::copy_options::overwrite_existing);
+  } catch (const std::filesystem::filesystem_error& e) {
+    utility::logErr("Layout::saveToFile - filesystem error: " +
+                    std::string(e.what()));
+  } catch (const std::exception& e) {
+    utility::logErr("Layout::saveToFile - error: " + std::string(e.what()));
+  }
+
+  // MAIN
+  std::filesystem::path mainPath = saveDir / "main.dat";
+  std::ofstream mainFile(mainPath);
+  if (!mainFile) {
+    utility::logErr("Layout::saveToFile - error opening file " +
+                    mainPath.string());
+    return;
+  }
+  mainFile << layoutPath.string() << "\n" << carPath.string();
+}
 
 IntersectionPhysical* Layout::createIntersection(sf::Vector2f& position) {
   std::unique_ptr<Intersection> i = std::make_unique<Intersection>(this);
@@ -213,10 +275,14 @@ void Layout::removeRoad(size_t id) {
       utility::Constants::GREEN_PHASE_TIME_DEFAULT,
       utility::Constants::YELLOW_PHASE_TIME_DEFAULT);
   if (startIntersection->getRoads().empty()) {
-    _physicalIntersections.erase(this->getIntersectionPhysicalFromInternalID(roadl->getEndIntersection())->getID());
+    _physicalIntersections.erase(
+        this->getIntersectionPhysicalFromInternalID(roadl->getEndIntersection())
+            ->getID());
   }
   if (endIntersection->getRoads().empty()) {
-    _physicalIntersections.erase(this->getIntersectionPhysicalFromInternalID(roadr->getEndIntersection())->getID());
+    _physicalIntersections.erase(
+        this->getIntersectionPhysicalFromInternalID(roadr->getEndIntersection())
+            ->getID());
   }
 
   for (size_t id : roadr->getLanes()) {
@@ -242,28 +308,27 @@ std::pair<IntersectionPhysical*, double> Layout::findClosestIntersection(
   return {closest, bestDist};
 }
 
-std::pair<RoadPhysical*, double> Layout::findClosestRoadUnlocked(sf::Vector2f pos) {
+std::pair<RoadPhysical*, double> Layout::findClosestRoadUnlocked(
+    sf::Vector2f pos) {
   RoadPhysical* closest = nullptr;
   double bestDist = std::numeric_limits<double>::max();
-  for (const auto& x : _physicalRoads){
-    if(x.second->isLocked()){
+  for (const auto& x : _physicalRoads) {
+    if (x.second->isLocked()) {
       continue;
     }
     auto a = x.second->getStart();
     auto b = x.second->getEnd();
-    float t = (pos-a).dot(b-a) / (a-b).lengthSquared();
+    float t = (pos - a).dot(b - a) / (a - b).lengthSquared();
     double newDist = 0;
-    if(t <= 0){
+    if (t <= 0) {
       newDist = (pos - a).length();
-    }
-    else if(t >= 1){
+    } else if (t >= 1) {
       newDist = (pos - b).length();
-    }
-    else{
+    } else {
       sf::Vector2f pt = a + (b - a) * t;
       newDist = (pt - pos).length();
     }
-    if(newDist < bestDist){
+    if (newDist < bestDist) {
       bestDist = newDist;
       closest = x.second.get();
     }
@@ -288,9 +353,10 @@ std::map<size_t, IntersectionPhysical*> Layout::getPhysicalIntersections()
   return res;
 }
 
-IntersectionPhysical* Layout::getIntersectionPhysicalFromInternalID(size_t id) const {
-  for(const auto& x : _physicalIntersections){
-    if(x.second->getInternalID() == id){
+IntersectionPhysical* Layout::getIntersectionPhysicalFromInternalID(
+    size_t id) const {
+  for (const auto& x : _physicalIntersections) {
+    if (x.second->getInternalID() == id) {
       return x.second.get();
     }
   }

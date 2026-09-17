@@ -25,6 +25,7 @@ class OverallStats{
   size_t numberArrived = 0;
   double totalTimeTraveled = 0.0;
   double totalDistanceTraveled = 0.0;
+  double totalDistFromSourceToDest = 0.0;
   double totalTimeAtIntersection = 0.0;
   double totalTimeWaitingNextCar = 0.0;
 };

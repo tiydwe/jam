@@ -11,6 +11,7 @@
 #include "Layout.h"
 
 RoadAsset::RoadAsset(std::string filename) {
+  this->filename = filename;
   std::ifstream file(filename);
   if (!file.is_open()) {
     std::cerr << "Error opening file!" << std::endl;

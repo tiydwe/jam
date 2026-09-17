@@ -18,9 +18,10 @@ class Button : public sf::Drawable, sf::Transformable {
   void setStart(sf::Vector2f newStart);
   void setSize(sf::Vector2f newsize);
   void setNormal(sf::Color color);
+  void setHover(sf::Color color);
 
   // runs _onclick if clicked, returns true
-  bool update(const sf::RenderWindow& window);
+  bool update(sf::Vector2f mousePosition);
   virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const override;
 
  private:

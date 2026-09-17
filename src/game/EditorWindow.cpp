@@ -17,7 +17,11 @@ EditorWindow::EditorWindow(std::unique_ptr<Layout> l, Game* g,
                        sf::Color::Green, sf::Color::Blue, sf::Color::Red),
       _removeRoadButton(g, sf::Vector2f(500, 10), sf::Vector2f(100, 40),
                         utility::Constants::defaultFont, "DEMOLISH",
-                        sf::Color::Green, sf::Color::Blue, sf::Color::Red) {
+                        sf::Color::Green, sf::Color::Blue, sf::Color::Red),
+      _saveButton(g, sf::Vector2f(620, 10), sf::Vector2f(100, 40),
+                  utility::Constants::defaultFont, "SAVE", sf::Color::Green,
+                  sf::Color::Blue, sf::Color::Red),
+      _saveWindow(nullptr) {
   _worldview.setSize({(float)windowSize.x, (float)windowSize.y});
   _worldview.setCenter({windowSize.x / 2.f, windowSize.y / 2.f});
   _uiview.setSize({(float)windowSize.x, (float)windowSize.y});
@@ -32,10 +36,15 @@ EditorWindow::EditorWindow(std::unique_ptr<Layout> l, Game* g,
       [&](Game* game) { this->onclickCreateRoad(game); });
   _removeRoadButton.setOnclick(
       [&](Game* game) { this->onclickDemolishRoad(game); });
+  _saveButton.setOnclick([this](Game* game) { this->onclickSaveGame(game); });
 }
 
 void EditorWindow::handleEvent(const sf::Event& event,
                                sf::RenderWindow& window) {
+  if (_saveWindow.get() != nullptr) {
+    _saveWindow->handleEvent(event, window);
+    return;
+  }
   auto pos = window.mapPixelToCoords(sf::Mouse::getPosition(window));
   if (!_topbar.getGlobalBounds().contains(pos)) {
     if (auto mbpIf = event.getIf<sf::Event::MouseButtonPressed>()) {
@@ -133,23 +142,52 @@ void EditorWindow::onclickDemolishRoad(Game* game) {
   _currentAction = ActionType::REMOVE_ROAD;
 }
 
+void EditorWindow::onclickSaveGame(Game* game) {
+  _saveWindow = std::make_unique<SaveWindow>(_l.get());
+  _saveWindow->setSize({(float)game->getMainWindow()->getSize().x,
+                        (float)game->getMainWindow()->getSize().y});
+}
+
 void EditorWindow::updateWindowSize(sf::Vector2f newSize) {
+  if (_saveWindow.get() != nullptr) {
+    _saveWindow->setSize(newSize);
+  }
   _worldview.setSize(newSize);
   _uiview.setSize(newSize);
   _uiview.setCenter({newSize.x / 2, newSize.y / 2});
   _topbar.setSize({newSize.x, 60.f});
 }
 
-void EditorWindow::update(sf::RenderWindow& rw) {
-  _simulateButton.update(rw);
-  _placeRoadButton.update(rw);
-  _removeRoadButton.update(rw);
+void EditorWindow::update(sf::Vector2f mousePosition) {
+  _simulateButton.update(mousePosition);
+  _placeRoadButton.update(mousePosition);
+  _removeRoadButton.update(mousePosition);
+  _saveButton.update(mousePosition);
+  if (_saveWindow.get() != nullptr) {
+    _saveWindow->update(mousePosition);
+    switch (_saveWindow->getStatus()) {
+      case SaveWindowStatus::EXIT_CANCEL:
+        _saveWindow.reset(nullptr);
+        break;
+      case SaveWindowStatus::EXIT_DONE:
+        _l->saveToFile(_saveWindow->getResult());
+        _saveWindow.reset(nullptr);
+        break;
+
+      default:
+        break;
+    }
+  }
 }
 
 void EditorWindow::draw(sf::RenderTarget& target,
                         sf::RenderStates states) const {
   sf::View origional = target.getView();
   target.setView(_worldview);
+  if (_saveWindow.get() != nullptr) {
+    _saveWindow->draw(target, states);
+    return;
+  }
   _l->draw(target, states);
   if (_clickedCtr == 1) {
     if (_currentAction == ActionType::DRAW_ROAD) {
@@ -174,17 +212,19 @@ void EditorWindow::draw(sf::RenderTarget& target,
       target.draw(rectangle);
     }
   }
-  if(_currentAction == ActionType::REMOVE_ROAD){
+  if (_currentAction == ActionType::REMOVE_ROAD) {
     auto road = _l->findClosestRoadUnlocked(_mouseWorldPos);
-    if(road.first != nullptr && road.second < utility::Constants::ROAD_SELECT_SNAP_DIST){
+    if (road.first != nullptr &&
+        road.second < utility::Constants::ROAD_SELECT_SNAP_DIST) {
       auto start = road.first->getStart();
       auto end = road.first->getEnd();
-      float width = road.first->getRoadAsset()->leftCenterOffset.back() + road.first->getRoadAsset()->rightCenterOffset.back();
-      sf::RectangleShape rectangle(sf::Vector2f{(start-end).length(), width});
-      rectangle.setOrigin({0.f, width/2});
-      rectangle.setRotation((end-start).angle());
+      float width = road.first->getRoadAsset()->leftCenterOffset.back() +
+                    road.first->getRoadAsset()->rightCenterOffset.back();
+      sf::RectangleShape rectangle(sf::Vector2f{(start - end).length(), width});
+      rectangle.setOrigin({0.f, width / 2});
+      rectangle.setRotation((end - start).angle());
       rectangle.setPosition(start);
-      rectangle.setFillColor(sf::Color(255,0,0,32));
+      rectangle.setFillColor(sf::Color(255, 0, 0, 32));
       target.draw(rectangle);
     }
   }
@@ -194,6 +234,7 @@ void EditorWindow::draw(sf::RenderTarget& target,
   target.draw(_simulateButton, states);
   target.draw(_placeRoadButton, states);
   target.draw(_removeRoadButton, states);
+  target.draw(_saveButton, states);
 
   target.setView(origional);
 }

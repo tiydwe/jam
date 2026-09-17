@@ -28,6 +28,8 @@ target_sources(main PRIVATE
     src/game/Game.cpp
     src/game/EditorWindow.cpp
     src/game/EditorWindowCreate.cpp
+    src/game/LevelSelectWindow.cpp
+    src/game/TitleWindow.cpp
     src/game/SimulateWindow.cpp
     src/game/StatsWindow.cpp
     src/game/SaveWindow.cpp

@@ -27,6 +27,9 @@ public:
   RoadPhysical *createRoad(IntersectionPhysical &start,
                            IntersectionPhysical &end, std::string datapath, bool locked = true);
 
+
+  bool checkHitbox(sf::RectangleShape hitbox);
+
   // physical ID
   void removeRoad(size_t id);
 

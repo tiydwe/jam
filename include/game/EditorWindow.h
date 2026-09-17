@@ -38,7 +38,7 @@ class EditorWindow : public sf::Drawable, sf::Transformable{
   void onclickSaveGame(Game* game);
   void makeRoad(sf::Vector2f pos2, std::string datapath);
   // will not do snapping
-  bool isRoadValid(sf::Vector2f start, sf::Vector2f end) const;
+  bool isRoadValid(sf::Vector2f start, sf::Vector2f end, std::string roadPath) const;
   sf::Vector2f getSnappedPos(sf::Vector2f pos) const;
   std::unique_ptr<Layout> _l;
 

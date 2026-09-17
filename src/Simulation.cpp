@@ -233,6 +233,7 @@ void OverallStats::addStat(ResultStats result) {
   numberArrived += result._arrived;
   totalTimeTraveled += result._timeToArrival;
   totalDistanceTraveled += result._distanceTravled;
+  totalDistFromSourceToDest += result._distanceFromSourceToDest;
   totalTimeAtIntersection += result._timeWastedAtIntersection;
   totalTimeWaitingNextCar += result._timeWastedForNextCar;
 }

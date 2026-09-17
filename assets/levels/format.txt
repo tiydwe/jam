@@ -1,0 +1,5 @@
+victory.dat:
+<percent cars arrived min> <average speed min> <time wasted max percent>
+
+progress.dat:
+<N | Y completion>

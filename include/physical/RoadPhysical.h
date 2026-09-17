@@ -60,6 +60,7 @@ class RoadPhysical : public sf::Drawable, sf::Transformable {
   sf::Vector2f getOffestVectorR() const;
   sf::Vector2f getOffestVectorL() const;
   bool isLocked() const {return _locked;}
+  sf::RectangleShape getHitbox() const;
 
  private:
   size_t _id;

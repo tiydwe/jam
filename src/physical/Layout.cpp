@@ -254,6 +254,13 @@ RoadPhysical* Layout::createRoad(IntersectionPhysical& start,
   return rpp;
 }
 
+bool Layout::checkHitbox(sf::RectangleShape hitbox)
+{
+  for(const auto& x : _physicalRoads){
+    
+  }
+}
+
 void Layout::removeRoad(size_t id) {
   std::unique_ptr<RoadPhysical> rp = std::move(_physicalRoads.at(id));
   _physicalRoads.erase(id);

@@ -66,4 +66,6 @@ class EditorWindow : public sf::Drawable, sf::Transformable{
   sf::Vector2f _mouseWorldPos;
 
   std::unique_ptr<SaveWindow> _saveWindow;
+
+  sf::Vector2f _windowSize;
 };

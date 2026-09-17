@@ -25,7 +25,7 @@ class SimulateWindow : public sf::Drawable, sf::Transformable {
   bool isDone() const {return _s->isDone();}
 
   void step(double trueDt);
-  void update(sf::RenderWindow& rw);
+  void update(sf::Vector2f mousePosition);
   virtual void draw(sf::RenderTarget& target,
                     sf::RenderStates states) const override;
 

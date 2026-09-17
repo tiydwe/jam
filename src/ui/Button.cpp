@@ -56,10 +56,12 @@ void Button::setNormal(sf::Color color) {
   _normal=color;
 }
 
-bool Button::update(const sf::RenderWindow& window) {
-  auto posI = sf::Mouse::getPosition(window);
-  sf::Vector2f position{(float)posI.x, (float)posI.y};
-  bool mouseover = sf::FloatRect(_start, _size).contains(position);
+void Button::setHover(sf::Color color) {
+  _hover = color;
+}
+
+bool Button::update(sf::Vector2f mousePosition) {
+  bool mouseover = sf::FloatRect(_start, _size).contains(mousePosition);
   if (!mouseover) {
     _shape.setFillColor(_normal);
     _isPressed = false;
@@ -81,6 +83,6 @@ bool Button::update(const sf::RenderWindow& window) {
 
 void Button::draw(sf::RenderTarget& target, sf::RenderStates states) const {
   states.transform *= getTransform();
-  target.draw(_shape);
-  target.draw(_text);
+  target.draw(_shape, states);
+  target.draw(_text, states);
 }

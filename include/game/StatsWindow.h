@@ -7,18 +7,33 @@
 
 #include <memory>
 #include <utility>
+#include <filesystem>
 
 class Game;
 
+class Level {
+ public:
+  Level(std::filesystem::path levelConfigPath);
+  bool passes(OverallStats stats);
+  double getPercentArrived() const {return _percentArrived;}
+  double getAvgSpeed() const {return _avgSpeed;}
+  double getTimeWasted() const {return _timeWasted;}
+
+ private:
+  double _percentArrived = 0.0;
+  double _avgSpeed = 0.0;
+  double _timeWasted = 1.0;
+};
+
 class StatsWindow : public sf::Drawable, sf::Transformable{
  public:
-  StatsWindow(Game* game, OverallStats stats, sf::Vector2u windowSize);
+  StatsWindow(Game* game, OverallStats stats, Level &level, sf::Vector2u windowSize);
 
   std::string getStatsString();
 
   void updateWindowSize(sf::Vector2f newSize);
 
-  void update(sf::RenderWindow &rw);
+  void update(sf::Vector2f mousePosition);
 
   virtual void draw(sf::RenderTarget& target,
                     sf::RenderStates states) const override;
@@ -32,5 +47,6 @@ class StatsWindow : public sf::Drawable, sf::Transformable{
   Button _continue;
 
   OverallStats _stats;
+  Level& _level;
 
 };

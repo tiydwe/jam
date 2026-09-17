@@ -85,11 +85,11 @@ void SimulateWindow::step(double trueDt) {
   }
 }
 
-void SimulateWindow::update(sf::RenderWindow& rw) {
-  _slow.update(rw);
-  _mid.update(rw);
-  _fast.update(rw);
-  _exitSim.update(rw);
+void SimulateWindow::update(sf::Vector2f mousePosition) {
+  _slow.update(mousePosition);
+  _mid.update(mousePosition);
+  _fast.update(mousePosition);
+  _exitSim.update(mousePosition);
 }
 
 void SimulateWindow::draw(sf::RenderTarget& target,

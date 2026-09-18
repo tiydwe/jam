@@ -151,6 +151,6 @@ const float utility::Constants::INTERSECTION_SNAP_DIST =
     utility::Constants::INTERSESCTION_SIZE * 1.3;
 const float utility::Constants::MIN_ROAD_DIST =
     2 * utility::Constants::INTERSESCTION_SIZE + 32;
-const float utility::Constants::TIMOUT_LIMIT_NO_MOVE_CAR = 75.f;
-const float utility::Constants::INTERSECTION_TRANSITION_LENGTH = 50.f;
+const float utility::Constants::TIMOUT_LIMIT_NO_MOVE_CAR = 150.f;
+const float utility::Constants::INTERSECTION_TRANSITION_LENGTH = 70.f;
 const float utility::Constants::ROAD_SELECT_SNAP_DIST = 50.f;

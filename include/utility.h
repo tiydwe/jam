@@ -3,6 +3,7 @@
 #include <string>
 #include <SFML/Graphics.hpp>
 #include <filesystem>
+#include <vector>
 
 //#define DEBUG 1
 
@@ -33,6 +34,10 @@ std::filesystem::path getSaveFileDirectory();
 std::filesystem::path getSaveFilePath(const std::string& gameName, const std::string& fileName);
 
 std::string truncateText(sf::Text &textObj, const std::string &str, float maxWidth);
+
+std::vector<sf::Vector2f> getVerticies(sf::RectangleShape shape);
+std::pair<float, float> projectVerticies(const std::vector<sf::Vector2f> &verticies, sf::Vector2f axis);
+bool rectanglesIntersect(sf::RectangleShape a, sf::RectangleShape b);
 
 namespace Constants{
   inline const sf::Font defaultFont{"assets/fonts/arial/ARIAL.TTF"};

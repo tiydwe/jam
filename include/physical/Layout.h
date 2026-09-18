@@ -28,7 +28,8 @@ public:
                            IntersectionPhysical &end, std::string datapath, bool locked = true);
 
 
-  bool checkHitbox(sf::RectangleShape hitbox);
+  // true if intersect
+  std::pair<bool, sf::RectangleShape> checkHitbox(sf::RectangleShape hitbox);
 
   // physical ID
   void removeRoad(size_t id);

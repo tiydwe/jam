@@ -54,14 +54,14 @@ void Game::endLevelSelectChoose(std::filesystem::path pathToMainDat) {
     std::getline(file, carSetupFilepath);
     _layoutP = std::filesystem::path(tmp);
     _carP = std::filesystem::path(carSetupFilepath);
-    std::unique_ptr<Layout> layout = std::make_unique<Layout>(
-        std::filesystem::path(tmp), std::filesystem::path(carSetupFilepath));
-    _editor = std::make_unique<EditorWindow>(std::move(layout), this,
-                                             MainWindow.getSize());
     std::getline(file, tmp);
     _victoryP = std::filesystem::path(tmp);
     std::getline(file, tmp);
     _progressP = std::filesystem::path(tmp);
+    std::unique_ptr<Layout> layout = std::make_unique<Layout>(
+        _layoutP, _carP, _victoryP, _progressP);
+    _editor = std::make_unique<EditorWindow>(std::move(layout), this,
+                                             MainWindow.getSize());
     _mainP = pathToMainDat;
     currentMode = GameScreenMode::EDIT;
   }
@@ -113,14 +113,14 @@ void Game::endLoadFileChoose(std::filesystem::path pathToMainDat) {
     std::getline(file, carSetupFilepath);
     _layoutP = std::filesystem::path(tmp);
     _carP = std::filesystem::path(carSetupFilepath);
-    std::unique_ptr<Layout> layout = std::make_unique<Layout>(
-        std::filesystem::path(tmp), std::filesystem::path(carSetupFilepath));
-    _editor = std::make_unique<EditorWindow>(std::move(layout), this,
-                                             MainWindow.getSize());
     std::getline(file, tmp);
     _victoryP = std::filesystem::path(tmp);
     std::getline(file, tmp);
     _progressP = std::filesystem::path(tmp);
+    std::unique_ptr<Layout> layout = std::make_unique<Layout>(
+        _layoutP, _carP, _victoryP, _progressP);
+    _editor = std::make_unique<EditorWindow>(std::move(layout), this,
+                                             MainWindow.getSize());
     _mainP = pathToMainDat;
     currentMode = GameScreenMode::EDIT;
   }

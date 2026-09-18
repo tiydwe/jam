@@ -7,8 +7,8 @@
 #include "CarPhysical.h"
 #include "Intersection.h"
 #include "Lane.h"
-#include "utility.h"
 #include "Layout.h"
+#include "utility.h"
 
 RoadAsset::RoadAsset(std::string filename) {
   this->filename = filename;
@@ -73,8 +73,7 @@ RoadPhysical::RoadPhysical(size_t id, std::unique_ptr<Road> road,
   _base.setPosition(sf::Vector2f(_start));
 }
 
-RoadPhysical::~RoadPhysical() {
-}
+RoadPhysical::~RoadPhysical() {}
 
 sf::Vector2f RoadPhysical::getPhysicalPosition(size_t roadid, size_t laneid,
                                                double trueDistance,
@@ -180,6 +179,19 @@ sf::Vector2f RoadPhysical::getOffestVectorL() const {
   offsetNorm = offsetNorm.normalized();
   return offsetNorm * static_cast<float>(_roadData.leftCenterOffset.at(
                           _roadb->getLanePosFromCenter(_roadb->getEdgeLane())));
+}
+
+sf::RectangleShape RoadPhysical::getHitbox() const {
+  sf::RectangleShape rect;
+  sf::FloatRect localBounds = _base.getLocalBounds();
+
+  rect.setSize({localBounds.size.x, localBounds.size.y});
+  rect.setOrigin(_base.getOrigin());
+  rect.setPosition(_base.getPosition());
+  rect.setRotation(_base.getRotation());
+  rect.setScale(_base.getScale());
+
+  return rect;
 }
 
 void RoadPhysical::draw(sf::RenderTarget& target,

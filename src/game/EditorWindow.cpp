@@ -1,14 +1,14 @@
 #include "EditorWindow.h"
 
-#include "Button.h"
-#include "Game.h"
-#include "Layout.h"
-#include "utility.h"
-
 #include <fstream>
 #include <istream>
 #include <sstream>
 #include <string>
+
+#include "Button.h"
+#include "Game.h"
+#include "Layout.h"
+#include "utility.h"
 
 EditorWindow::EditorWindow(std::unique_ptr<Layout> l, Game* g,
                            sf::Vector2u windowSize)
@@ -57,51 +57,43 @@ void EditorWindow::handleEvent(const sf::Event& event,
         _isDragging = true;
         _oldMousePos = sf::Mouse::getPosition(window);
       }
-      if (mbpIf->button == sf::Mouse::Button::Left)
-      {
-        switch (_currentAction)
-        {
-        case ActionType::DRAW_ROAD:
-        {
-          if (_clickedCtr == 0)
-          {
-            // first click
-            ++_clickedCtr;
-            sf::View old = window.getView();
-            window.setView(_worldview);
-            _lastClickedPos =
-                window.mapPixelToCoords(sf::Mouse::getPosition(window));
-            window.setView(old);
-          }
-          else
-          {
-            if (isRoadValid(_mouseWorldPos, _lastClickedPos))
-            {
+      if (mbpIf->button == sf::Mouse::Button::Left) {
+        switch (_currentAction) {
+          case ActionType::DRAW_ROAD: {
+            if (_clickedCtr == 0) {
+              // first click
+              ++_clickedCtr;
               sf::View old = window.getView();
               window.setView(_worldview);
-              auto pos =
+              _lastClickedPos =
                   window.mapPixelToCoords(sf::Mouse::getPosition(window));
-              this->makeRoad(
-                  pos, getDatapathFromActionType(ActionType::DRAW_ROAD));
               window.setView(old);
-              _clickedCtr = 0;
+            } else {
+              auto irv = isRoadValid(getSnappedPos(_mouseWorldPos), getSnappedPos(_lastClickedPos),
+                                     getDatapathFromActionType(_currentAction));
+              if (irv.first) {
+                sf::View old = window.getView();
+                window.setView(_worldview);
+                auto pos =
+                    window.mapPixelToCoords(sf::Mouse::getPosition(window));
+                this->makeRoad(pos, getDatapathFromActionType(_currentAction));
+                window.setView(old);
+                _clickedCtr = 0;
+              }
             }
+            break;
           }
-          break;
-        }
-        case ActionType::REMOVE_ROAD:
-        {
-          // already checks for locked
-          auto road = _l->findClosestRoadUnlocked(_mouseWorldPos);
-          if (road.first != nullptr &&
-              road.second < utility::Constants::ROAD_SELECT_SNAP_DIST)
-          {
-            _l->removeRoad(road.first->getID());
+          case ActionType::REMOVE_ROAD: {
+            // already checks for locked
+            auto road = _l->findClosestRoadUnlocked(_mouseWorldPos);
+            if (road.first != nullptr &&
+                road.second < utility::Constants::ROAD_SELECT_SNAP_DIST) {
+              _l->removeRoad(road.first->getID());
+            }
+            break;
           }
-          break;
-        }
-        default:
-          break;
+          default:
+            break;
         }
       }
     }
@@ -206,7 +198,7 @@ void EditorWindow::draw(sf::RenderTarget& target,
   if (_clickedCtr == 1) {
     if (_currentAction == ActionType::DRAW_ROAD) {
       sf::Vector2f pos = getSnappedPos(_mouseWorldPos);
-      sf::Vector2f direction = _lastClickedPos - pos;
+      sf::Vector2f direction = getSnappedPos(_lastClickedPos) - pos;
       float width = 30.f;
       float length =
           std::sqrt(direction.x * direction.x + direction.y * direction.y);
@@ -218,11 +210,15 @@ void EditorWindow::draw(sf::RenderTarget& target,
 
       float angle = std::atan2(direction.y, direction.x);
       rectangle.setRotation(sf::radians(angle));
-      if (isRoadValid(pos, pos + direction))
-      {
+      auto irv = isRoadValid(pos, pos + direction,
+                             getDatapathFromActionType(_currentAction));
+      if (irv.first) {
         rectangle.setFillColor(sf::Color::Blue);
       } else {
+        // sf::RectangleShape rect()
         rectangle.setFillColor(sf::Color::Red);
+        irv.second.setFillColor(sf::Color(255, 0, 0, 32));
+        target.draw(irv.second);
       }
       target.draw(rectangle);
     }
@@ -254,27 +250,41 @@ void EditorWindow::draw(sf::RenderTarget& target,
   target.setView(origional);
 }
 
-bool EditorWindow::isRoadValid(sf::Vector2f start, sf::Vector2f end) const
-{
-  if ((start - end).length() < utility::Constants::MIN_ROAD_DIST)
-  {
-    return false;
+std::pair<bool, sf::RectangleShape> EditorWindow::isRoadValid(
+    sf::Vector2f start, sf::Vector2f end, std::string roadPath) const {
+  if ((start - end).length() < utility::Constants::MIN_ROAD_DIST) {
+    return {false, sf::RectangleShape{}};
   }
   std::ifstream file(roadPath);
+  if (!file.is_open()) {
+    utility::logErr("EditorWindow::isRoadValid - could not open road " +
+                    roadPath);
+    return {false, sf::RectangleShape{}};
+  }
   std::string tmp;
   std::getline(file, tmp);
   std::getline(file, tmp);
   std::getline(file, tmp);
   std::getline(file, tmp);
   sf::Image im;
-  if(im.loadFromFile(tmp)){
+  if (im.loadFromFile(tmp)) {
     auto height = im.getSize().y;
-    sf::RectangleShape hitbox({(end-start).length(), height});
-    hitbox.setRotation((end-start).angle());
-    hitbox.setPosition(start);
-    
+    auto delta = end - start;
+    // fudge it a bit to make placement easier
+    auto adjStart = start + delta.normalized() *
+                                (utility::Constants::INTERSESCTION_SIZE);
+    auto adjEnd = end - delta.normalized() *
+                            (utility::Constants::INTERSESCTION_SIZE);
+    sf::RectangleShape hitbox({(adjEnd - adjStart).length(), height});
+    hitbox.setOrigin({0.f, hitbox.getSize().y / 2.f});
+    hitbox.setRotation((adjEnd - adjStart).angle());
+    hitbox.setPosition(adjStart);
+    auto hb = _l->checkHitbox(hitbox);
+    if (hb.first) {
+      return {false, hb.second};
+    }
   }
-  return true;
+  return {true, sf::RectangleShape{}};
 }
 
 sf::Vector2f EditorWindow::getSnappedPos(sf::Vector2f pos) const {
@@ -283,7 +293,8 @@ sf::Vector2f EditorWindow::getSnappedPos(sf::Vector2f pos) const {
     return pos;
   } else {
     if ((x.first->getPos() - pos).length() >
-        utility::Constants::INTERSECTION_SNAP_DIST) {
+        utility::Constants::INTERSECTION_SNAP_DIST *
+            std::min(_zoomLevel, 1.0)) {
       return pos;
     } else {
       return x.first->getPos();

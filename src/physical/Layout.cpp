@@ -53,7 +53,8 @@ Layout::Layout(std::filesystem::path filepath, std::filesystem::path carpath)
       size_t id;
       size_t laneslhs, lanesrhs;
       char locked;
-      ss >> id >> datapath >> startid >> endid >> laneslhs >> lanesrhs >> locked;
+      ss >> id >> datapath >> startid >> endid >> laneslhs >> lanesrhs >>
+          locked;
       auto ra = RoadAsset(datapath);
       double speedlimit = ra.speedLimit;
       utility::registerPhysicalID(id);
@@ -91,7 +92,8 @@ Layout::Layout(std::filesystem::path filepath, std::filesystem::path carpath)
           delta.normalized() * utility::Constants::INTERSESCTION_SIZE;
       std::unique_ptr<RoadPhysical> rp = std::make_unique<RoadPhysical>(
           id, std::move(r_rhs), std::move(r_lhs), ra,
-          startpos + correctionVector, endpos - correctionVector, locked=='l');
+          startpos + correctionVector, endpos - correctionVector,
+          locked == 'l');
       _roads.try_emplace(rp->getInternalIDR(), rp->getRoadR());
       _roads.try_emplace(rp->getInternalIDL(), rp->getRoadL());
       _physicalRoads.try_emplace(id, std::move(rp));
@@ -252,6 +254,16 @@ RoadPhysical* Layout::createRoad(IntersectionPhysical& start,
       ->reSchedule(utility::Constants::GREEN_PHASE_TIME_DEFAULT,
                    utility::Constants::YELLOW_PHASE_TIME_DEFAULT);
   return rpp;
+}
+
+std::pair<bool, sf::RectangleShape> Layout::checkHitbox(
+    sf::RectangleShape hitbox) {
+  for (const auto& x : _physicalRoads) {
+    if (utility::rectanglesIntersect(x.second->getHitbox(), hitbox)) {
+      return {true, x.second->getHitbox()};
+    }
+  }
+  return {false, sf::RectangleShape{}};
 }
 
 void Layout::removeRoad(size_t id) {

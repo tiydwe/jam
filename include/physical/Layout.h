@@ -17,7 +17,7 @@
 class Layout : public sf::Drawable, sf::Transformable
 {
 public:
-  Layout(std::filesystem::path filename, std::filesystem::path carPath);
+  Layout(std::filesystem::path filename, std::filesystem::path carPath, std::filesystem::path victorypath, std::filesystem::path progresspath);
   ~Layout();
 
   // FOLDER relative to save directory
@@ -76,4 +76,6 @@ private:
   
   // absolute
   std::filesystem::path _carfpath;
+  std::filesystem::path _progressfpath;
+  std::filesystem::path _victoryfpath;
 };

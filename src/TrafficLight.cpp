@@ -111,6 +111,9 @@ void TrafficLight::removeRoad(size_t roadid) {
 }
 
 size_t TrafficLight::timeToScheduleItem(double time) {
+  if(_schedule.size() == 0){
+    this->reSchedule(utility::Constants::GREEN_PHASE_TIME_DEFAULT, utility::Constants::YELLOW_PHASE_TIME_DEFAULT);
+  }
   double totalCycleTime = 0;
   for (ScheduleItem& s : _schedule) {
     totalCycleTime += s.duration;

@@ -9,7 +9,11 @@
 
 Game::Game(std::filesystem::path pathToLevelsFolder)
     : _pathToLevelsFolder(pathToLevelsFolder) {
-  MainWindow = sf::RenderWindow(sf::VideoMode({1000, 800}), "JAM");
+  sf::ContextSettings settings;
+  settings.antiAliasingLevel = 8;
+  MainWindow =
+      sf::RenderWindow(sf::VideoMode({1000, 800}), "JAM", sf::Style::Default,
+                       sf::State::Windowed, settings);
   _titleWindow = std::make_unique<TitleWindow>(
       this, sf::Vector2f{static_cast<float>(MainWindow.getSize().x),
                          static_cast<float>(MainWindow.getSize().y)});
@@ -58,8 +62,8 @@ void Game::endLevelSelectChoose(std::filesystem::path pathToMainDat) {
     _victoryP = std::filesystem::path(tmp);
     std::getline(file, tmp);
     _progressP = std::filesystem::path(tmp);
-    std::unique_ptr<Layout> layout = std::make_unique<Layout>(
-        _layoutP, _carP, _victoryP, _progressP);
+    std::unique_ptr<Layout> layout =
+        std::make_unique<Layout>(_layoutP, _carP, _victoryP, _progressP);
     _editor = std::make_unique<EditorWindow>(std::move(layout), this,
                                              MainWindow.getSize());
     _mainP = pathToMainDat;
@@ -104,7 +108,8 @@ void Game::endLoadFileChoose(std::filesystem::path pathToMainDat) {
     std::ifstream file(pathToMainDat);
     if (!file.is_open()) {
       utility::logErr("Error opening game file! " + pathToMainDat.string());
-      pfd::message("JAM", "Error opening file!", pfd::choice::ok, pfd::icon::error);
+      pfd::message("JAM", "Error opening file!", pfd::choice::ok,
+                   pfd::icon::error);
       currentMode = GameScreenMode::TITLE_SCREEN;
       return;
     }
@@ -117,8 +122,8 @@ void Game::endLoadFileChoose(std::filesystem::path pathToMainDat) {
     _victoryP = std::filesystem::path(tmp);
     std::getline(file, tmp);
     _progressP = std::filesystem::path(tmp);
-    std::unique_ptr<Layout> layout = std::make_unique<Layout>(
-        _layoutP, _carP, _victoryP, _progressP);
+    std::unique_ptr<Layout> layout =
+        std::make_unique<Layout>(_layoutP, _carP, _victoryP, _progressP);
     _editor = std::make_unique<EditorWindow>(std::move(layout), this,
                                              MainWindow.getSize());
     _mainP = pathToMainDat;
@@ -152,8 +157,9 @@ void Game::run() {
           _levelSelectWindow->updateWindowSize(newSize);
         } else if (currentMode == GameScreenMode::TITLE_SCREEN) {
           _titleWindow->updateWindowSize(newSize);
-        } else if (currentMode == GameScreenMode::LOAD_GAME){
-          _saveWindow->setSize({MainWindow.getSize().x, MainWindow.getSize().y});
+        } else if (currentMode == GameScreenMode::LOAD_GAME) {
+          _saveWindow->setSize(
+              {MainWindow.getSize().x, MainWindow.getSize().y});
         }
       }
       if (currentMode == GameScreenMode::SIMULATE) {
@@ -190,12 +196,10 @@ void Game::run() {
           MainWindow.mapPixelToCoords(sf::Mouse::getPosition(MainWindow)));
     } else if (currentMode == GameScreenMode::LOAD_GAME) {
       _saveWindow->update(
-        MainWindow.mapPixelToCoords(sf::Mouse::getPosition(MainWindow))
-      );
-      if(_saveWindow->getStatus() == SaveWindowStatus::EXIT_CANCEL){
+          MainWindow.mapPixelToCoords(sf::Mouse::getPosition(MainWindow)));
+      if (_saveWindow->getStatus() == SaveWindowStatus::EXIT_CANCEL) {
         this->endLoadFileBack();
-      }
-      else if(_saveWindow->getStatus() == SaveWindowStatus::EXIT_DONE){
+      } else if (_saveWindow->getStatus() == SaveWindowStatus::EXIT_DONE) {
         this->endLoadFileChoose(_saveWindow->getResult());
       }
     }

@@ -33,7 +33,7 @@ class Road{
   size_t getID()const{return _id;}
   size_t getSpeedLimit()const{return _speed_limit;}
   const std::deque<size_t>& getLanes()const{return _lanes;}
-  size_t getEdgeLane()const{return _lanes.back();}
+  size_t getEdgeLane()const{return _lanes.front();}
   size_t getEndIntersection()const{return _endIntersection;}
   Intersection* getTrueEndIntersection() const;
   size_t getNumLanes()const{return _lanes.size();}
@@ -51,7 +51,6 @@ class Road{
 
   double _speed_limit;
 
-  // front = left (center), back = right (edge)
   std::deque<size_t> _lanes;
 
   size_t _endIntersection;

@@ -24,9 +24,9 @@ void IntersectionPhysical::draw(sf::RenderTarget& target,
     }
     idsdone.insert(x.first->getRoadPhysical()->getID());
     auto offr = x.first->getRoadPhysical()->getOffestVectorR();
-    offr *= ((offr.length() + 5.0f) / offr.length());
+    offr *= ((offr.length() + 0.5f) / offr.length());
     auto offl = x.first->getRoadPhysical()->getOffestVectorL();
-    offl *= ((offl.length() + 5.0f) / offl.length());
+    offl *= ((offl.length() + 0.5f) / offl.length());
     if (x.second == EdgeType::INGOING) {
       verticies.push_back(x.first->getRoadPhysical()->getEnd() + offr);
       verticies.push_back(x.first->getRoadPhysical()->getEnd() + offl);

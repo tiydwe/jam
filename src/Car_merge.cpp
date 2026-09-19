@@ -29,9 +29,13 @@ bool Car::_mergeToNextLane(double dd) {
       return false;
     }
     if (nextLane < 0) {
-      // err
+      // probally no path
+      _status = carStatus::NO_ROUTE;
+      return false;
+      /*
       utility::logErr(
           "Car::_mergeToNextLane got negative return from closestLaneTo");
+          */
     } else {
       _init_merge(nextLane);
       return true;

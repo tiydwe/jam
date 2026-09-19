@@ -17,13 +17,24 @@ EditorWindow::EditorWindow(std::unique_ptr<Layout> l, Game* g,
       _simulateButton(g, sf::Vector2f(10, 10), sf::Vector2f(100, 40),
                       utility::Constants::defaultFont, "Simulate",
                       sf::Color::Green, sf::Color::Blue, sf::Color::Red),
-      _placeRoadButton(g, sf::Vector2f(120, 10), sf::Vector2f(100, 40),
-                       utility::Constants::defaultFont, "ROAD",
-                       sf::Color::Green, sf::Color::Blue, sf::Color::Red),
-      _removeRoadButton(g, sf::Vector2f(500, 10), sf::Vector2f(100, 40),
+      _placeRoad1Way1LaneButton(g, sf::Vector2f(120, 10), sf::Vector2f(100, 40),
+                                utility::Constants::defaultFont, "1-way",
+                                sf::Color::Green, sf::Color::Blue,
+                                sf::Color::Red),
+      _placeRoad1Way2LaneButton(g, sf::Vector2f(240, 10), sf::Vector2f(100, 40),
+                                utility::Constants::defaultFont, "1-way 2-lane",
+                                sf::Color::Green, sf::Color::Blue,
+                                sf::Color::Red),
+      _placeRoad2LaneButton(g, sf::Vector2f(360, 10), sf::Vector2f(100, 40),
+                            utility::Constants::defaultFont, "2-lane",
+                            sf::Color::Green, sf::Color::Blue, sf::Color::Red),
+      _placeRoad4LaneButton(g, sf::Vector2f(480, 10), sf::Vector2f(100, 40),
+                            utility::Constants::defaultFont, "4-lane",
+                            sf::Color::Green, sf::Color::Blue, sf::Color::Red),
+      _removeRoadButton(g, sf::Vector2f(600, 10), sf::Vector2f(100, 40),
                         utility::Constants::defaultFont, "DEMOLISH",
                         sf::Color::Green, sf::Color::Blue, sf::Color::Red),
-      _saveButton(g, sf::Vector2f(620, 10), sf::Vector2f(100, 40),
+      _saveButton(g, sf::Vector2f(720, 10), sf::Vector2f(100, 40),
                   utility::Constants::defaultFont, "SAVE", sf::Color::Green,
                   sf::Color::Blue, sf::Color::Red),
       _saveWindow(nullptr) {
@@ -37,8 +48,18 @@ EditorWindow::EditorWindow(std::unique_ptr<Layout> l, Game* g,
   _topbar.setPosition({0.f, 0.f});
 
   _simulateButton.setOnclick([&](Game* game) { this->onclickSimulate(game); });
-  _placeRoadButton.setOnclick(
-      [&](Game* game) { this->onclickCreateRoad(game); });
+  _placeRoad1Way1LaneButton.setOnclick([&](Game* game) {
+    this->onclickCreateRoad(game, ActionType::DRAW_ROAD_1_1LANE);
+  });
+  _placeRoad1Way2LaneButton.setOnclick([&](Game* game) {
+    this->onclickCreateRoad(game, ActionType::DRAW_ROAD_1_2LANE);
+  });
+  _placeRoad2LaneButton.setOnclick([&](Game* game) {
+    this->onclickCreateRoad(game, ActionType::DRAW_ROAD_2LANE);
+  });
+  _placeRoad4LaneButton.setOnclick([&](Game* game) {
+    this->onclickCreateRoad(game, ActionType::DRAW_ROAD_4LANE);
+  });
   _removeRoadButton.setOnclick(
       [&](Game* game) { this->onclickDemolishRoad(game); });
   _saveButton.setOnclick([this](Game* game) { this->onclickSaveGame(game); });
@@ -58,42 +79,36 @@ void EditorWindow::handleEvent(const sf::Event& event,
         _oldMousePos = sf::Mouse::getPosition(window);
       }
       if (mbpIf->button == sf::Mouse::Button::Left) {
-        switch (_currentAction) {
-          case ActionType::DRAW_ROAD: {
-            if (_clickedCtr == 0) {
-              // first click
-              ++_clickedCtr;
+        if (isDrawRoad(_currentAction)) {
+          if (_clickedCtr == 0) {
+            // first click
+            ++_clickedCtr;
+            sf::View old = window.getView();
+            window.setView(_worldview);
+            _lastClickedPos =
+                window.mapPixelToCoords(sf::Mouse::getPosition(window));
+            window.setView(old);
+          } else {
+            auto irv = isRoadValid(getSnappedPos(_mouseWorldPos),
+                                   getSnappedPos(_lastClickedPos),
+                                   getDatapathFromActionType(_currentAction));
+            if (irv.first) {
               sf::View old = window.getView();
               window.setView(_worldview);
-              _lastClickedPos =
+              auto pos =
                   window.mapPixelToCoords(sf::Mouse::getPosition(window));
+              this->makeRoad(pos, getDatapathFromActionType(_currentAction));
               window.setView(old);
-            } else {
-              auto irv = isRoadValid(getSnappedPos(_mouseWorldPos), getSnappedPos(_lastClickedPos),
-                                     getDatapathFromActionType(_currentAction));
-              if (irv.first) {
-                sf::View old = window.getView();
-                window.setView(_worldview);
-                auto pos =
-                    window.mapPixelToCoords(sf::Mouse::getPosition(window));
-                this->makeRoad(pos, getDatapathFromActionType(_currentAction));
-                window.setView(old);
-                _clickedCtr = 0;
-              }
+              _clickedCtr = 0;
             }
-            break;
           }
-          case ActionType::REMOVE_ROAD: {
-            // already checks for locked
-            auto road = _l->findClosestRoadUnlocked(_mouseWorldPos);
-            if (road.first != nullptr &&
-                road.second < utility::Constants::ROAD_SELECT_SNAP_DIST) {
-              _l->removeRoad(road.first->getID());
-            }
-            break;
+        } else if (_currentAction == ActionType::REMOVE_ROAD) {
+          // already checks for locked
+          auto road = _l->findClosestRoadUnlocked(_mouseWorldPos);
+          if (road.first != nullptr &&
+              road.second < utility::Constants::ROAD_SELECT_SNAP_DIST) {
+            _l->removeRoad(road.first->getID());
           }
-          default:
-            break;
         }
       }
     }
@@ -133,14 +148,20 @@ void EditorWindow::handleEvent(const sf::Event& event,
   }
 }
 
+bool EditorWindow::isDrawRoad(ActionType tp) const {
+  return tp == ActionType::DRAW_ROAD_1_1LANE ||
+         tp == ActionType::DRAW_ROAD_1_2LANE ||
+         tp == ActionType::DRAW_ROAD_2LANE || tp == ActionType::DRAW_ROAD_4LANE;
+}
+
 void EditorWindow::onclickSimulate(Game* game) {
   _clickedCtr = 0;
   game->beginSimulation();
 }
 
-void EditorWindow::onclickCreateRoad(Game* game) {
+void EditorWindow::onclickCreateRoad(Game* game, ActionType at) {
   _clickedCtr = 0;
-  _currentAction = ActionType::DRAW_ROAD;
+  _currentAction = at;
 }
 
 void EditorWindow::onclickDemolishRoad(Game* game) {
@@ -166,7 +187,10 @@ void EditorWindow::updateWindowSize(sf::Vector2f newSize) {
 
 void EditorWindow::update(sf::Vector2f mousePosition) {
   _simulateButton.update(mousePosition);
-  _placeRoadButton.update(mousePosition);
+  _placeRoad1Way1LaneButton.update(mousePosition);
+  _placeRoad1Way2LaneButton.update(mousePosition);
+  _placeRoad2LaneButton.update(mousePosition);
+  _placeRoad4LaneButton.update(mousePosition);
   _removeRoadButton.update(mousePosition);
   _saveButton.update(mousePosition);
   if (_saveWindow.get() != nullptr) {
@@ -196,7 +220,7 @@ void EditorWindow::draw(sf::RenderTarget& target,
   }
   _l->draw(target, states);
   if (_clickedCtr == 1) {
-    if (_currentAction == ActionType::DRAW_ROAD) {
+    if (isDrawRoad(_currentAction)) {
       sf::Vector2f pos = getSnappedPos(_mouseWorldPos);
       sf::Vector2f direction = getSnappedPos(_lastClickedPos) - pos;
       float width = 30.f;
@@ -229,8 +253,8 @@ void EditorWindow::draw(sf::RenderTarget& target,
         road.second < utility::Constants::ROAD_SELECT_SNAP_DIST) {
       auto start = road.first->getStart();
       auto end = road.first->getEnd();
-      float width = road.first->getRoadAsset()->leftCenterOffset.back() +
-                    road.first->getRoadAsset()->rightCenterOffset.back();
+      float width = road.first->getOffestVectorL().length() +
+                    road.first->getOffestVectorR().length();
       sf::RectangleShape rectangle(sf::Vector2f{(start - end).length(), width});
       rectangle.setOrigin({0.f, width / 2});
       rectangle.setRotation((end - start).angle());
@@ -243,7 +267,10 @@ void EditorWindow::draw(sf::RenderTarget& target,
   target.draw(_topbar, states);
 
   target.draw(_simulateButton, states);
-  target.draw(_placeRoadButton, states);
+  target.draw(_placeRoad1Way1LaneButton, states);
+  target.draw(_placeRoad1Way2LaneButton, states);
+  target.draw(_placeRoad2LaneButton, states);
+  target.draw(_placeRoad4LaneButton, states);
   target.draw(_removeRoadButton, states);
   target.draw(_saveButton, states);
 
@@ -271,10 +298,10 @@ std::pair<bool, sf::RectangleShape> EditorWindow::isRoadValid(
     auto height = im.getSize().y;
     auto delta = end - start;
     // fudge it a bit to make placement easier
-    auto adjStart = start + delta.normalized() *
-                                (utility::Constants::INTERSESCTION_SIZE);
-    auto adjEnd = end - delta.normalized() *
-                            (utility::Constants::INTERSESCTION_SIZE);
+    auto adjStart =
+        start + delta.normalized() * (utility::Constants::INTERSESCTION_SIZE);
+    auto adjEnd =
+        end - delta.normalized() * (utility::Constants::INTERSESCTION_SIZE);
     sf::RectangleShape hitbox({(adjEnd - adjStart).length(), height});
     hitbox.setOrigin({0.f, hitbox.getSize().y / 2.f});
     hitbox.setRotation((adjEnd - adjStart).angle());
@@ -304,8 +331,14 @@ sf::Vector2f EditorWindow::getSnappedPos(sf::Vector2f pos) const {
 
 std::string getDatapathFromActionType(ActionType type) {
   switch (type) {
-    case ActionType::DRAW_ROAD:
+    case ActionType::DRAW_ROAD_4LANE:
       return "assets/data/roads/generic4lane.dat";
+    case ActionType::DRAW_ROAD_2LANE:
+      return "assets/data/roads/generic2lane.dat";
+    case ActionType::DRAW_ROAD_1_1LANE:
+      return "assets/data/roads/1way1lane.dat";
+    case ActionType::DRAW_ROAD_1_2LANE:
+      return "assets/data/roads/1way2lane.dat";
 
     default:
       return "";

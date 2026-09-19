@@ -62,6 +62,7 @@ RoadPhysical::RoadPhysical(size_t id, std::unique_ptr<Road> road,
         "RoadPhysical1Way::RoadPhysical1Way - texture path not found.");
   }
   _texture.setRepeated(true);
+  _texture.setSmooth(true);
   _base.setTexture(_texture);
   _base.setOrigin({0.f, _texture.getSize().y / 2.f});
   _base.setTextureRect(sf::IntRect(
@@ -169,16 +170,14 @@ sf::Vector2f RoadPhysical::getOffestVectorR() const {
   sf::Vector2f delta = _end - _start;
   sf::Vector2f offsetNorm = {-delta.y, delta.x};
   offsetNorm = offsetNorm.normalized();
-  return offsetNorm * static_cast<float>(_roadData.rightCenterOffset.at(
-                          _road->getLanePosFromCenter(_road->getEdgeLane())));
+  return offsetNorm * getHitbox().getSize().y / 2.f;
 }
 
 sf::Vector2f RoadPhysical::getOffestVectorL() const {
   sf::Vector2f delta = _start - _end;
   sf::Vector2f offsetNorm = {-delta.y, delta.x};
   offsetNorm = offsetNorm.normalized();
-  return offsetNorm * static_cast<float>(_roadData.leftCenterOffset.at(
-                          _roadb->getLanePosFromCenter(_roadb->getEdgeLane())));
+  return offsetNorm * getHitbox().getSize().y / 2.f;
 }
 
 sf::RectangleShape RoadPhysical::getHitbox() const {

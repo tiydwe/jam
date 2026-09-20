@@ -43,6 +43,7 @@ class SimulateWindow : public sf::Drawable, sf::Transformable {
   double _zoomLevel = 1.0;
 
   sf::RectangleShape _topbar;
+  sf::RectangleShape _background;
 
   Button _slow;
   Button _mid;

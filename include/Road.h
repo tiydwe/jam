@@ -2,6 +2,7 @@
 
 #include <vector>
 #include <deque>
+#include <random>
 
 #include "Lane.h"
 
@@ -34,6 +35,8 @@ class Road{
   size_t getSpeedLimit()const{return _speed_limit;}
   const std::deque<size_t>& getLanes()const{return _lanes;}
   size_t getEdgeLane()const{return _lanes.front();}
+  template <class Generator>
+  size_t getRandomLane(Generator& g) const;
   size_t getEndIntersection()const{return _endIntersection;}
   Intersection* getTrueEndIntersection() const;
   size_t getNumLanes()const{return _lanes.size();}
@@ -57,3 +60,8 @@ class Road{
 
   double _angle;
 };
+
+template <class Generator>
+inline size_t Road::getRandomLane(Generator& g) const {
+  return _lanes[std::uniform_int_distribution<>(0, _lanes.size()-1)(g)];
+}

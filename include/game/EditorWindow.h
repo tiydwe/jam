@@ -60,6 +60,7 @@ class EditorWindow : public sf::Drawable, sf::Transformable {
   double _zoomLevel = 0.7;
 
   sf::RectangleShape _topbar;
+  sf::RectangleShape _background;
 
   Button _simulateButton;
 
@@ -69,6 +70,7 @@ class EditorWindow : public sf::Drawable, sf::Transformable {
   Button _placeRoad4LaneButton;
   Button _removeRoadButton;
   Button _saveButton;
+  Button _exitButton;
 
   sf::Vector2f _lastClickedPos;
   size_t _clickedCtr = 0;

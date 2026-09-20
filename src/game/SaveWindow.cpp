@@ -8,18 +8,18 @@ SaveWindow::SaveWindow(Layout* layout)
       _fpathText(utility::Constants::defaultFont),
       _result(),
       _status(SaveWindowStatus::NORMAL),
-      _choose(nullptr, {290, 10}, {60, 20}, utility::Constants::defaultFont,
-              "Choose", sf::Color(120, 120, 120), sf::Color(100, 100, 100),
+      _choose(nullptr, {390, 10}, {80, 30}, utility::Constants::defaultFont,
+              "Choose", utility::ColorPalette::functionalBtn, utility::ColorPalette::functionalBtnHover,
               sf::Color::Black),
-      _ok(nullptr, {290, 70}, {60, 20}, utility::Constants::defaultFont, "ok",
-          sf::Color(120, 120, 120), sf::Color(100, 100, 100), sf::Color::Black),
-      _cancel(nullptr, {10, 70}, {60, 20}, utility::Constants::defaultFont,
-              "cancel", sf::Color(120, 120, 120), sf::Color(100, 100, 100),
+      _ok(nullptr, {390, 110}, {80, 30}, utility::Constants::defaultFont, "ok",
+          utility::ColorPalette::functionalBtn, utility::ColorPalette::functionalBtnHover, sf::Color::Black),
+      _cancel(nullptr, {10, 110}, {80, 30}, utility::Constants::defaultFont,
+              "cancel", utility::ColorPalette::destructiveBtn, utility::ColorPalette::destructiveBtnHover,
               sf::Color::Black) {
   _choose.setOnclick([this](Game* gm) { this->onclickChoose(); });
   _ok.setOnclick([this](Game* gm) { this->onclickOk(); });
   _cancel.setOnclick([this](Game* gm) { this->onclickCancel(); });
-  _background.setSize({360, 100});
+  _background.setSize({500, 150});
   _fpathText.setCharacterSize(20);
   _fpathText.setPosition({10, 10});
   _fpathText.setFillColor(sf::Color::Black);
@@ -69,8 +69,12 @@ void SaveWindow::onclickRecent(size_t num) {
 }
 
 void SaveWindow::onclickOk() {
-  if (std::filesystem::exists(_result)) {
+  if (std::filesystem::is_directory(_result)) {
     _status = SaveWindowStatus::EXIT_DONE;
+  } else if (_result.empty()) {
+    pfd::message("JAM", "Please enter a folder path!", pfd::choice::ok, pfd::icon::error);
+  } else {
+    pfd::message("JAM", "Invalid path!", pfd::choice::ok, pfd::icon::error);
   }
 }
 

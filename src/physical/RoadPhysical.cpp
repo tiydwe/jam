@@ -76,11 +76,12 @@ RoadPhysical::RoadPhysical(size_t id, std::unique_ptr<Road> road,
 
 RoadPhysical::~RoadPhysical() {}
 
-sf::Vector2f RoadPhysical::getPhysicalPosition(size_t roadid, size_t laneid,
+std::pair<sf::Vector2f, sf::Angle> RoadPhysical::getPhysicalPosition(size_t roadid, size_t laneid,
                                                double trueDistance,
                                                CarPhysical* cp,
                                                RoadPhysical* lastRoad,
                                                const Lane* lastLane) const {
+  sf::Angle res;
   const Road* r = nullptr;
   int mdf = 0;
   const std::vector<int>* offset;
@@ -159,7 +160,7 @@ sf::Vector2f RoadPhysical::getPhysicalPosition(size_t roadid, size_t laneid,
     sf::Vector2f trueStart =
         start + static_cast<float>(startOffset) * startOffsetNorm;
     sf::Vector2f trueEnd = end + static_cast<float>(endOffset) * endOffsetNorm;
-    return trueStart + percent * (trueEnd - trueStart);
+    return {trueStart + percent * (trueEnd - trueStart), (trueEnd - trueStart).angle()};
   }
   utility::logErr("RoadPhysical::getPhysicalPosition - laneid not found");
   utility::exit();

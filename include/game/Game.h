@@ -34,6 +34,7 @@ class Game {
   void beginLoadFile();
   void endLoadFileBack();
   void endLoadFileChoose(std::filesystem::path pathToMainDat);
+  void endEditorWindow();
 
   void run();
 

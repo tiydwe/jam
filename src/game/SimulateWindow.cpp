@@ -10,13 +10,13 @@ SimulateWindow::SimulateWindow(Layout* l, Game* g, std::string filename,
       _slow(g, sf::Vector2f(10, 10), sf::Vector2f(100, 40),
             utility::Constants::defaultFont, "Slow", sf::Color::Green,
             sf::Color::Blue, sf::Color::Red),
-      _mid(g, sf::Vector2f(220, 10), sf::Vector2f(100, 40),
+      _mid(g, sf::Vector2f(120, 10), sf::Vector2f(100, 40),
            utility::Constants::defaultFont, "Normal", sf::Color::Green,
            sf::Color::Blue, sf::Color::Red),
-      _fast(g, sf::Vector2f(330, 10), sf::Vector2f(100, 40),
+      _fast(g, sf::Vector2f(240, 10), sf::Vector2f(100, 40),
             utility::Constants::defaultFont, "Fast", sf::Color::Green,
             sf::Color::Blue, sf::Color::Red),
-      _exitSim(g, sf::Vector2f(530, 10), sf::Vector2f(100, 40),
+      _exitSim(g, sf::Vector2f(600, 10), sf::Vector2f(100, 40),
                utility::Constants::defaultFont, "EXIT", sf::Color::Red,
                sf::Color::Blue, sf::Color::Red) {
   _s = std::make_unique<Simulation>(l, filename);
@@ -28,10 +28,16 @@ SimulateWindow::SimulateWindow(Layout* l, Game* g, std::string filename,
   _topbar.setSize({(float)windowSize.x, 60.2f});
   _topbar.setFillColor(sf::Color::Blue);
   _topbar.setPosition({0.f, 0.f});
+  
+  _background.setSize(
+      {static_cast<float>(windowSize.x), static_cast<float>(windowSize.y)});
+  _background.setPosition({0.f, 0.f});
+  _background.setFillColor(utility::Constants::BACKGROUND_COLOR);
 
-  _slow.setOnclick([&](Game* gm) { _timeMultiplier = 5.0; });
-  _mid.setOnclick([&](Game* gm) { _timeMultiplier = 8.0; });
-  _fast.setOnclick([&](Game* gm) { _timeMultiplier = 12.0; });
+  _timeMultiplier = 8.0;
+  _slow.setOnclick([&](Game* gm) { _timeMultiplier = 8.0; });
+  _mid.setOnclick([&](Game* gm) { _timeMultiplier = 13.0; });
+  _fast.setOnclick([&](Game* gm) { _timeMultiplier = 20.0; });
   _exitSim.setOnclick([&](Game* gm) { gm->endSimulation(); });
 }
 
@@ -43,7 +49,7 @@ void SimulateWindow::handleEvent(const sf::Event& event,
       _oldMousePos = sf::Mouse::getPosition(window);
     }
   }
-  if (auto mbrIf = event.getIf<sf::Event::MouseButtonPressed>()) {
+  if (auto mbrIf = event.getIf<sf::Event::MouseButtonReleased>()) {
     if (mbrIf->button == sf::Mouse::Button::Right) {
       _isDragging = false;
     }
@@ -75,6 +81,8 @@ void SimulateWindow::updateWindowSize(sf::Vector2f newSize) {
   _worldview.setSize(newSize);
   _uiview.setSize(newSize);
   _uiview.setCenter({newSize.x / 2, newSize.y / 2});
+  
+  _background.setSize(newSize);
   _topbar.setSize({newSize.x, 60.f});
 }
 
@@ -94,6 +102,7 @@ void SimulateWindow::update(sf::Vector2f mousePosition) {
 
 void SimulateWindow::draw(sf::RenderTarget& target,
                           sf::RenderStates states) const {
+  target.draw(_background, states);
   sf::View origional = target.getView();
   target.setView(_worldview);
   _l->draw(target, states);

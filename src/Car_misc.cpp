@@ -30,9 +30,9 @@ void Car::setDestination(const std::pair<size_t, double>& dest) {
   auto prstart = _parentSim->getLayout()->getPhysicalRoadFromInternalID(_position_roadid);
   _results._distanceFromSourceToDest =
       (pr->getPhysicalPosition(dest.first, r->getEdgeLane(), dest.second,
-                              nullptr, nullptr, nullptr) -
+                              nullptr, nullptr, nullptr).first -
       prstart->getPhysicalPosition(_position_roadid, _position_laneid, _position_distance,
-                              nullptr, nullptr, nullptr)).length();
+                              nullptr, nullptr, nullptr).first).length();
 }
 
 void Car::setRoute(const std::deque<size_t>& route) { _route = route; }

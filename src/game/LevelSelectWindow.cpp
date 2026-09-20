@@ -10,11 +10,15 @@
 LevelSelectWindow::LevelSelectWindow(std::filesystem::path levelsDir,
                                      sf::Vector2f windowSize, Game* game)
     : _game(game),
-      _back(nullptr, {windowSize.x / 2.f - 40, windowSize.y / 2.f - 70},
+      _back(nullptr, {windowSize.x / 2.f - 40, windowSize.y / 2.f + 70},
             {80, 30}, utility::Constants::defaultFont, "BACK",
             sf::Color(120, 120, 120), sf::Color(100, 100, 100),
-            sf::Color::Black) {
+            sf::Color::Black),
+      _title(utility::Constants::defaultFont, "Select a level:") {
   _back.setOnclick([this](Game* gm) { this->onclickBack(); });
+  _title.setOrigin(_title.getLocalBounds().getCenter());
+  _title.setPosition({windowSize.x / 2.f, windowSize.y / 2.f - 40});
+  _title.setFillColor(sf::Color::Black);
   if (!std::filesystem::exists(levelsDir) ||
       !std::filesystem::is_directory(levelsDir)) {
     utility::logErr(
@@ -54,6 +58,7 @@ void LevelSelectWindow::updateWindowSize(sf::Vector2f newSize) {
   this->createButtons(newSize);
   _back.setStart({newSize.x / 2.f - 40, newSize.y / 2.f - 100});
   _contentBox.setPosition(newSize/ 2.f);
+  _title.setPosition({newSize.x / 2.f, newSize.y / 2.f - 40});
 }
 
 void LevelSelectWindow::update(sf::Vector2f mousePos) {
@@ -71,6 +76,7 @@ void LevelSelectWindow::draw(sf::RenderTarget& target,
                              sf::RenderStates states) const {
   states.transform *= getTransform();
   target.draw(_contentBox,states);
+  target.draw(_title, states);
   for (const auto& x : _levelButtons) {
     x->draw(target, states);
   }
@@ -93,7 +99,7 @@ void LevelSelectWindow::createButtons(sf::Vector2f windowSize) {
   double spacing = 15.f;
   double netWidth =
       _levels.size() * widthPerButton + (_levels.size() - 1) * spacing;
-  _contentBox.setSize({netWidth + 2 * spacing, height + 110});
+  _contentBox.setSize({netWidth + 2 * spacing, height + 180});
   _contentBox.setOrigin(_contentBox.getSize() / 2.f);
   _contentBox.setPosition(windowSize/ 2.f);
   sf::Vector2f startPos{center.x - netWidth / 2, center.y - height / 2};

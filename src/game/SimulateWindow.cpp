@@ -8,17 +8,21 @@ SimulateWindow::SimulateWindow(Layout* l, Game* g, std::string filename,
     : _l(l),
       _g(g),
       _slow(g, sf::Vector2f(10, 10), sf::Vector2f(100, 40),
-            utility::Constants::defaultFont, "Slow", sf::Color::Green,
-            sf::Color::Blue, sf::Color::Red),
+            utility::Constants::defaultFont, "Slow",
+            utility::ColorPalette::functionalBtn,
+            utility::ColorPalette::functionalBtnHover, sf::Color::Red),
       _mid(g, sf::Vector2f(120, 10), sf::Vector2f(100, 40),
-           utility::Constants::defaultFont, "Normal", sf::Color::Green,
-           sf::Color::Blue, sf::Color::Red),
+           utility::Constants::defaultFont, "Normal",
+           utility::ColorPalette::functionalBtn,
+           utility::ColorPalette::functionalBtnHover, sf::Color::Red),
       _fast(g, sf::Vector2f(240, 10), sf::Vector2f(100, 40),
-            utility::Constants::defaultFont, "Fast", sf::Color::Green,
-            sf::Color::Blue, sf::Color::Red),
+            utility::Constants::defaultFont, "Fast",
+            utility::ColorPalette::functionalBtn,
+            utility::ColorPalette::functionalBtnHover, sf::Color::Red),
       _exitSim(g, sf::Vector2f(600, 10), sf::Vector2f(100, 40),
-               utility::Constants::defaultFont, "EXIT", sf::Color::Red,
-               sf::Color::Blue, sf::Color::Red) {
+               utility::Constants::defaultFont, "EXIT",
+               utility::ColorPalette::destructiveBtn,
+               utility::ColorPalette::destructiveBtnHover, sf::Color::Red) {
   _s = std::make_unique<Simulation>(l, filename);
   _worldview.setSize({(float)windowSize.x, (float)windowSize.y});
   _worldview.setCenter({windowSize.x / 2.f, windowSize.y / 2.f});
@@ -28,7 +32,7 @@ SimulateWindow::SimulateWindow(Layout* l, Game* g, std::string filename,
   _topbar.setSize({(float)windowSize.x, 60.2f});
   _topbar.setFillColor(sf::Color::Blue);
   _topbar.setPosition({0.f, 0.f});
-  
+
   _background.setSize(
       {static_cast<float>(windowSize.x), static_cast<float>(windowSize.y)});
   _background.setPosition({0.f, 0.f});
@@ -38,7 +42,16 @@ SimulateWindow::SimulateWindow(Layout* l, Game* g, std::string filename,
   _slow.setOnclick([&](Game* gm) { _timeMultiplier = 8.0; });
   _mid.setOnclick([&](Game* gm) { _timeMultiplier = 13.0; });
   _fast.setOnclick([&](Game* gm) { _timeMultiplier = 20.0; });
-  _exitSim.setOnclick([&](Game* gm) { gm->endSimulation(); });
+  _exitSim.setOnclick([&](Game* gm) {
+    if (!_s->isDone()) {
+      pfd::message(
+          "JAM",
+          "Wait until all cars have reached their destination or despawned!",
+          pfd::choice::ok);
+    } else {
+      gm->endSimulation();
+    }
+  });
 }
 
 void SimulateWindow::handleEvent(const sf::Event& event,
@@ -81,7 +94,7 @@ void SimulateWindow::updateWindowSize(sf::Vector2f newSize) {
   _worldview.setSize(newSize);
   _uiview.setSize(newSize);
   _uiview.setCenter({newSize.x / 2, newSize.y / 2});
-  
+
   _background.setSize(newSize);
   _topbar.setSize({newSize.x, 60.f});
 }
@@ -89,7 +102,7 @@ void SimulateWindow::updateWindowSize(sf::Vector2f newSize) {
 void SimulateWindow::step(double trueDt) {
   _s->step(trueDt * _timeMultiplier);
   if (_s->isDone()) {
-    _exitSim.setNormal(sf::Color::Green);
+    _exitSim.setNormal(utility::ColorPalette::functionalBtn);
   }
 }
 

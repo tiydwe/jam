@@ -66,8 +66,10 @@ bool Car::_check_merge() {
     utility::logWarn("Car::_check_merge was called but car is not merging!");
     return false;
   }
+  _parentSim->getLane(_newLaneMerge)->moveCar(_position_distance + _margin, _id);
+  _newMergedDistance = _position_distance + _margin;
   auto minD = _parentSim->getLane(_newLaneMerge)->minDistance(_id);
-  if (minD.second == -1 || (minD.first - _newMergedDistance) > _margin) {
+  if (minD.second == -1 || (minD.first - _newMergedDistance) > _minStoppingDist + _margin || minD.first < _newMergedDistance) {
     // clear to merge
     _parentSim->getLane(_position_laneid)->removeCar(_id);
     _position_distance = _newMergedDistance;

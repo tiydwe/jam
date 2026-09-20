@@ -49,6 +49,19 @@ namespace Constants{
   extern const float TIMOUT_LIMIT_NO_MOVE_CAR;
   extern const float INTERSECTION_TRANSITION_LENGTH;
   extern const float ROAD_SELECT_SNAP_DIST;
+  extern const float CAR_MARGIN;
+  
+  extern const sf::Color BACKGROUND_COLOR;
 }
+
+namespace ColorPalette{
+  extern const sf::Color functionalBtn;
+  extern const sf::Color functionalBtnHover;
+  extern const sf::Color destructiveBtn;
+  extern const sf::Color destructiveBtnHover;
+  extern const sf::Color editorBtn;
+  extern const sf::Color editorBtnHover;
+  extern const sf::Color uiBackgroundColor;
+};
 
 };

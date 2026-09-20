@@ -12,7 +12,7 @@ Game::Game(std::filesystem::path pathToLevelsFolder)
   sf::ContextSettings settings;
   settings.antiAliasingLevel = 8;
   MainWindow =
-      sf::RenderWindow(sf::VideoMode({1000, 800}), "JAM", sf::Style::Default,
+      sf::RenderWindow(sf::VideoMode({1200, 1000}), "JAM", sf::Style::Default,
                        sf::State::Windowed, settings);
   _titleWindow = std::make_unique<TitleWindow>(
       this, sf::Vector2f{static_cast<float>(MainWindow.getSize().x),
@@ -128,6 +128,16 @@ void Game::endLoadFileChoose(std::filesystem::path pathToMainDat) {
                                              MainWindow.getSize());
     _mainP = pathToMainDat;
     currentMode = GameScreenMode::EDIT;
+  }
+}
+
+void Game::endEditorWindow() {
+  if (currentMode == GameScreenMode::EDIT) {
+    if (pfd::message("JAM", "Exiting will lose all unsaved changes! Exit?",
+                     pfd::choice::yes_no, pfd::icon::question)
+            .result() == pfd::button::yes) {
+      currentMode = GameScreenMode::TITLE_SCREEN;
+    }
   }
 }
 

@@ -16,13 +16,15 @@ enum class Lights{
 
 class RoadWrapper{
   public:
-  RoadWrapper(Layout* s, size_t roadid);
+  RoadWrapper(Layout* s, size_t roadid, bool ingoing);
   bool operator<(const RoadWrapper &r) const;
   size_t getRoadID() const {return _roadid;}
+  bool isIngoing() const{return _ingoing;}
 
   private:
   Layout* _parent;
   size_t _roadid;
+  bool _ingoing;
 };
 
 // SCHEDULE GUARENTEED SO THAT ALL ROADS CAN GO TO ALL OTHER ROADS
@@ -56,8 +58,10 @@ class TrafficLight{
 
   Lights getLightToLane(size_t laneidSource, size_t laneidTarget, double time);
 
-  // returns a lane id ON THE NEW ROAD if can turn onto a lane on road, otherwise -1
+  // returns a lane id ON THE NEW ROAD if can turn onto a lane on road, otherwise -1 or -2
   // if multiple possible lanes, will choose arbitrarly
+  // -1 if red
+  // -2 if yellow
   int getLaneCanTurnOnRoad(size_t laneidSource, size_t roadidTarget, double time);
 
   // dumb scheduler, just gives each road a turn to go every which way and splits it evenly

@@ -53,12 +53,12 @@ Simulation::Simulation(Layout* layout, std::string filepath, unsigned int seed)
       if (lrs == 'l') {
         cp = std::make_unique<Car>(
             *this, _layout->getPhysicalRoad(start)->getInternalIDL(),
-            _layout->getPhysicalRoad(start)->getRoadL()->getEdgeLane(),
+            _layout->getPhysicalRoad(start)->getRoadL()->getRandomLane(_rng),
             initDist, maxa);
       } else {
         cp = std::make_unique<Car>(
             *this, _layout->getPhysicalRoad(start)->getInternalIDR(),
-            _layout->getPhysicalRoad(start)->getRoadR()->getEdgeLane(),
+            _layout->getPhysicalRoad(start)->getRoadR()->getRandomLane(_rng),
             initDist, maxa);
       }
       _simulationLanes[cp->getCurrLane()]->addCar(cp->getCurrDist(),

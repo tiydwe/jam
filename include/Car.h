@@ -4,6 +4,8 @@
 #include <deque>
 #include <string>
 
+#include "utility.h"
+
 class Simulation;
 class Lane;
 class Road;
@@ -43,7 +45,7 @@ class Car
 {
 public:
   Car();
-  Car(Simulation &parent, size_t initRoad, size_t initLane, size_t initDist, double max_a, double margin = 30.0);
+  Car(Simulation &parent, size_t initRoad, size_t initLane, size_t initDist, double max_a, double margin = utility::Constants::CAR_MARGIN);
   void setDestination(const std::pair<size_t, double> &dest);
 
   void move(double dt);

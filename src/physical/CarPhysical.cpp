@@ -24,13 +24,15 @@ void CarPhysical::move(double dt) {
   _car->move(dt);
   _road = _game->getLayout()->getPhysicalRoadFromInternalID(
       _car->getParentSim()->getLayout()->getRoad(_car->getCurrRoad())->getID());
-  _base.setPosition(_road->getPhysicalPosition(
+  auto ans = _road->getPhysicalPosition(
       _car->getCurrRoad(), _car->getCurrLane(), _car->getCurrDist(), this,
       _car->getLastRoad() == nullptr
           ? nullptr
           : _game->getLayout()->getPhysicalRoadFromInternalID(
                 _car->getLastRoad()->getID()),
-      _car->getLastLane()));
+      _car->getLastLane());
+  _base.setPosition(ans.first);
+  _base.setRotation(ans.second);
 }
 
 void CarPhysical::draw(sf::RenderTarget& target,

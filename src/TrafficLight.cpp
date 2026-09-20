@@ -4,14 +4,18 @@
 #include <cmath>
 #include <map>
 
+#include "Layout.h"
 #include "Simulation.h"
 #include "utility.h"
-#include "Layout.h"
 
-RoadWrapper::RoadWrapper(Layout* s, size_t roadid)
-    : _parent(s), _roadid(roadid) {}
+RoadWrapper::RoadWrapper(Layout* s, size_t roadid, bool ingoing)
+    : _parent(s), _roadid(roadid), _ingoing(ingoing) {}
 
 bool RoadWrapper::operator<(const RoadWrapper& r) const {
+  if (_parent->getRoad(_roadid)->getAngle() ==
+      _parent->getRoad(r.getRoadID())->getAngle()) {
+    return _roadid < r.getRoadID();
+  }
   return _parent->getRoad(_roadid)->getAngle() <
          _parent->getRoad(r.getRoadID())->getAngle();
 }
@@ -38,7 +42,7 @@ bool TrafficLight::addIngoing(size_t roadid) {
     return false;
   }
 #endif
-  _ingoingRoads.insert(RoadWrapper(_parent, roadid));
+  _ingoingRoads.insert(RoadWrapper(_parent, roadid, true));
   _totalLanes += _parent->getRoad(roadid)->getNumLanes();
   return true;
 }
@@ -63,7 +67,7 @@ bool TrafficLight::addOutgoing(size_t roadid) {
     return false;
   }
 #endif
-  _outgoingRoads.insert(RoadWrapper(_parent, roadid));
+  _outgoingRoads.insert(RoadWrapper(_parent, roadid, false));
   _totalLanes += _parent->getRoad(roadid)->getNumLanes();
   return true;
 }
@@ -75,8 +79,7 @@ void TrafficLight::removeRoad(size_t roadid) {
     if (it->getRoadID() == roadid) {
       it = _ingoingRoads.erase(it);
       inIn = true;
-    }
-    else{
+    } else {
       ++it;
     }
   }
@@ -84,8 +87,7 @@ void TrafficLight::removeRoad(size_t roadid) {
     if (it->getRoadID() == roadid) {
       it = _outgoingRoads.erase(it);
       inOut = true;
-    }
-    else{
+    } else {
       ++it;
     }
   }
@@ -102,8 +104,7 @@ void TrafficLight::removeRoad(size_t roadid) {
       if (_parent->getLane(it2->first.first)->getRoad() == roadid ||
           _parent->getLane(it2->first.second)->getRoad() == roadid) {
         it2 = it->valid.erase(it2);
-      }
-      else{
+      } else {
         ++it2;
       }
     }
@@ -111,8 +112,9 @@ void TrafficLight::removeRoad(size_t roadid) {
 }
 
 size_t TrafficLight::timeToScheduleItem(double time) {
-  if(_schedule.size() == 0){
-    this->reSchedule(utility::Constants::GREEN_PHASE_TIME_DEFAULT, utility::Constants::YELLOW_PHASE_TIME_DEFAULT);
+  if (_schedule.size() == 0) {
+    this->reSchedule(utility::Constants::GREEN_PHASE_TIME_DEFAULT,
+                     utility::Constants::YELLOW_PHASE_TIME_DEFAULT);
   }
   double totalCycleTime = 0;
   for (ScheduleItem& s : _schedule) {
@@ -147,7 +149,8 @@ std::vector<size_t> TrafficLight::whereToTurn(size_t roadid) {
   std::vector<size_t> res;
   for (const ScheduleItem& s : _schedule) {
     for (const auto& [path, light] : s.valid) {
-      if (_parent->getLane(path.second)->getRoad() == roadid && light == Lights::GREEN) {
+      if (_parent->getLane(path.second)->getRoad() == roadid &&
+          light == Lights::GREEN) {
         res.push_back(path.first);
       }
     }
@@ -161,14 +164,14 @@ Lights TrafficLight::getLightToLane(size_t laneidSource, size_t laneidTarget,
       {laneidSource, laneidTarget});
 }
 
-int TrafficLight::getLaneCanTurnOnRoad(size_t laneidSource,
-                                          size_t roadidTarget, double time) {
-  //utility::log(std::to_string(time));
+int TrafficLight::getLaneCanTurnOnRoad(size_t laneidSource, size_t roadidTarget,
+                                       double time) {
+  // utility::log(std::to_string(time));
   size_t currScheduleItem = timeToScheduleItem(time);
   for (const auto& [path, light] : _schedule[currScheduleItem].valid) {
     if (path.first == laneidSource &&
         _parent->getLane(path.second)->getRoad() == roadidTarget &&
-      light == Lights::GREEN) {
+        light == Lights::GREEN) {
       return path.second;
     }
   }
@@ -182,7 +185,7 @@ void TrafficLight::reSchedule(double greenPhaseTime, double yellowPhaseTime) {
     numOutgoing += _parent->getRoad(rw.getRoadID())->getNumLanes();
   }
   for (RoadWrapper rw : _ingoingRoads) {
-    if(_parent->getRoad(rw.getRoadID())->getNumLanes() == 0){
+    if (_parent->getRoad(rw.getRoadID())->getNumLanes() == 0) {
       continue;
     }
     ScheduleItem greenPhase;
@@ -190,26 +193,44 @@ void TrafficLight::reSchedule(double greenPhaseTime, double yellowPhaseTime) {
     greenPhase.duration = greenPhaseTime;
     yellowPhase.duration = yellowPhaseTime;
     auto lanes = _parent->getRoad(rw.getRoadID())->getLanes();
+    std::function<size_t()> getNext;
+    // utility::log(rw.isIngoing() ? "ingoing" : "not ingoing");
+    if (_parent->getPhysicalRoadFromInternalID(rw.getRoadID())
+            ->getRoadR()
+            ->getID() == rw.getRoadID()) {
+      getNext = [&lanes] {
+        size_t res = lanes.back();
+        lanes.pop_back();
+        return res;
+      };
+    } else {
+      getNext = [&lanes] {
+        size_t res = lanes.front();
+        lanes.pop_front();
+        return res;
+      };
+    };
     size_t numIn = _parent->getRoad(rw.getRoadID())->getNumLanes();
     size_t baseLanesPerLane = numOutgoing / numIn;
     int extra = numOutgoing - baseLanesPerLane * numIn;
     // this is probally the worst way to move current lane and remaining lanes
     // i love making hard-to-maintain codebases
-    size_t currentLane = lanes.back();
-    lanes.pop_back();
+    size_t currentLane = getNext();
     // yum cursed c++ -->
     // i love making hard-to-maintain codebases
-    int remainingLanes = baseLanesPerLane + (extra --> 0 ? 1 : 0);
+    int remainingLanes = baseLanesPerLane + (extra-- > 0 ? 1 : 0);
     for (RoadWrapper rwo : _outgoingRoads) {
-      for (size_t lane : _parent->getRoad(rwo.getRoadID())->getLanes()) {
+      auto& lanes = _parent->getRoad(rwo.getRoadID())->getLanes();
+      for (auto laneid = 0; laneid < lanes.size(); ++laneid) {
+        // correct for wrong direction
+        size_t lane = lanes[laneid];
         if (remainingLanes-- > 0) {
           greenPhase.valid[{currentLane, lane}] = Lights::GREEN;
           yellowPhase.valid[{currentLane, lane}] = Lights::YELLOW;
         } else {
           // no more lanes, move to next
-          remainingLanes = baseLanesPerLane + (extra --> 0 ? 1 : 0);
-          currentLane = lanes.back();
-          lanes.pop_back();
+          remainingLanes = baseLanesPerLane + (extra-- > 0 ? 1 : 0);
+          currentLane = getNext();
           greenPhase.valid[{currentLane, lane}] = Lights::GREEN;
           yellowPhase.valid[{currentLane, lane}] = Lights::YELLOW;
         }

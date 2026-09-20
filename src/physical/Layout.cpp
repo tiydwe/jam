@@ -6,6 +6,8 @@
 #include <limits>
 #include <sstream>
 
+#include "portable-file-dialogs.h"
+
 Layout::Layout(std::filesystem::path filepath, std::filesystem::path carpath,
                std::filesystem::path victorypath,
                std::filesystem::path progresspath)
@@ -60,6 +62,10 @@ Layout::Layout(std::filesystem::path filepath, std::filesystem::path carpath,
       ss >> id >> datapath >> startid >> endid >> laneslhs >> lanesrhs >>
           locked;
       auto ra = RoadAsset(datapath);
+      ///*
+      laneslhs = ra.leftCenterOffset.size();
+      lanesrhs = ra.rightCenterOffset.size();
+      //*/
       double speedlimit = ra.speedLimit;
       utility::registerPhysicalID(id);
       startpos = _physicalIntersections.at(startid)->getPos();
@@ -170,6 +176,9 @@ void Layout::saveToFile(std::filesystem::path fpath) {
            << this->_carfpath.string() << "\n"
            << this->_victoryfpath.string() << "\n"
            << this->_progressfpath.string();
+
+  pfd::message("JAM", "Succesfully saved!", pfd::choice::ok,
+               pfd::icon::info);
 }
 
 IntersectionPhysical* Layout::createIntersection(sf::Vector2f& position) {

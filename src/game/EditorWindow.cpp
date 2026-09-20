@@ -16,36 +16,56 @@ EditorWindow::EditorWindow(std::unique_ptr<Layout> l, Game* g,
       _game(g),
       _simulateButton(g, sf::Vector2f(10, 10), sf::Vector2f(100, 40),
                       utility::Constants::defaultFont, "Simulate",
-                      sf::Color::Green, sf::Color::Blue, sf::Color::Red),
+                      utility::ColorPalette::functionalBtn,
+                      utility::ColorPalette::functionalBtnHover,
+                      sf::Color::Red),
       _placeRoad1Way1LaneButton(g, sf::Vector2f(120, 10), sf::Vector2f(100, 40),
                                 utility::Constants::defaultFont, "1-way",
-                                sf::Color::Green, sf::Color::Blue,
+                                utility::ColorPalette::editorBtn,
+                                utility::ColorPalette::editorBtnHover,
                                 sf::Color::Red),
       _placeRoad1Way2LaneButton(g, sf::Vector2f(240, 10), sf::Vector2f(100, 40),
                                 utility::Constants::defaultFont, "1-way 2-lane",
-                                sf::Color::Green, sf::Color::Blue,
+                                utility::ColorPalette::editorBtn,
+                                utility::ColorPalette::editorBtnHover,
                                 sf::Color::Red),
       _placeRoad2LaneButton(g, sf::Vector2f(360, 10), sf::Vector2f(100, 40),
                             utility::Constants::defaultFont, "2-lane",
-                            sf::Color::Green, sf::Color::Blue, sf::Color::Red),
+                            utility::ColorPalette::editorBtn,
+                            utility::ColorPalette::editorBtnHover,
+                            sf::Color::Red),
       _placeRoad4LaneButton(g, sf::Vector2f(480, 10), sf::Vector2f(100, 40),
                             utility::Constants::defaultFont, "4-lane",
-                            sf::Color::Green, sf::Color::Blue, sf::Color::Red),
-      _removeRoadButton(g, sf::Vector2f(600, 10), sf::Vector2f(100, 40),
+                            utility::ColorPalette::editorBtn,
+                            utility::ColorPalette::editorBtnHover,
+                            sf::Color::Red),
+      _removeRoadButton(g, sf::Vector2f(630, 10), sf::Vector2f(100, 40),
                         utility::Constants::defaultFont, "DEMOLISH",
-                        sf::Color::Green, sf::Color::Blue, sf::Color::Red),
-      _saveButton(g, sf::Vector2f(720, 10), sf::Vector2f(100, 40),
-                  utility::Constants::defaultFont, "SAVE", sf::Color::Green,
-                  sf::Color::Blue, sf::Color::Red),
+                        utility::ColorPalette::destructiveBtn,
+                        utility::ColorPalette::destructiveBtnHover,
+                        sf::Color::Red),
+      _saveButton(g, sf::Vector2f(770, 10), sf::Vector2f(100, 40),
+                  utility::Constants::defaultFont, "SAVE",
+                  utility::ColorPalette::functionalBtn,
+                  utility::ColorPalette::functionalBtnHover, sf::Color::Red),
+      _exitButton(g, sf::Vector2f(910, 10), sf::Vector2f(100, 40),
+                  utility::Constants::defaultFont, "EXIT",
+                  utility::ColorPalette::destructiveBtn,
+                  utility::ColorPalette::destructiveBtnHover, sf::Color::Red),
       _saveWindow(nullptr) {
   _worldview.setSize({(float)windowSize.x, (float)windowSize.y});
   _worldview.setCenter({windowSize.x / 2.f, windowSize.y / 2.f});
   _uiview.setSize({(float)windowSize.x, (float)windowSize.y});
   _uiview.setCenter({windowSize.x / 2.f, windowSize.y / 2.f});
 
-  _topbar.setSize({(float)windowSize.x, 60.2f});
-  _topbar.setFillColor(sf::Color::Yellow);
+  _topbar.setSize({(float)windowSize.x, 60.f});
+  _topbar.setFillColor(utility::ColorPalette::uiBackgroundColor);
   _topbar.setPosition({0.f, 0.f});
+
+  _background.setSize(
+      {static_cast<float>(windowSize.x), static_cast<float>(windowSize.y)});
+  _background.setPosition({0.f, 0.f});
+  _background.setFillColor(utility::Constants::BACKGROUND_COLOR);
 
   _simulateButton.setOnclick([&](Game* game) { this->onclickSimulate(game); });
   _placeRoad1Way1LaneButton.setOnclick([&](Game* game) {
@@ -63,6 +83,7 @@ EditorWindow::EditorWindow(std::unique_ptr<Layout> l, Game* g,
   _removeRoadButton.setOnclick(
       [&](Game* game) { this->onclickDemolishRoad(game); });
   _saveButton.setOnclick([this](Game* game) { this->onclickSaveGame(game); });
+  _exitButton.setOnclick([this](Game* game) { game->endEditorWindow(); });
 }
 
 void EditorWindow::handleEvent(const sf::Event& event,
@@ -182,6 +203,7 @@ void EditorWindow::updateWindowSize(sf::Vector2f newSize) {
   _worldview.setSize(newSize);
   _uiview.setSize(newSize);
   _uiview.setCenter({newSize.x / 2, newSize.y / 2});
+  _background.setSize(newSize);
   _topbar.setSize({newSize.x, 60.f});
 }
 
@@ -193,6 +215,7 @@ void EditorWindow::update(sf::Vector2f mousePosition) {
   _placeRoad4LaneButton.update(mousePosition);
   _removeRoadButton.update(mousePosition);
   _saveButton.update(mousePosition);
+  _exitButton.update(mousePosition);
   if (_saveWindow.get() != nullptr) {
     _saveWindow->update(mousePosition);
     switch (_saveWindow->getStatus()) {
@@ -212,12 +235,13 @@ void EditorWindow::update(sf::Vector2f mousePosition) {
 
 void EditorWindow::draw(sf::RenderTarget& target,
                         sf::RenderStates states) const {
-  sf::View origional = target.getView();
-  target.setView(_worldview);
   if (_saveWindow.get() != nullptr) {
     _saveWindow->draw(target, states);
     return;
   }
+  target.draw(_background);
+  sf::View origional = target.getView();
+  target.setView(_worldview);
   _l->draw(target, states);
   if (_clickedCtr == 1) {
     if (isDrawRoad(_currentAction)) {
@@ -273,6 +297,7 @@ void EditorWindow::draw(sf::RenderTarget& target,
   target.draw(_placeRoad4LaneButton, states);
   target.draw(_removeRoadButton, states);
   target.draw(_saveButton, states);
+  target.draw(_exitButton, states);
 
   target.setView(origional);
 }

@@ -114,7 +114,7 @@ std::pair<float, float> utility::projectVerticies(
   std::pair<float, float> res{
       verticies[0].x * axis.x + verticies[0].y * axis.y,
       verticies[0].x * axis.x + verticies[0].y * axis.y};
-  for(int i = 1; i < verticies.size(); ++i){
+  for (int i = 1; i < verticies.size(); ++i) {
     auto proj = verticies[i].x * axis.x + verticies[i].y * axis.y;
     res.first = std::min(res.first, proj);
     res.second = std::max(res.second, proj);
@@ -126,18 +126,18 @@ bool utility::rectanglesIntersect(sf::RectangleShape a, sf::RectangleShape b) {
   auto va = getVerticies(a);
   auto vb = getVerticies(b);
   std::vector<sf::Vector2f> axes;
-  for(int i = 0; i < 4; ++i){
-    auto delta = va[(i == 3 ? 0 : i+1)] - va[i];
+  for (int i = 0; i < 4; ++i) {
+    auto delta = va[(i == 3 ? 0 : i + 1)] - va[i];
     axes.push_back(sf::Vector2f{-delta.y, delta.x}.normalized());
   }
-  for(int i = 0; i < 4; ++i){
-    auto delta = vb[(i == 3 ? 0 : i+1)] - vb[i];
+  for (int i = 0; i < 4; ++i) {
+    auto delta = vb[(i == 3 ? 0 : i + 1)] - vb[i];
     axes.push_back(sf::Vector2f{-delta.y, delta.x}.normalized());
   }
-  for(auto ax : axes){
+  for (auto ax : axes) {
     auto pa = projectVerticies(va, ax);
     auto pb = projectVerticies(vb, ax);
-    if(pa.second <= pb.first || pb.second <= pa.first){
+    if (pa.second <= pb.first || pb.second <= pa.first) {
       return false;
     }
   }
@@ -154,3 +154,15 @@ const float utility::Constants::MIN_ROAD_DIST =
 const float utility::Constants::TIMOUT_LIMIT_NO_MOVE_CAR = 150.f;
 const float utility::Constants::INTERSECTION_TRANSITION_LENGTH = 70.f;
 const float utility::Constants::ROAD_SELECT_SNAP_DIST = 50.f;
+const sf::Color utility::Constants::BACKGROUND_COLOR =
+    sf::Color(52, 69, 36);
+const float utility::Constants::CAR_MARGIN = 60.f;
+
+
+const sf::Color utility::ColorPalette::functionalBtn = sf::Color(23, 113, 145);
+const sf::Color utility::ColorPalette::functionalBtnHover = sf::Color(22, 87, 110);
+const sf::Color utility::ColorPalette::destructiveBtn = sf::Color(199, 40, 52);
+const sf::Color utility::ColorPalette::destructiveBtnHover = sf::Color(156, 31, 41);
+const sf::Color utility::ColorPalette::editorBtn = sf::Color(121, 145, 23);
+const sf::Color utility::ColorPalette::editorBtnHover = sf::Color(92, 110, 19);
+const sf::Color utility::ColorPalette::uiBackgroundColor = sf::Color(2, 9, 59);

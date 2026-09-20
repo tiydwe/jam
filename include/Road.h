@@ -32,7 +32,7 @@ class Road{
   int getLanePosFromCenter(size_t laneid) const;
 
   size_t getID()const{return _id;}
-  size_t getSpeedLimit()const{return _speed_limit;}
+  double getSpeedLimit()const{return _speed_limit;}
   const std::deque<size_t>& getLanes()const{return _lanes;}
   size_t getEdgeLane()const{return _lanes.front();}
   template <class Generator>

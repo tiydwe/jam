@@ -79,12 +79,14 @@ void Game::endLevelSelectBack() {
 
 void Game::beginLevelSelect() {
   if (currentMode == GameScreenMode::TITLE_SCREEN) {
+    //utility::log("click");
     currentMode = GameScreenMode::LEVEL_SELECT;
     _levelSelectWindow = std::make_unique<LevelSelectWindow>(
         _pathToLevelsFolder,
         sf::Vector2f{static_cast<float>(MainWindow.getSize().x),
                      static_cast<float>(MainWindow.getSize().y)},
         this);
+    
   }
 }
 

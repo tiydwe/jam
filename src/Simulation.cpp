@@ -131,7 +131,9 @@ std::deque<size_t> Simulation::findRoute(size_t startRoad, size_t endRoad) {
       if (std::isfinite(dist[curr.second])) {
         double newDist =
             dist[curr.second] +
-            _layout->getPhysicalRoadFromInternalID(nxt)->getLength();
+            _layout->getPhysicalRoadFromInternalID(nxt)->getLength() /
+                _layout->getRoad(nxt)->getSpeedLimit() +
+            outs.size() * utility::Constants::GREEN_PHASE_TIME_DEFAULT;
         if (newDist < dist[nexti]) {
           dist[nexti] = newDist;
           prev[nexti] = curr.second;

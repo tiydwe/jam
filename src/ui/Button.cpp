@@ -14,7 +14,7 @@ Button::Button(Game* game, sf::Vector2f start, sf::Vector2f size, sf::Font font,
       _size(size),
       _font(font),
       _zVal(zVal),
-      _isPressed(false),
+      _isPressed(true),
       _text(utility::Constants::defaultFont, "[empty]") {
   _shape.setPosition(start);
   _shape.setSize(size);
@@ -52,13 +52,9 @@ void Button::setSize(sf::Vector2f newsize) {
   _text.setPosition({_start.x + newsize.x / 2, _start.y + newsize.y / 2});
 }
 
-void Button::setNormal(sf::Color color) {
-  _normal=color;
-}
+void Button::setNormal(sf::Color color) { _normal = color; }
 
-void Button::setHover(sf::Color color) {
-  _hover = color;
-}
+void Button::setHover(sf::Color color) { _hover = color; }
 
 bool Button::update(sf::Vector2f mousePosition) {
   bool mouseover = sf::FloatRect(_start, _size).contains(mousePosition);
@@ -67,9 +63,12 @@ bool Button::update(sf::Vector2f mousePosition) {
     _isPressed = false;
   } else {
     _shape.setFillColor(_hover);
+    //utility::log(std::string(_isPressed ? "yes" : "no"));
     if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)) {
+      //utility::log(std::string("clicked2: ") + std::string(_isPressed ? "yes" : "no"));
       _shape.setFillColor(_click);
       if (!_isPressed) {
+        //utility::log("clicked3");
         _isPressed = true;
         _onclick(_game);
         return true;

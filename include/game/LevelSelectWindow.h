@@ -34,4 +34,5 @@ class LevelSelectWindow : public sf::Drawable, sf::Transformable {
   std::filesystem::path _choosenLevel;
   LevelSelectWindowStatus _status = LevelSelectWindowStatus::NORMAL;
   sf::RectangleShape _contentBox;
+  sf::Text _title;
 };

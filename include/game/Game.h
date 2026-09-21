@@ -35,6 +35,7 @@ class Game {
   void endLoadFileBack();
   void endLoadFileChoose(std::filesystem::path pathToMainDat);
   void endEditorWindow();
+  void backSimulation();
 
   void run();
 

@@ -49,6 +49,7 @@ class SimulateWindow : public sf::Drawable, sf::Transformable {
   Button _mid;
   Button _fast;
   Button _exitSim;
+  Button _backBtn;
 
   double _timeMultiplier = 5.0;
 };

@@ -20,9 +20,13 @@ SimulateWindow::SimulateWindow(Layout* l, Game* g, std::string filename,
             utility::ColorPalette::functionalBtn,
             utility::ColorPalette::functionalBtnHover, sf::Color::Red),
       _exitSim(g, sf::Vector2f(600, 10), sf::Vector2f(100, 40),
+               utility::Constants::defaultFont, "Next",
+               utility::ColorPalette::functionalBtn,
+               utility::ColorPalette::functionalBtnHover, sf::Color::Red),
+      _backBtn(g, sf::Vector2f(800, 10), sf::Vector2f(100, 40),
                utility::Constants::defaultFont, "EXIT",
                utility::ColorPalette::destructiveBtn,
-               utility::ColorPalette::destructiveBtnHover, sf::Color::Red) {
+               utility::ColorPalette::destructiveBtnHover, sf::Color::Red)  {
   _s = std::make_unique<Simulation>(l, filename);
   _worldview.setSize({(float)windowSize.x, (float)windowSize.y});
   _worldview.setCenter({windowSize.x / 2.f, windowSize.y / 2.f});
@@ -50,6 +54,11 @@ SimulateWindow::SimulateWindow(Layout* l, Game* g, std::string filename,
           pfd::choice::ok);
     } else {
       gm->endSimulation();
+    }
+  });
+  _backBtn.setOnclick([&](Game* gm){
+    if(pfd::message("JAM","This will go back to the editor.\nIf you want to see the results, click Next instead.\nEXIT?", pfd::choice::yes_no, pfd::icon::warning).result() == pfd::button::yes){
+      gm->backSimulation();
     }
   });
 }
@@ -111,6 +120,7 @@ void SimulateWindow::update(sf::Vector2f mousePosition) {
   _mid.update(mousePosition);
   _fast.update(mousePosition);
   _exitSim.update(mousePosition);
+  _backBtn.update(mousePosition);
 }
 
 void SimulateWindow::draw(sf::RenderTarget& target,
@@ -126,6 +136,7 @@ void SimulateWindow::draw(sf::RenderTarget& target,
   target.draw(_mid, states);
   target.draw(_fast, states);
   target.draw(_exitSim, states);
+  target.draw(_backBtn, states);
 
   target.setView(origional);
 }

@@ -143,6 +143,13 @@ void Game::endEditorWindow() {
   }
 }
 
+void Game::backSimulation()
+{
+  if(currentMode == GameScreenMode::SIMULATE){
+    currentMode = GameScreenMode::EDIT;
+  }
+}
+
 void Game::run() {
   lastTickTime = clk.getElapsedTime();
   while (MainWindow.isOpen()) {

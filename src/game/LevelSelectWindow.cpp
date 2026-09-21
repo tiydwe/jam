@@ -17,7 +17,7 @@ LevelSelectWindow::LevelSelectWindow(std::filesystem::path levelsDir,
       _title(utility::Constants::defaultFont, "Select a level:") {
   _back.setOnclick([this](Game* gm) { this->onclickBack(); });
   _title.setOrigin(_title.getLocalBounds().getCenter());
-  _title.setPosition({windowSize.x / 2.f, windowSize.y / 2.f - 40});
+  _title.setPosition({windowSize.x / 2.f, windowSize.y / 2.f - 60});
   _title.setFillColor(sf::Color::Black);
   if (!std::filesystem::exists(levelsDir) ||
       !std::filesystem::is_directory(levelsDir)) {
@@ -58,7 +58,7 @@ void LevelSelectWindow::updateWindowSize(sf::Vector2f newSize) {
   this->createButtons(newSize);
   _back.setStart({newSize.x / 2.f - 40, newSize.y / 2.f - 100});
   _contentBox.setPosition(newSize/ 2.f);
-  _title.setPosition({newSize.x / 2.f, newSize.y / 2.f - 40});
+  _title.setPosition({newSize.x / 2.f, newSize.y / 2.f - 60});
 }
 
 void LevelSelectWindow::update(sf::Vector2f mousePos) {

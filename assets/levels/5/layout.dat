@@ -1,0 +1,85 @@
+I 1 167.667 498.911
+I 2 434.472 501.089
+I 4 649.005 500
+I 6 653.361 745.025
+I 8 657.978 991.498
+I 10 403.664 998.087
+I 12 128.267 990.181
+I 14 126.949 731.913
+I 17 394.44 731.913
+I 22 183.705 226.981
+I 23 437.206 218.3
+I 25 666.398 220.036
+I 27 662.926 -23.0471
+I 29 659.453 -231.404
+I 31 385.117 -233.14
+I 33 155.924 -231.404
+I 35 147.242 44.6688
+I 38 393.798 -14.3656
+I 43 1079.64 -233.14
+I 44 1086.58 9.94269
+I 46 1093.53 235.663
+I 48 1350.5 230.454
+I 50 1586.64 221.772
+I 52 1565.81 -24.7835
+I 54 1550.18 -234.877
+I 56 1275.84 -245.294
+I 59 1317.51 -12.6293
+I 64 1060.54 542.989
+I 65 1366.13 536.044
+I 67 1633.52 530.835
+I 69 1638.73 803.435
+I 71 1645.68 1051.73
+I 73 1329.67 1048.25
+I 75 1077.9 1044.78
+I 77 1079.64 782.599
+I 80 1355.71 786.072
+SW
+R2 3 assets/data/roads/generic2lane.dat 1 2 1 1 
+R2 5 assets/data/roads/generic2lane.dat 2 4 1 1 l
+R2 7 assets/data/roads/generic2lane.dat 4 6 1 1 l
+R2 9 assets/data/roads/generic2lane.dat 6 8 1 1 l
+R2 11 assets/data/roads/generic2lane.dat 8 10 1 1 l
+R2 13 assets/data/roads/generic2lane.dat 10 12 1 1 l
+R2 15 assets/data/roads/generic2lane.dat 12 14 1 1 l
+R2 16 assets/data/roads/generic2lane.dat 14 1 1 1 l
+R2 18 assets/data/roads/generic2lane.dat 10 17 1 1 l
+R2 19 assets/data/roads/generic2lane.dat 17 2 1 1 l
+R2 20 assets/data/roads/generic2lane.dat 17 6 1 1 l
+R2 21 assets/data/roads/generic2lane.dat 17 14 1 1 l
+R2 24 assets/data/roads/generic2lane.dat 22 23 1 1 l
+R2 26 assets/data/roads/generic2lane.dat 23 25 1 1 l
+R2 28 assets/data/roads/generic2lane.dat 25 27 1 1 l
+R2 30 assets/data/roads/generic2lane.dat 27 29 1 1 l
+R2 32 assets/data/roads/generic2lane.dat 29 31 1 1 l
+R2 34 assets/data/roads/generic2lane.dat 31 33 1 1 l
+R2 36 assets/data/roads/generic2lane.dat 33 35 1 1 l
+R2 37 assets/data/roads/generic2lane.dat 35 22 1 1 l
+R2 39 assets/data/roads/generic2lane.dat 35 38 1 1 l
+R2 40 assets/data/roads/generic2lane.dat 38 27 1 1 l
+R2 41 assets/data/roads/generic2lane.dat 31 38 1 1 l
+R2 42 assets/data/roads/generic2lane.dat 38 23 1 1 l
+R2 45 assets/data/roads/generic2lane.dat 43 44 1 1 l
+R2 47 assets/data/roads/generic2lane.dat 44 46 1 1 l
+R2 49 assets/data/roads/generic2lane.dat 46 48 1 1 l
+R2 51 assets/data/roads/generic2lane.dat 48 50 1 1 l
+R2 53 assets/data/roads/generic2lane.dat 50 52 1 1 l
+R2 55 assets/data/roads/generic2lane.dat 52 54 1 1 l
+R2 57 assets/data/roads/generic2lane.dat 54 56 1 1 l
+R2 58 assets/data/roads/generic2lane.dat 56 43 1 1 l
+R2 60 assets/data/roads/generic2lane.dat 56 59 1 1 l
+R2 61 assets/data/roads/generic2lane.dat 59 48 1 1 l
+R2 62 assets/data/roads/generic2lane.dat 59 52 1 1 l
+R2 63 assets/data/roads/generic2lane.dat 59 44 1 1 l
+R2 66 assets/data/roads/generic2lane.dat 64 65 1 1 l
+R2 68 assets/data/roads/generic2lane.dat 65 67 1 1 l
+R2 70 assets/data/roads/generic2lane.dat 67 69 1 1 l
+R2 72 assets/data/roads/generic2lane.dat 69 71 1 1 l
+R2 74 assets/data/roads/generic2lane.dat 71 73 1 1 l
+R2 76 assets/data/roads/generic2lane.dat 73 75 1 1 l
+R2 78 assets/data/roads/generic2lane.dat 75 77 1 1 l
+R2 79 assets/data/roads/generic2lane.dat 77 64 1 1 l
+R2 81 assets/data/roads/generic2lane.dat 77 80 1 1 l
+R2 82 assets/data/roads/generic2lane.dat 80 69 1 1 l
+R2 83 assets/data/roads/generic2lane.dat 65 80 1 1 l
+R2 84 assets/data/roads/generic2lane.dat 80 73 1 1 l

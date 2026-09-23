@@ -109,6 +109,8 @@ void EditorWindow::handleEvent(const sf::Event& event,
             _lastClickedPos =
                 window.mapPixelToCoords(sf::Mouse::getPosition(window));
             window.setView(old);
+            _lastip = _l->findClosestIntersection(_lastClickedPos);
+            _lastip.second /= _zoomLevel;
           } else {
             auto irv = isRoadValid(getSnappedPos(_mouseWorldPos),
                                    getSnappedPos(_lastClickedPos),
@@ -207,17 +209,17 @@ void EditorWindow::updateWindowSize(sf::Vector2f newSize) {
   _topbar.setSize({newSize.x, 60.f});
 }
 
-void EditorWindow::update(sf::Vector2f mousePosition) {
-  _simulateButton.update(mousePosition);
-  _placeRoad1Way1LaneButton.update(mousePosition);
-  _placeRoad1Way2LaneButton.update(mousePosition);
-  _placeRoad2LaneButton.update(mousePosition);
-  _placeRoad4LaneButton.update(mousePosition);
-  _removeRoadButton.update(mousePosition);
-  _saveButton.update(mousePosition);
-  _exitButton.update(mousePosition);
+void EditorWindow::update(sf::Vector2f mousePosition, bool enable) {
+  _simulateButton.update(mousePosition, enable);
+  _placeRoad1Way1LaneButton.update(mousePosition, enable);
+  _placeRoad1Way2LaneButton.update(mousePosition, enable);
+  _placeRoad2LaneButton.update(mousePosition, enable);
+  _placeRoad4LaneButton.update(mousePosition, enable);
+  _removeRoadButton.update(mousePosition, enable);
+  _saveButton.update(mousePosition, enable);
+  _exitButton.update(mousePosition, enable);
   if (_saveWindow.get() != nullptr) {
-    _saveWindow->update(mousePosition);
+    _saveWindow->update(mousePosition, enable);
     switch (_saveWindow->getStatus()) {
       case SaveWindowStatus::EXIT_CANCEL:
         _saveWindow.reset(nullptr);
@@ -243,8 +245,8 @@ void EditorWindow::draw(sf::RenderTarget& target,
   sf::View origional = target.getView();
   target.setView(_worldview);
   _l->draw(target, states);
-  if (_clickedCtr == 1) {
-    if (isDrawRoad(_currentAction)) {
+  if (isDrawRoad(_currentAction)) {
+    if (_clickedCtr == 1) {
       sf::Vector2f pos = getSnappedPos(_mouseWorldPos);
       sf::Vector2f direction = getSnappedPos(_lastClickedPos) - pos;
       float width = 30.f;
@@ -269,6 +271,15 @@ void EditorWindow::draw(sf::RenderTarget& target,
         target.draw(irv.second);
       }
       target.draw(rectangle);
+    }
+    else if (_clickedCtr == 0){
+      sf::CircleShape cs;
+      cs.setRadius(15.0);
+      cs.setOrigin(cs.getLocalBounds().size / 2.f);
+      auto sp = getSnappedPos(_mouseWorldPos);
+      cs.setPosition(sp);
+      cs.setFillColor(sf::Color::Blue);
+      target.draw(cs, states);
     }
   }
   if (_currentAction == ActionType::REMOVE_ROAD) {

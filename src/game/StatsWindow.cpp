@@ -100,8 +100,8 @@ void StatsWindow::updateWindowSize(sf::Vector2f newSize) {
   _continue.setSize({newSize.x / 3.f, 40.f});
 }
 
-void StatsWindow::update(sf::Vector2f mousePosition) {
-  _continue.update(mousePosition);
+void StatsWindow::update(sf::Vector2f mousePosition, bool enable) {
+  _continue.update(mousePosition, enable);
 }
 
 void StatsWindow::draw(sf::RenderTarget& target,

@@ -197,25 +197,26 @@ void Game::run() {
     }
     sf::Time nex = clk.getElapsedTime();
     double dt = std::min((nex - lastTickTime).asSeconds(), clampTime);
+    bool enable = MainWindow.hasFocus();
     if (currentMode == GameScreenMode::SIMULATE) {
       _simulation->step(dt);
       _simulation->update(
-          MainWindow.mapPixelToCoords(sf::Mouse::getPosition(MainWindow)));
+          MainWindow.mapPixelToCoords(sf::Mouse::getPosition(MainWindow)), enable);
     } else if (currentMode == GameScreenMode::EDIT) {
       _editor->update(
-          MainWindow.mapPixelToCoords(sf::Mouse::getPosition(MainWindow)));
+          MainWindow.mapPixelToCoords(sf::Mouse::getPosition(MainWindow)), enable);
     } else if (currentMode == GameScreenMode::STATS) {
       _statsWindow->update(
-          MainWindow.mapPixelToCoords(sf::Mouse::getPosition(MainWindow)));
+          MainWindow.mapPixelToCoords(sf::Mouse::getPosition(MainWindow)), enable);
     } else if (currentMode == GameScreenMode::LEVEL_SELECT) {
       _levelSelectWindow->update(
-          MainWindow.mapPixelToCoords(sf::Mouse::getPosition(MainWindow)));
+          MainWindow.mapPixelToCoords(sf::Mouse::getPosition(MainWindow)), enable);
     } else if (currentMode == GameScreenMode::TITLE_SCREEN) {
       _titleWindow->update(
-          MainWindow.mapPixelToCoords(sf::Mouse::getPosition(MainWindow)));
+          MainWindow.mapPixelToCoords(sf::Mouse::getPosition(MainWindow)), enable);
     } else if (currentMode == GameScreenMode::LOAD_GAME) {
       _saveWindow->update(
-          MainWindow.mapPixelToCoords(sf::Mouse::getPosition(MainWindow)));
+          MainWindow.mapPixelToCoords(sf::Mouse::getPosition(MainWindow)), enable);
       if (_saveWindow->getStatus() == SaveWindowStatus::EXIT_CANCEL) {
         this->endLoadFileBack();
       } else if (_saveWindow->getStatus() == SaveWindowStatus::EXIT_DONE) {

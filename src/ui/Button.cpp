@@ -56,12 +56,12 @@ void Button::setNormal(sf::Color color) { _normal = color; }
 
 void Button::setHover(sf::Color color) { _hover = color; }
 
-bool Button::update(sf::Vector2f mousePosition) {
+bool Button::update(sf::Vector2f mousePosition, bool enable) {
   bool mouseover = sf::FloatRect(_start, _size).contains(mousePosition);
   if (!mouseover) {
     _shape.setFillColor(_normal);
     _isPressed = false;
-  } else {
+  } else if(enable) {
     _shape.setFillColor(_hover);
     //utility::log(std::string(_isPressed ? "yes" : "no"));
     if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)) {

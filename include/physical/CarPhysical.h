@@ -21,6 +21,10 @@ class CarPhysical : public sf::Drawable, sf::Transformable {
   Simulation* getGame() {return _game;}
   Car* getCar() const {return _car.get();}
 
+  sf::RectangleShape getHitbox() const;
+
+  void setHovering(bool hovering);
+
  private:
   Simulation* _game = nullptr;
   std::unique_ptr<Car> _car;
@@ -29,4 +33,5 @@ class CarPhysical : public sf::Drawable, sf::Transformable {
   sf::Sprite _base;
 
   sf::Vector2<float> _pos;
+  bool _isHovering = false;
 };

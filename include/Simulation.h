@@ -58,6 +58,8 @@ class Simulation : public sf::Drawable, sf::Transformable{
 
   std::mt19937& getRNG();
 
+  void handleEvent(const sf::Event& event, const sf::RenderWindow& window);
+
   virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const override;
 
   private:

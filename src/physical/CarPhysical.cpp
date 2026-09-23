@@ -39,6 +39,51 @@ void CarPhysical::draw(sf::RenderTarget& target,
                        sf::RenderStates states) const {
   states.transform *= getTransform();
   if (_car->getStatus() != carStatus::ARRIVED) {
-    target.draw(_base);
+    // pro-tip: this one weird trick makes your cpu cry
+    auto cpy = _base;
+    if(_isHovering){
+      cpy.setColor(sf::Color(150, 150, 150));
+    }else{
+      cpy.setColor(sf::Color(255,255,255));
+    }
+    target.draw(cpy);
+  }
+  if (_isHovering) {
+    // show destination
+    auto destPos =
+        _game->getLayout()
+            ->getPhysicalRoadFromInternalID(_car->getParentSim()
+                                                ->getLayout()
+                                                ->getRoad(_car->getDestRoad())
+                                                ->getID())
+            ->getPhysicalPosition(
+                _car->getDestRoad(), _car->getDestLane(), _car->getDestDist(),
+                this,
+                _car->getLastRoad() == nullptr
+                    ? nullptr
+                    : nullptr /*just hope that it doesnt go over an edge*/,
+                _car->getLastLane())
+            .first;
+    sf::CircleShape destVis;
+    destVis.setRadius(8.f);
+    destVis.setOrigin(destVis.getLocalBounds().size / 2.f);
+    destVis.setPosition(destPos);
+    destVis.setFillColor(sf::Color(34, 189, 28));
+    target.draw(destVis, states);
   }
 }
+
+sf::RectangleShape CarPhysical::getHitbox() const {
+  sf::RectangleShape rect;
+  sf::FloatRect localBounds = _base.getLocalBounds();
+
+  rect.setSize({localBounds.size.x, localBounds.size.y});
+  rect.setOrigin(_base.getOrigin());
+  rect.setPosition(_base.getPosition());
+  rect.setRotation(_base.getRotation());
+  rect.setScale(_base.getScale());
+
+  return rect;
+}
+
+void CarPhysical::setHovering(bool hovering) { _isHovering = hovering; }

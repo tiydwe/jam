@@ -21,7 +21,7 @@ class Button : public sf::Drawable, sf::Transformable {
   void setHover(sf::Color color);
 
   // runs _onclick if clicked, returns true
-  bool update(sf::Vector2f mousePosition);
+  bool update(sf::Vector2f mousePosition, bool enable);
   virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const override;
 
  private:

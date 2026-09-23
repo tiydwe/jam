@@ -61,11 +61,11 @@ void LevelSelectWindow::updateWindowSize(sf::Vector2f newSize) {
   _title.setPosition({newSize.x / 2.f, newSize.y / 2.f - 60});
 }
 
-void LevelSelectWindow::update(sf::Vector2f mousePos) {
+void LevelSelectWindow::update(sf::Vector2f mousePos, bool enable) {
   for (const auto& x : _levelButtons) {
-    x->update(mousePos);
+    x->update(mousePos, enable);
   }
-  _back.update(mousePos);
+  _back.update(mousePos, enable);
 }
 
 std::filesystem::path LevelSelectWindow::getChoosenLevel() const {

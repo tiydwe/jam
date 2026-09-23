@@ -11,7 +11,7 @@ class TitleWindow : public sf::Drawable, sf::Transformable {
  public:
   TitleWindow(Game* game, sf::Vector2f size);
   void updateWindowSize(sf::Vector2f newSize);
-  void update(sf::Vector2f mousePos);
+  void update(sf::Vector2f mousePos, bool enable);
   virtual void draw(sf::RenderTarget& target,
                     sf::RenderStates states) const override;
 

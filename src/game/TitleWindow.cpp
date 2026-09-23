@@ -31,9 +31,9 @@ void TitleWindow::updateWindowSize(sf::Vector2f newSize) {
   _newLevel.setStart({newSize.x / 2.f - 100, newSize.y / 2.f + 60});
 }
 
-void TitleWindow::update(sf::Vector2f mousePos) {
-  _load.update(mousePos);
-  _newLevel.update(mousePos);
+void TitleWindow::update(sf::Vector2f mousePos, bool enable) {
+  _load.update(mousePos, enable);
+  _newLevel.update(mousePos, enable);
 }
 
 void TitleWindow::draw(sf::RenderTarget& target,

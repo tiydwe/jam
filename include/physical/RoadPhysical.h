@@ -42,7 +42,7 @@ class RoadPhysical : public sf::Drawable, sf::Transformable {
   void draw(sf::RenderTarget& target, sf::RenderStates states) const override;
 
   std::pair<sf::Vector2f, sf::Angle> getPhysicalPosition(size_t roadid, size_t laneid,
-                                   double trueDistance, CarPhysical* cp,
+                                   double trueDistance, const CarPhysical* cp,
                                    RoadPhysical* lastRoad,
                                    const Lane* lastLane) const;
 

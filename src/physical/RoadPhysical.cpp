@@ -78,7 +78,7 @@ RoadPhysical::~RoadPhysical() {}
 
 std::pair<sf::Vector2f, sf::Angle> RoadPhysical::getPhysicalPosition(size_t roadid, size_t laneid,
                                                double trueDistance,
-                                               CarPhysical* cp,
+                                               const CarPhysical* cp,
                                                RoadPhysical* lastRoad,
                                                const Lane* lastLane) const {
   sf::Angle res;

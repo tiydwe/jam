@@ -20,7 +20,7 @@ class SaveWindow : public sf::Drawable, sf::Transformable {
   SaveWindow(Layout* layout);
   void setSize(sf::Vector2f size);
   void handleEvent(const sf::Event& event, sf::RenderWindow& window);
-  void update(sf::Vector2f mousePosition);
+  void update(sf::Vector2f mousePosition, bool enable);
   virtual void draw(sf::RenderTarget& target,
                     sf::RenderStates states) const override;
   SaveWindowStatus getStatus() const;

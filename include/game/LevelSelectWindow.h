@@ -17,7 +17,7 @@ class LevelSelectWindow : public sf::Drawable, sf::Transformable {
   LevelSelectWindow(std::filesystem::path levelsDir, sf::Vector2f windowSize,
                     Game* game);
   void updateWindowSize(sf::Vector2f newSize);
-  void update(sf::Vector2f mousePos);
+  void update(sf::Vector2f mousePos, bool enable);
   // returns the main.dat path
   std::filesystem::path getChoosenLevel() const;
   virtual void draw(sf::RenderTarget& target,

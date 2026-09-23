@@ -34,11 +34,11 @@ void SaveWindow::handleEvent(const sf::Event& event, sf::RenderWindow& window) {
   }
 }
 
-void SaveWindow::update(sf::Vector2f mousePosition) {
+void SaveWindow::update(sf::Vector2f mousePosition, bool enable) {
   mousePosition = getInverseTransform().transformPoint(mousePosition);
-  _choose.update(mousePosition);
-  _ok.update(mousePosition);
-  _cancel.update(mousePosition);
+  _choose.update(mousePosition, enable);
+  _ok.update(mousePosition, enable);
+  _cancel.update(mousePosition, enable);
 }
 
 void SaveWindow::draw(sf::RenderTarget& target, sf::RenderStates states) const {

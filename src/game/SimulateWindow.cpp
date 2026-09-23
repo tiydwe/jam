@@ -64,7 +64,7 @@ SimulateWindow::SimulateWindow(Layout* l, Game* g, std::string filename,
 }
 
 void SimulateWindow::handleEvent(const sf::Event& event,
-                                 const sf::RenderWindow& window) {
+                                 sf::RenderWindow& window) {
   if (auto mbpIf = event.getIf<sf::Event::MouseButtonPressed>()) {
     if (mbpIf->button == sf::Mouse::Button::Right) {
       _isDragging = true;
@@ -97,6 +97,10 @@ void SimulateWindow::handleEvent(const sf::Event& event,
       }
     }
   }
+  auto orview = window.getView();
+  window.setView(_worldview);
+  _s->handleEvent(event, window);
+  window.setView(orview);
 }
 
 void SimulateWindow::updateWindowSize(sf::Vector2f newSize) {

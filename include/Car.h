@@ -60,6 +60,9 @@ public:
   size_t getCurrLane() const { return _position_laneid; }
   double getCurrDist() const { return _position_distance; }
   double getCurrDistFrac() const;
+  size_t getDestLane() const;
+  size_t getDestRoad() const { return _current_destination.first; }
+  double getDestDist() const { return _current_destination.second; }
   carStatus getStatus() const { return _status; }
 
   Simulation *getParentSim() const { return _parentSim; }

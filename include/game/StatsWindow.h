@@ -19,6 +19,9 @@ class Level {
   double getAvgSpeed() const {return _avgSpeed;}
   double getTimeWasted() const {return _timeWasted;}
 
+  bool pass1(OverallStats stats) const;
+  bool pass2(OverallStats stats) const;
+
  private:
   double _percentArrived = 0.0;
   double _avgSpeed = 0.0;
@@ -42,6 +45,9 @@ class StatsWindow : public sf::Drawable, sf::Transformable{
   Game* _game;
 
   sf::RectangleShape _container;
+  sf::RectangleShape _carsArrived;
+  sf::RectangleShape _averageSpeed;
+  sf::RectangleShape _background;
   sf::Text _statsText;
   
   Button _continue;

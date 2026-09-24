@@ -154,7 +154,7 @@ const float utility::Constants::INTERSECTION_SNAP_DIST =
 const float utility::Constants::MIN_ROAD_DIST =
     2 * utility::Constants::INTERSESCTION_SIZE + 32;
 const float utility::Constants::TIMOUT_LIMIT_NO_MOVE_CAR = 300.f;
-const float utility::Constants::INTERSECTION_TRANSITION_LENGTH = 70.f;
+const float utility::Constants::INTERSECTION_TRANSITION_LENGTH = 90.f;
 const float utility::Constants::ROAD_SELECT_SNAP_DIST = 50.f;
 const sf::Color utility::Constants::BACKGROUND_COLOR =
     sf::Color(52, 69, 36);

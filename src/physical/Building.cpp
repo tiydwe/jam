@@ -35,6 +35,7 @@ void Building::draw(sf::RenderTarget& target, sf::RenderStates states) const {
   states.transform *= getTransform();
   if (_show) {
     sf::Sprite sprite(_texture);
+    sprite.setPosition(_pos);
     sprite.setScale({_scale, _scale});
     sprite.setColor(_darkened ? sf::Color(200, 200, 200) : sf::Color::White);
     target.draw(sprite, states);

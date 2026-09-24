@@ -21,6 +21,7 @@ class IntersectionPhysical : public sf::Drawable, sf::Transformable {
   Intersection* getIntersection() const {return _intersection.get();}
   size_t getID() const {return _id;}
  private:
+ void drawCrosswalk(sf::RenderTarget& target, sf::RenderStates states, sf::Vector2f start, sf::Vector2f end) const;
   std::unique_ptr<Intersection> _intersection;
 
   sf::Vector2<float> _pos;

@@ -41,6 +41,10 @@ void Car::recalcRoute() {
   _route = _parentSim->findRoute(_position_roadid, _current_destination.first);
 }
 
+size_t Car::getDestLane() const {
+  return _parentSim->getLayout()->getRoad(_current_destination.first)->getEdgeLane();
+}
+
 double Car::getCurrDistFrac() const {
   return _position_distance /
          _parentSim->getLayout()->getLane(_position_laneid)->getLength();

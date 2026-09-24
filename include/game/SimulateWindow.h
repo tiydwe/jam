@@ -16,7 +16,7 @@ class SimulateWindow : public sf::Drawable, sf::Transformable {
   SimulateWindow(Layout* l, Game* g, std::string filename,
                  sf::Vector2u windowSize);
 
-  void handleEvent(const sf::Event& event, const sf::RenderWindow& window);
+  void handleEvent(const sf::Event& event, sf::RenderWindow& window);
 
   void updateWindowSize(sf::Vector2f newSize);
 

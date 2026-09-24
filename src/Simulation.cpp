@@ -222,6 +222,15 @@ bool Simulation::isDone() const { return _cars.empty(); }
 
 std::mt19937& Simulation::getRNG() { return _rng; }
 
+void Simulation::handleEvent(const sf::Event& event, const sf::RenderWindow& window) {
+  for (const auto& x : _cars) {
+    auto hbox = x.second->getHitbox();
+    x.second->setHovering(hbox.getLocalBounds().contains(
+        hbox.getInverseTransform().transformPoint(
+            window.mapPixelToCoords(sf::Mouse::getPosition(window)))));
+  }
+}
+
 void Simulation::draw(sf::RenderTarget& target, sf::RenderStates states) const {
   states.transform *= getTransform();
   _layout->draw(target, states);

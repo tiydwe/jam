@@ -10,10 +10,11 @@
 
 Layout::Layout(std::filesystem::path filepath, std::filesystem::path carpath,
                std::filesystem::path victorypath,
-               std::filesystem::path progresspath)
+               std::filesystem::path progresspath, std::filesystem::path buildingpath)
     : _carfpath(carpath),
       _victoryfpath(victorypath),
-      _progressfpath(progresspath) {
+      _progressfpath(progresspath),
+      _buildingfpath(buildingpath){
   std::ifstream file(filepath);
 
   if (!file.is_open()) {
@@ -128,6 +129,15 @@ Layout::Layout(std::filesystem::path filepath, std::filesystem::path carpath,
       break;
     }
   }
+
+  std::ifstream buildingsfile(buildingpath);
+  while (std::getline(buildingsfile, tmp)){
+    std::stringstream ss(tmp);
+    std::string path;
+    float x, y;
+    ss >> path >> x >> y;
+    _buildings.push_back(std::move(std::make_unique<Building>(path, sf::Vector2f{x, y})));
+  }
 }
 
 Layout::~Layout() {}
@@ -175,7 +185,8 @@ void Layout::saveToFile(std::filesystem::path fpath) {
   mainFile << layoutPath.string() << "\n"
            << this->_carfpath.string() << "\n"
            << this->_victoryfpath.string() << "\n"
-           << this->_progressfpath.string();
+           << this->_progressfpath.string() << "\n"
+           << this->_buildingfpath.string();
 
   pfd::message("JAM", "Succesfully saved!", pfd::choice::ok,
                pfd::icon::info);
@@ -415,5 +426,8 @@ void Layout::draw(sf::RenderTarget& target, sf::RenderStates states) const {
   }
   for (const auto& x : _physicalIntersections) {
     x.second->draw(target, states);
+  }
+  for (const auto& x : _buildings){
+    x->draw(target, states);
   }
 }

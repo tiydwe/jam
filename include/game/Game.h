@@ -16,6 +16,7 @@
 #include "LevelSelectWindow.h"
 #include "TitleWindow.h"
 #include "SaveWindow.h"
+#include "Building.h"
 
 enum class GameScreenMode{
   EDIT, SIMULATE, STATS, LEVEL_SELECT, TITLE_SCREEN, LOAD_GAME
@@ -62,4 +63,5 @@ class Game {
   std::filesystem::path _progressP;
   std::filesystem::path _victoryP;
   std::filesystem::path _pathToLevelsFolder;
+  std::filesystem::path _buildingP;
 };

@@ -62,8 +62,10 @@ void Game::endLevelSelectChoose(std::filesystem::path pathToMainDat) {
     _victoryP = std::filesystem::path(tmp);
     std::getline(file, tmp);
     _progressP = std::filesystem::path(tmp);
+    std::getline(file, tmp);
+    _buildingP = std::filesystem::path(tmp);
     std::unique_ptr<Layout> layout =
-        std::make_unique<Layout>(_layoutP, _carP, _victoryP, _progressP);
+        std::make_unique<Layout>(_layoutP, _carP, _victoryP, _progressP, _buildingP);
     _editor = std::make_unique<EditorWindow>(std::move(layout), this,
                                              MainWindow.getSize());
     _mainP = pathToMainDat;
@@ -124,8 +126,10 @@ void Game::endLoadFileChoose(std::filesystem::path pathToMainDat) {
     _victoryP = std::filesystem::path(tmp);
     std::getline(file, tmp);
     _progressP = std::filesystem::path(tmp);
+    std::getline(file, tmp);
+    _buildingP = std::filesystem::path(tmp);
     std::unique_ptr<Layout> layout =
-        std::make_unique<Layout>(_layoutP, _carP, _victoryP, _progressP);
+        std::make_unique<Layout>(_layoutP, _carP, _victoryP, _progressP, _buildingP);
     _editor = std::make_unique<EditorWindow>(std::move(layout), this,
                                              MainWindow.getSize());
     _mainP = pathToMainDat;

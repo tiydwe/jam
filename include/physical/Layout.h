@@ -6,6 +6,7 @@
 #include <string>
 #include <utility>
 #include <filesystem>
+#include <vector>
 
 #include "Car.h"
 #include "IntersectionPhysical.h"
@@ -13,11 +14,12 @@
 #include "Road.h"
 #include "RoadPhysical.h"
 #include "utility.h"
+#include "Building.h"
 
 class Layout : public sf::Drawable, sf::Transformable
 {
 public:
-  Layout(std::filesystem::path filename, std::filesystem::path carPath, std::filesystem::path victorypath, std::filesystem::path progresspath);
+  Layout(std::filesystem::path filename, std::filesystem::path carPath, std::filesystem::path victorypath, std::filesystem::path progresspath, std::filesystem::path buildingpath);
   ~Layout();
 
   // FOLDER relative to save directory
@@ -73,9 +75,12 @@ private:
   std::map<size_t, std::unique_ptr<RoadPhysical>> _physicalRoads;
   std::map<size_t, std::unique_ptr<IntersectionPhysical>>
       _physicalIntersections;
+
+  std::vector<std::unique_ptr<Building>> _buildings;
   
   // absolute
   std::filesystem::path _carfpath;
   std::filesystem::path _progressfpath;
   std::filesystem::path _victoryfpath;
+  std::filesystem::path _buildingfpath;
 };

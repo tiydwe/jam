@@ -37,6 +37,7 @@ target_sources(main PRIVATE
     src/physical/RoadPhysical.cpp
     src/physical/CarPhysical.cpp
     src/physical/IntersectionPhysical.cpp
+    src/physical/Building.cpp
     src/ui/Button.cpp
 ) 
 target_include_directories(main PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/include")

@@ -65,7 +65,7 @@ void IntersectionPhysical::draw(sf::RenderTarget& target,
     for (int i = 0; i < verticies.size(); ++i) {
       polygon.setPoint(i, verticies[i]);
     }
-    polygon.setFillColor(sf::Color(0, 0, 0));
+    polygon.setFillColor(sf::Color(18, 18, 18));
     target.draw(polygon);
   }
   for(const auto& x : startends){

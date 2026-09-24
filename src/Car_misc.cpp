@@ -50,10 +50,6 @@ double Car::getCurrDistFrac() const {
          _parentSim->getLayout()->getLane(_position_laneid)->getLength();
 }
 
-size_t Car::getDestLane() const {
-  return _parentSim->getLayout()->getRoad(_current_destination.first)->getEdgeLane();
-}
-
 void Car::_clipVelocity() {
   double speedLimit =
       _parentSim->getLayout()->getRoad(_position_roadid)->getSpeedLimit();

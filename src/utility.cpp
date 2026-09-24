@@ -144,6 +144,8 @@ bool utility::rectanglesIntersect(sf::RectangleShape a, sf::RectangleShape b) {
   return true;
 }
 
+const sf::Texture utility::Constants::noRouteIcon{"assets/textures/cars/noroute.png"};
+
 const float utility::Constants::GREEN_PHASE_TIME_DEFAULT = 50;
 const float utility::Constants::YELLOW_PHASE_TIME_DEFAULT = 5;
 const float utility::Constants::INTERSESCTION_SIZE = 50.f;

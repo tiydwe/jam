@@ -34,4 +34,5 @@ class CarPhysical : public sf::Drawable, sf::Transformable {
 
   sf::Vector2<float> _pos;
   bool _isHovering = false;
+  sf::Sprite _noRouteIcon;
 };

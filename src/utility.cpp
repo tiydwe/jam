@@ -161,8 +161,8 @@ const sf::Color utility::Constants::BACKGROUND_COLOR =
 const float utility::Constants::CAR_MARGIN = 40.f;
 
 
-const sf::Color utility::ColorPalette::functionalBtn = sf::Color(23, 113, 145);
-const sf::Color utility::ColorPalette::functionalBtnHover = sf::Color(22, 87, 110);
+const sf::Color utility::ColorPalette::functionalBtn = sf::Color(43, 133, 165);
+const sf::Color utility::ColorPalette::functionalBtnHover = sf::Color(42, 107, 130);
 const sf::Color utility::ColorPalette::destructiveBtn = sf::Color(199, 40, 52);
 const sf::Color utility::ColorPalette::destructiveBtnHover = sf::Color(156, 31, 41);
 const sf::Color utility::ColorPalette::editorBtn = sf::Color(121, 145, 23);

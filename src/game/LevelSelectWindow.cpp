@@ -4,8 +4,8 @@
 #include <fstream>
 #include <sstream>
 #include <utility>
-#include "Game.h"
 
+#include "Game.h"
 
 LevelSelectWindow::LevelSelectWindow(std::filesystem::path levelsDir,
                                      sf::Vector2f windowSize, Game* game)
@@ -14,7 +14,8 @@ LevelSelectWindow::LevelSelectWindow(std::filesystem::path levelsDir,
             {80, 30}, utility::Constants::defaultFont, "BACK",
             sf::Color(120, 120, 120), sf::Color(100, 100, 100),
             sf::Color::Black),
-      _title(utility::Constants::defaultFont, "Select a level:") {
+      _title(utility::Constants::defaultFont, "Select a level:"),
+      _backgroundsprite(utility::Constants::titleScreenBackground) {
   _back.setOnclick([this](Game* gm) { this->onclickBack(); });
   _title.setOrigin(_title.getLocalBounds().getCenter());
   _title.setPosition({windowSize.x / 2.f, windowSize.y / 2.f - 60});
@@ -47,18 +48,46 @@ LevelSelectWindow::LevelSelectWindow(std::filesystem::path levelsDir,
         ss >> c;
         complete = c == 'Y';
       }
-      _levels.push_back({levelMainFile, complete ? LevelStatus::COMPLETE : LevelStatus::INCOMPLETE});
+      _levels.push_back({levelMainFile, complete ? LevelStatus::COMPLETE
+                                                 : LevelStatus::INCOMPLETE});
     }
   }
   this->createButtons(windowSize);
+
+  sf::Vector2f texturesize{
+      static_cast<float>(utility::Constants::titleScreenBackground.getSize().x),
+      static_cast<float>(
+          utility::Constants::titleScreenBackground.getSize().y)};
+  float scale =
+      std::max(windowSize.x / texturesize.x, windowSize.y / texturesize.y);
+  _backgroundsprite.setScale({scale, scale});
+  sf::Vector2f corrsize{windowSize.x / scale, windowSize.y / scale};
+  sf::Vector2f startpos = ((texturesize - corrsize) / 2.f);
+  _backgroundsprite.setTextureRect(sf::IntRect{
+      sf::Vector2i{static_cast<int>(startpos.x), static_cast<int>(startpos.y)},
+      sf::Vector2i{static_cast<int>(corrsize.x),
+                   static_cast<int>(corrsize.y)}});
 }
 
 void LevelSelectWindow::updateWindowSize(sf::Vector2f newSize) {
   _levelButtons.clear();
   this->createButtons(newSize);
   _back.setStart({newSize.x / 2.f - 40, newSize.y / 2.f - 100});
-  _contentBox.setPosition(newSize/ 2.f);
+  _contentBox.setPosition(newSize / 2.f);
   _title.setPosition({newSize.x / 2.f, newSize.y / 2.f - 60});
+
+  sf::Vector2f texturesize{
+      static_cast<float>(utility::Constants::titleScreenBackground.getSize().x),
+      static_cast<float>(
+          utility::Constants::titleScreenBackground.getSize().y)};
+  float scale = std::max(newSize.x / texturesize.x, newSize.y / texturesize.y);
+  _backgroundsprite.setScale({scale, scale});
+  sf::Vector2f corrsize{newSize.x / scale, newSize.y / scale};
+  sf::Vector2f startpos = ((texturesize - corrsize) / 2.f);
+  _backgroundsprite.setTextureRect(sf::IntRect{
+      sf::Vector2i{static_cast<int>(startpos.x), static_cast<int>(startpos.y)},
+      sf::Vector2i{static_cast<int>(corrsize.x),
+                   static_cast<int>(corrsize.y)}});
 }
 
 void LevelSelectWindow::update(sf::Vector2f mousePos, bool enable) {
@@ -75,7 +104,8 @@ std::filesystem::path LevelSelectWindow::getChoosenLevel() const {
 void LevelSelectWindow::draw(sf::RenderTarget& target,
                              sf::RenderStates states) const {
   states.transform *= getTransform();
-  target.draw(_contentBox,states);
+  target.draw(_backgroundsprite, states);
+  target.draw(_contentBox, states);
   target.draw(_title, states);
   for (const auto& x : _levelButtons) {
     x->draw(target, states);
@@ -88,9 +118,7 @@ void LevelSelectWindow::onclickLevel(std::filesystem::path levelPath) {
   _game->endLevelSelectChoose(levelPath);
 }
 
-void LevelSelectWindow::onclickBack() {
-  _game->endLevelSelectBack();
-}
+void LevelSelectWindow::onclickBack() { _game->endLevelSelectBack(); }
 
 void LevelSelectWindow::createButtons(sf::Vector2f windowSize) {
   sf::Vector2f center = windowSize / 2.f;
@@ -101,15 +129,15 @@ void LevelSelectWindow::createButtons(sf::Vector2f windowSize) {
       _levels.size() * widthPerButton + (_levels.size() - 1) * spacing;
   _contentBox.setSize({netWidth + 2 * spacing, height + 180});
   _contentBox.setOrigin(_contentBox.getSize() / 2.f);
-  _contentBox.setPosition(windowSize/ 2.f);
+  _contentBox.setPosition(windowSize / 2.f);
   sf::Vector2f startPos{center.x - netWidth / 2, center.y - height / 2};
   sf::Vector2f size{height, widthPerButton};
   for (const auto& levelPath : _levels) {
     _levelButtons.push_back(std::make_unique<Button>(
         nullptr, startPos, size, utility::Constants::defaultFont,
-        levelPath.first.parent_path().filename().string(), sf::Color(120, 120, 120),
-        sf::Color(100, 100, 100), sf::Color::Black));
-    if(levelPath.second == LevelStatus::COMPLETE){
+        levelPath.first.parent_path().filename().string(),
+        sf::Color(120, 120, 120), sf::Color(100, 100, 100), sf::Color::Black));
+    if (levelPath.second == LevelStatus::COMPLETE) {
       _levelButtons.back()->setNormal(sf::Color(120, 150, 120));
       _levelButtons.back()->setHover(sf::Color(100, 130, 100));
     }

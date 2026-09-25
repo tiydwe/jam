@@ -35,4 +35,5 @@ class LevelSelectWindow : public sf::Drawable, sf::Transformable {
   LevelSelectWindowStatus _status = LevelSelectWindowStatus::NORMAL;
   sf::RectangleShape _contentBox;
   sf::Text _title;
+  sf::Sprite _backgroundsprite;
 };

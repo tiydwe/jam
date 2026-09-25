@@ -1,0 +1,140 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  build:
+    name: ${{ matrix.platform.name }} ${{ matrix.config.name }}
+    runs-on: ${{ matrix.platform.os }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        platform:
+          - name: Windows
+            os: windows-latest
+
+          - name: Linux GCC
+            os: ubuntu-latest
+
+          - name: Linux Clang
+            os: ubuntu-latest
+            flags: >-
+              -DCMAKE_C_COMPILER=clang
+              -DCMAKE_CXX_COMPILER=clang++
+
+          - name: macOS
+            os: macos-latest
+
+        config:
+          - name: Shared
+            flags: -DBUILD_SHARED_LIBS=ON
+
+          - name: Static
+            flags: -DBUILD_SHARED_LIBS=OFF
+
+    steps:
+      - name: Install Linux dependencies
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            libxrandr-dev \
+            libxcursor-dev \
+            libxi-dev \
+            libudev-dev \
+            libflac-dev \
+            libvorbis-dev \
+            libgl1-mesa-dev \
+            libegl1-mesa-dev \
+            libfreetype-dev \
+            libharfbuzz-dev \
+            libmbedtls-dev \
+            libssh2-1-dev
+
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Configure
+        run: |
+          cmake \
+            -S . \
+            -B build \
+            -DCMAKE_BUILD_TYPE=Release \
+            ${{ matrix.platform.flags }} \
+            ${{ matrix.config.flags }}
+
+      - name: Build
+        run: cmake --build build --config Release --parallel
+
+      - name: Package binaries
+        run: |
+          set -e
+
+          mkdir -p package
+
+          if [[ "$RUNNER_OS" == "Windows" ]]; then
+            find build -type f \( \
+              -name "*.exe" -o \
+              -name "*.dll" -o \
+              -name "*.lib" \
+            \) -exec cp {} package/ \;
+
+          elif [[ "$RUNNER_OS" == "macOS" ]]; then
+            find build -type f \( \
+              -name "*.dylib" -o \
+              -name "*.a" \
+            \) -exec cp {} package/ \;
+
+          else
+            find build -type f \( \
+              -name "*.so" -o \
+              -name "*.a" \
+            \) -exec cp {} package/ \;
+          fi
+
+          if [[ -z "$(find package -type f -print -quit)" ]]; then
+            echo "No binaries were found to package."
+            exit 1
+          fi
+
+      - name: Create archive
+        run: |
+          cd package
+          zip -r "../${{ matrix.platform.name }}-${{ matrix.config.name }}.zip" .
+
+      - name: Upload package
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.platform.name }}-${{ matrix.config.name }}
+          path: ${{ matrix.platform.name }}-${{ matrix.config.name }}.zip
+          if-no-files-found: error
+
+  release:
+    name: Create GitHub Release
+    needs: build
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+
+    steps:
+      - name: Download all packages
+        uses: actions/download-artifact@v5
+        with:
+          path: release
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.ref_name }}
+          name: ${{ github.ref_name }}
+          generate_release_notes: true
+          files: release/**/*.zip

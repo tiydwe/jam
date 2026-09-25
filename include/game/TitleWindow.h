@@ -19,6 +19,7 @@ class TitleWindow : public sf::Drawable, sf::Transformable {
   Game* _game;
   sf::RectangleShape _contentBox;
   sf::Text _title;
+  sf::Sprite _backgroundsprite;
   Button _load;
   Button _newLevel;
 };

@@ -42,6 +42,7 @@ bool rectanglesIntersect(sf::RectangleShape a, sf::RectangleShape b);
 namespace Constants{
   inline const sf::Font defaultFont{"assets/fonts/arial/ARIAL.TTF"};
   extern const sf::Texture noRouteIcon;
+  extern const sf::Texture titleScreenBackground;
   extern const float GREEN_PHASE_TIME_DEFAULT;
   extern const float YELLOW_PHASE_TIME_DEFAULT;
   extern const float INTERSESCTION_SIZE;

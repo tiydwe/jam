@@ -40,7 +40,7 @@ std::pair<float, float> projectVerticies(const std::vector<sf::Vector2f> &vertic
 bool rectanglesIntersect(sf::RectangleShape a, sf::RectangleShape b);
 
 namespace Constants{
-  inline const sf::Font defaultFont{"assets/fonts/arial/ARIAL.TTF"};
+  inline const sf::Font defaultFont{"assets/fonts/Tanker-Regular.otf"};
   extern const sf::Texture noRouteIcon;
   extern const sf::Texture titleScreenBackground;
   extern const float GREEN_PHASE_TIME_DEFAULT;

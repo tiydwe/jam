@@ -93,7 +93,7 @@ void Game::beginLevelSelect() {
 void Game::beginLoadFile() {
   if (currentMode == GameScreenMode::TITLE_SCREEN) {
     _saveWindow = std::make_unique<SaveWindow>(nullptr);
-    _saveWindow->setSize({MainWindow.getSize().x, MainWindow.getSize().y});
+    _saveWindow->setSize({static_cast<float>(MainWindow.getSize().x), static_cast<float>(MainWindow.getSize().y)});
     currentMode = GameScreenMode::LOAD_GAME;
   }
 }
@@ -171,14 +171,14 @@ void Game::run() {
           _editor->updateWindowSize(newSize);
         } else if (currentMode == GameScreenMode::STATS) {
           _statsWindow->updateWindowSize(
-              {MainWindow.getSize().x, MainWindow.getSize().y});
+              {static_cast<float>(MainWindow.getSize().x), static_cast<float>(MainWindow.getSize().y)});
         } else if (currentMode == GameScreenMode::LEVEL_SELECT) {
           _levelSelectWindow->updateWindowSize(newSize);
         } else if (currentMode == GameScreenMode::TITLE_SCREEN) {
           _titleWindow->updateWindowSize(newSize);
         } else if (currentMode == GameScreenMode::LOAD_GAME) {
           _saveWindow->setSize(
-              {MainWindow.getSize().x, MainWindow.getSize().y});
+              {static_cast<float>(MainWindow.getSize().x), static_cast<float>(MainWindow.getSize().y)});
         }
       }
       if (currentMode == GameScreenMode::SIMULATE) {

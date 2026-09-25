@@ -21,7 +21,7 @@ CarPhysical::CarPhysical(Simulation* game, std::unique_ptr<Car> car,
   _noRouteIcon.setScale({nriscale, nriscale});
   _noRouteIcon.setOrigin(_noRouteIcon.getLocalBounds().size / 2.f);
   _base.setTexture(_texture);
-  _base.setOrigin({_texture.getSize().x / 2, _texture.getSize().y / 2});
+  _base.setOrigin({static_cast<float>(_texture.getSize().x) / 2.f, static_cast<float>(_texture.getSize().y) / 2});
 }
 
 void CarPhysical::move(double dt) {

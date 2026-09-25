@@ -338,7 +338,7 @@ std::pair<bool, sf::RectangleShape> EditorWindow::isRoadValid(
         start + delta.normalized() * (utility::Constants::INTERSESCTION_SIZE);
     auto adjEnd =
         end - delta.normalized() * (utility::Constants::INTERSESCTION_SIZE);
-    sf::RectangleShape hitbox({(adjEnd - adjStart).length(), height});
+    sf::RectangleShape hitbox({(adjEnd - adjStart).length(), static_cast<float>(height)});
     hitbox.setOrigin({0.f, hitbox.getSize().y / 2.f});
     hitbox.setRotation((adjEnd - adjStart).angle());
     hitbox.setPosition(adjStart);

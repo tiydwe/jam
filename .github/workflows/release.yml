@@ -73,7 +73,7 @@ jobs:
 
       - name: Build
         run: cmake --build build --config Release --parallel
-        
+ 
       - name: Package binaries
         run: |
           set -e
@@ -90,12 +90,14 @@ jobs:
             \) -exec cp {} package/ \;
 
           elif [[ "$RUNNER_OS" == "macOS" ]]; then
+            cp build/bin/main package/
             find build -type f \( \
               -name "*.dylib" -o \
               -name "*.a" \
             \) -exec cp {} package/ \;
 
           else
+            cp build/bin/main package/
             find build -type f \( \
               -name "*.so" -o \
               -name "*.so.*" -o \
@@ -103,12 +105,13 @@ jobs:
             \) -exec cp {} package/ \;
           fi
 
+          echo "Package contents:"
+          find package -type f -print
+
           if [[ -z "$(find package -type f -print -quit)" ]]; then
             echo "No binaries were found to package."
             exit 1
           fi
-
-
 
       - name: Create archive
         shell: bash

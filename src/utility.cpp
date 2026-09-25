@@ -150,7 +150,7 @@ const float utility::Constants::GREEN_PHASE_TIME_DEFAULT = 50;
 const float utility::Constants::YELLOW_PHASE_TIME_DEFAULT = 5;
 const float utility::Constants::INTERSESCTION_SIZE = 50.f;
 const float utility::Constants::INTERSECTION_SNAP_DIST =
-    utility::Constants::INTERSESCTION_SIZE * 1.3;
+    utility::Constants::INTERSESCTION_SIZE * 1.5;
 const float utility::Constants::MIN_ROAD_DIST =
     2 * utility::Constants::INTERSESCTION_SIZE + 32;
 const float utility::Constants::TIMOUT_LIMIT_NO_MOVE_CAR = 300.f;

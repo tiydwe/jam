@@ -74,7 +74,7 @@ StatsWindow::StatsWindow(Game* game, OverallStats stats, Level& level,
 
   _carsArrived.setSize({400, 60});
   _carsArrived.setOrigin(_carsArrived.getSize() / 2.f);
-  _carsArrived.setPosition({windowSize.x / 2.f, windowSize.y / 2.f - 85});
+  _carsArrived.setPosition({windowSize.x / 2.f, windowSize.y / 2.f - 100});
   _carsArrived.setFillColor(sf::Color::Transparent);
   _carsArrived.setOutlineColor(_level.pass1(stats) ? sf::Color::Green : sf::Color::Red);
   _carsArrived.setOutlineThickness(8.f);
@@ -121,6 +121,13 @@ void StatsWindow::updateWindowSize(sf::Vector2f newSize) {
   _continue.setStart({center.x - 220, center.y + d.y - 50.f});
   _continue.setSize({440.f, 40.f});
   _background.setSize(newSize);
+
+  
+  _carsArrived.setOrigin(_carsArrived.getSize() / 2.f);
+  _carsArrived.setPosition({newSize.x / 2.f, newSize.y / 2.f - 100});
+
+  _averageSpeed.setOrigin(_averageSpeed.getSize() / 2.f);
+  _averageSpeed.setPosition({newSize.x / 2.f, newSize.y / 2.f});
 }
 
 void StatsWindow::update(sf::Vector2f mousePosition, bool enable) {

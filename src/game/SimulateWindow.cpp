@@ -115,7 +115,8 @@ void SimulateWindow::updateWindowSize(sf::Vector2f newSize) {
 void SimulateWindow::step(double trueDt) {
   _s->step(trueDt * _timeMultiplier);
   if (_s->isDone()) {
-    _exitSim.setNormal(utility::ColorPalette::functionalBtn);
+    _exitSim.setNormal(sf::Color::Green);
+    _exitSim.setHover(sf::Color(0, 200, 0));
   }
 }
 

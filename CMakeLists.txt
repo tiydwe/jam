@@ -53,8 +53,10 @@ add_custom_command(
     COMMENT "Copying assets folder to build directory..."
 )
 target_compile_features(main PRIVATE cxx_std_17)
-set(SFML_DIR "C:/c++/libaries/SFML-3.1.0/lib/cmake/SFML")
-find_package(SFML 3.1 COMPONENTS Graphics Window System Audio REQUIRED)
+
+#set(SFML_DIR "C:/c++/libaries/SFML-3.1.0/lib/cmake/SFML")
+#find_package(SFML 3.1 COMPONENTS Graphics Window System Audio REQUIRED)
+
 target_link_libraries(main PRIVATE SFML::Graphics)
 
 

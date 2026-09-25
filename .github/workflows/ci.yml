@@ -8,6 +8,8 @@ defaults:
 
 jobs:
   build:
+    if: github.event_name == 'push' && startsWith(github.event.head_commit.message, 'release')
+
     name: ${{ matrix.platform.name }} ${{ matrix.config.name }}
     runs-on: ${{ matrix.platform.os }}
 

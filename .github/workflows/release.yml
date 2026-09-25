@@ -73,11 +73,14 @@ jobs:
 
       - name: Build
         run: cmake --build build --config Release --parallel
+        
       - name: Package binaries
         run: |
           set -e
 
           mkdir -p package
+
+          cp -r assets package/
 
           if [[ "$RUNNER_OS" == "Windows" ]]; then
             find build -type f \( \
@@ -104,6 +107,7 @@ jobs:
             echo "No binaries were found to package."
             exit 1
           fi
+
 
 
       - name: Create archive

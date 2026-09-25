@@ -122,12 +122,12 @@ void LevelSelectWindow::onclickBack() { _game->endLevelSelectBack(); }
 
 void LevelSelectWindow::createButtons(sf::Vector2f windowSize) {
   sf::Vector2f center = windowSize / 2.f;
-  double height = 50.f;
-  double widthPerButton = 70.f;
-  double spacing = 15.f;
-  double netWidth =
+  float height = 50.f;
+  float widthPerButton = 70.f;
+  float spacing = 15.f;
+  float netWidth =
       _levels.size() * widthPerButton + (_levels.size() - 1) * spacing;
-  _contentBox.setSize({netWidth + 2 * spacing, height + 180});
+  _contentBox.setSize({netWidth + 2 * spacing, height + 180.f});
   _contentBox.setOrigin(_contentBox.getSize() / 2.f);
   _contentBox.setPosition(windowSize / 2.f);
   sf::Vector2f startPos{center.x - netWidth / 2, center.y - height / 2};

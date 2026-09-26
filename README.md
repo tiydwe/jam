@@ -1,8 +1,8 @@
 # JAM
 JAM is a video game where you build the road network of a city and manage traffic.
-
 [Jump to quickstart](#quickstart)
 
+<small>Tested on Windows and Linux Ubuntu</small>
 ![Screenshot of game title screen showing many cars navigating a large network of roads and two buttons, load saved game and new game](assets/images/gameimage3.png)
 ![Screenshot of game simulation window showing many cars navigating a large network of roads](assets/images/gameimage2.png)
 
@@ -10,8 +10,8 @@ JAM is a video game where you build the road network of a city and manage traffi
 
 I strongly recommend you check out the [controls](#controls) section before you play the game!
 
-1) Download the ZIP file for your operating system here: https://github.com/tiydwe/jam/releases. Download either the shared or static version, both should work.
-For example, if you are using windows, you can download either `Windows-Shared.zip` or `Windows-Static.zip`.
+1) Download the ZIP file for your operating system here: https://github.com/tiydwe/jam/releases. I recommend downloading the static version, as the shared version has known issues.
+For example, if you are using windows, you should download `Windows-Static.zip`.
 
 2) Extract all files into a location of your choice.
 3) Run `main` depending on what OS you have. 
@@ -59,4 +59,4 @@ Jam is built off of a custom made traffic engine. Internally, roads are represen
 The game was built off of SFML and portable-file-dialogs without any additional helpers. Every single UI element was created by hand.
 
 # Credits
-Thank you so much to [SFML](https://github.com/sfml/sfml) and [portable file dialogs](https://github.com/samhocevar/portable-file-dialogs)! The Montserrat font was used in this project. The license and attribution is [here](/assets/fonts/OFL.txt)
+Thank you so much to [SFML](https://github.com/sfml/sfml) and [portable file dialogs](https://github.com/samhocevar/portable-file-dialogs)! The Montserrat font was used in this project. The license and attribution is [here](/assets/fonts/OFL.txt).

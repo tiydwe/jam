@@ -5,6 +5,8 @@
 #include <sstream>
 #include <utility>
 
+#include <algorithm>
+
 #include "Game.h"
 
 LevelSelectWindow::LevelSelectWindow(std::filesystem::path levelsDir,
@@ -52,6 +54,9 @@ LevelSelectWindow::LevelSelectWindow(std::filesystem::path levelsDir,
                                                  : LevelStatus::INCOMPLETE});
     }
   }
+  std::sort(_levels.begin(), _levels.end(), [](const auto& lhs, const auto& rhs){
+    return lhs.first < rhs.first;
+  });
   this->createButtons(windowSize);
 
   sf::Vector2f texturesize{

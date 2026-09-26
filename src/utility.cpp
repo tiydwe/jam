@@ -144,13 +144,15 @@ bool utility::rectanglesIntersect(sf::RectangleShape a, sf::RectangleShape b) {
   return true;
 }
 
+const sf::Font utility::Constants::defaultFont{"assets/fonts/montserrat-latin-700-normal.ttf"};
+
 const sf::Texture utility::Constants::noRouteIcon{"assets/textures/cars/noroute.png"};
 const sf::Texture utility::Constants::titleScreenBackground{"assets/images/gameimage1.png"};
 const float utility::Constants::GREEN_PHASE_TIME_DEFAULT = 50;
 const float utility::Constants::YELLOW_PHASE_TIME_DEFAULT = 5;
 const float utility::Constants::INTERSESCTION_SIZE = 50.f;
 const float utility::Constants::INTERSECTION_SNAP_DIST =
-    utility::Constants::INTERSESCTION_SIZE * 1.5;
+    utility::Constants::INTERSESCTION_SIZE * 1.6;
 const float utility::Constants::MIN_ROAD_DIST =
     2 * utility::Constants::INTERSESCTION_SIZE + 32;
 const float utility::Constants::TIMOUT_LIMIT_NO_MOVE_CAR = 300.f;

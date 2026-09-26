@@ -61,7 +61,7 @@ StatsWindow::StatsWindow(Game* game, OverallStats stats, Level& level,
   _container.setSize(d * 2.f);
   _statsText.setString(getStatsString());
   _statsText.setFillColor(sf::Color::Black);
-  _statsText.setCharacterSize(25);
+  _statsText.setCharacterSize(20);
   sf::FloatRect textRect = _statsText.getLocalBounds();
   _statsText.setOrigin({textRect.position.x + textRect.size.x / 2,
                         textRect.position.y + textRect.size.y / 2});
@@ -74,14 +74,14 @@ StatsWindow::StatsWindow(Game* game, OverallStats stats, Level& level,
 
   _carsArrived.setSize({400, 60});
   _carsArrived.setOrigin(_carsArrived.getSize() / 2.f);
-  _carsArrived.setPosition({windowSize.x / 2.f, windowSize.y / 2.f - 100});
+  _carsArrived.setPosition({windowSize.x / 2.f, windowSize.y / 2.f - 80});
   _carsArrived.setFillColor(sf::Color::Transparent);
   _carsArrived.setOutlineColor(_level.pass1(stats) ? sf::Color::Green : sf::Color::Red);
   _carsArrived.setOutlineThickness(8.f);
 
   _averageSpeed.setSize({400, 60});
   _averageSpeed.setOrigin(_averageSpeed.getSize() / 2.f);
-  _averageSpeed.setPosition({windowSize.x / 2.f, windowSize.y / 2.f});
+  _averageSpeed.setPosition({windowSize.x / 2.f, windowSize.y / 2.f + 15});
   _averageSpeed.setFillColor(sf::Color::Transparent);
   _averageSpeed.setOutlineColor(_level.pass2(stats) ? sf::Color::Green : sf::Color::Red);
   _averageSpeed.setOutlineThickness(8.f);
@@ -97,7 +97,7 @@ std::string StatsWindow::getStatsString() {
       << (_stats.numberOfCars == 0
               ? 0
               : ((double)_stats.numberArrived) / _stats.numberOfCars * 100)
-      << "%, required min " << _level.getPercentArrived() * 100 << "%\n\n"
+      << "%, required min " << _level.getPercentArrived() * 100 << "%\n\n\n"
       << "Average speed:\n"
       << (utility::isclose(_stats.totalTimeTraveled, 0.0)
               ? 0
@@ -124,10 +124,10 @@ void StatsWindow::updateWindowSize(sf::Vector2f newSize) {
 
   
   _carsArrived.setOrigin(_carsArrived.getSize() / 2.f);
-  _carsArrived.setPosition({newSize.x / 2.f, newSize.y / 2.f - 100});
+  _carsArrived.setPosition({newSize.x / 2.f, newSize.y / 2.f - 80});
 
   _averageSpeed.setOrigin(_averageSpeed.getSize() / 2.f);
-  _averageSpeed.setPosition({newSize.x / 2.f, newSize.y / 2.f});
+  _averageSpeed.setPosition({newSize.x / 2.f, newSize.y / 2.f + 15});
 }
 
 void StatsWindow::update(sf::Vector2f mousePosition, bool enable) {

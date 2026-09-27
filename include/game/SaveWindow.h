@@ -33,6 +33,7 @@ class SaveWindow : public sf::Drawable, sf::Transformable {
   SaveWindowStatus _status;
   Layout* _layout;
   sf::RectangleShape _background;
+  sf::RectangleShape _contentBox;
   sf::Text _fpathText;
   std::filesystem::path _result;
 

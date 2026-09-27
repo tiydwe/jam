@@ -19,12 +19,18 @@ SaveWindow::SaveWindow(Layout* layout)
   _choose.setOnclick([this](Game* gm) { this->onclickChoose(); });
   _ok.setOnclick([this](Game* gm) { this->onclickOk(); });
   _cancel.setOnclick([this](Game* gm) { this->onclickCancel(); });
-  _background.setSize({500, 150});
+  _contentBox.setSize({500, 150});
   _fpathText.setCharacterSize(20);
   _fpathText.setPosition({10, 10});
   _fpathText.setFillColor(sf::Color::Black);
+
+  _background.setSize({100000.f, 100000.f});
+  _background.setOrigin({10000.f, 10000.f});
+  _background.setFillColor(utility::Constants::BACKGROUND_COLOR);
+
   this->setOrigin(
-      sf::Vector2f{_background.getSize().x, _background.getSize().y} / 2.f);
+      sf::Vector2f{_contentBox.getSize().x, _contentBox.getSize().y} / 2.f);
+
 }
 
 void SaveWindow::setSize(sf::Vector2f size) { this->setPosition(size / 2.f); }
@@ -44,6 +50,7 @@ void SaveWindow::update(sf::Vector2f mousePosition, bool enable) {
 void SaveWindow::draw(sf::RenderTarget& target, sf::RenderStates states) const {
   states.transform *= getTransform();
   target.draw(_background, states);
+  target.draw(_contentBox, states);
   target.draw(_fpathText, states);
   _choose.draw(target, states);
   _ok.draw(target, states);

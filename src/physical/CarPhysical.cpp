@@ -21,7 +21,8 @@ CarPhysical::CarPhysical(Simulation* game, std::unique_ptr<Car> car,
   _noRouteIcon.setScale({nriscale, nriscale});
   _noRouteIcon.setOrigin(_noRouteIcon.getLocalBounds().size / 2.f);
   _base.setTexture(_texture);
-  _base.setOrigin({static_cast<float>(_texture.getSize().x) / 2.f, static_cast<float>(_texture.getSize().y) / 2});
+  _base.setOrigin({static_cast<float>(_texture.getSize().x) / 2.f,
+                   static_cast<float>(_texture.getSize().y) / 2});
 }
 
 void CarPhysical::move(double dt) {
@@ -45,7 +46,20 @@ void CarPhysical::move(double dt) {
 void CarPhysical::draw(sf::RenderTarget& target,
                        sf::RenderStates states) const {
   states.transform *= getTransform();
-  if (_car->getStatus() != carStatus::ARRIVED) {
+  if (_car->isDeleting()) {
+    auto cpy = _base;
+    float prc = _car->getCountdownPercent();
+    if (_car->isDeletionGood()) {
+      cpy.setColor(
+          sf::Color(prc * 255.0 / 2.0, prc*1.5 * 255.0, prc * 255.0 / 2.0));
+    } else {
+      cpy.setColor(
+          sf::Color(prc*1.5 * 255.0, prc * 255.0 / 2.0, prc * 255.0 / 2.0));
+    }
+    target.draw(cpy);
+    return;
+  }
+  if (!_car->isDeleting()) {
     // pro-tip: this one weird trick makes your cpu cry
     auto cpy = _base;
     if (_isHovering) {
@@ -80,29 +94,6 @@ void CarPhysical::draw(sf::RenderTarget& target,
   }
   if (_car->getStatus() == carStatus::NO_ROUTE) {
     target.draw(_noRouteIcon, states);
-  }
-  if (_isHovering) {
-    // show destination
-    auto destPos =
-        _game->getLayout()
-            ->getPhysicalRoadFromInternalID(_car->getParentSim()
-                                                ->getLayout()
-                                                ->getRoad(_car->getDestRoad())
-                                                ->getID())
-            ->getPhysicalPosition(
-                _car->getDestRoad(), _car->getDestLane(), _car->getDestDist(),
-                this,
-                _car->getLastRoad() == nullptr
-                    ? nullptr
-                    : nullptr /*just hope that it doesnt go over an edge*/,
-                _car->getLastLane())
-            .first;
-    sf::CircleShape destVis;
-    destVis.setRadius(8.f);
-    destVis.setOrigin(destVis.getLocalBounds().size / 2.f);
-    destVis.setPosition(destPos);
-    destVis.setFillColor(sf::Color(34, 189, 28));
-    target.draw(destVis, states);
   }
 }
 

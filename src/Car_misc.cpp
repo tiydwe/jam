@@ -50,6 +50,10 @@ double Car::getCurrDistFrac() const {
          _parentSim->getLayout()->getLane(_position_laneid)->getLength();
 }
 
+bool Car::isDeleting() const { return _deleting; }
+
+bool Car::isDeletionGood() const { return _status == carStatus::ARRIVED; }
+
 void Car::_clipVelocity() {
   double speedLimit =
       _parentSim->getLayout()->getRoad(_position_roadid)->getSpeedLimit();
@@ -58,10 +62,19 @@ void Car::_clipVelocity() {
 }
 
 double Car::_applyVelocity(double dt) {
+  if(isDeleting()){
+    _countdownToDeletion -= dt;
+    if(_countdownToDeletion <= 0.0){
+      _parentSim->removeCar(_id);
+      return 0.0;
+    }
+  }
   if (utility::isclose(_velocity, 0.0)) {
     _timeSinseLastMove += dt;
     if (_timeSinseLastMove > utility::Constants::TIMOUT_LIMIT_NO_MOVE_CAR) {
-      _parentSim->removeCar(_id);
+      _status = carStatus::DESPAWNING;
+      _deleting = true;
+      //_parentSim->removeCar(_id);
       return 0.0;
     }
   } else {

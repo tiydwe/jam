@@ -35,9 +35,11 @@ void Car::move(double dt) {
                            10.0) &&
           _current_destination.first == _position_roadid) {
         _status = carStatus::ARRIVED;
+        _deleting = true;
         _results._arrived = true;
+        _applyVelocity(dt);
         // remove car after arrival
-        _parentSim->removeCar(_id);
+        //_parentSim->removeCar(_id);
         return;
         
       } else {

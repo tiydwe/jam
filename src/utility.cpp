@@ -161,6 +161,7 @@ const float utility::Constants::ROAD_SELECT_SNAP_DIST = 50.f;
 const sf::Color utility::Constants::BACKGROUND_COLOR =
     sf::Color(52, 69, 36);
 const float utility::Constants::CAR_MARGIN = 40.f;
+const float utility::Constants::CAR_DELETION_TIME = 8.f;
 
 
 const sf::Color utility::ColorPalette::functionalBtn = sf::Color(43, 133, 165);

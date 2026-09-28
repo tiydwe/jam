@@ -1,11 +1,17 @@
 # JAM
 JAM is a video game where you build the road network of a city and manage traffic.
+
 [Jump to quickstart](#quickstart)
+
 [Jump to controls](#controls)
 
 <small>Tested on Windows and Linux Ubuntu</small>
 ![Screenshot of game title screen showing many cars navigating a large network of roads and two buttons, load saved game and new game](assets/images/gameimage3.png)
 ![Screenshot of game simulation window showing many cars navigating a large network of roads](assets/images/gameimage2.png)
+
+# Objective
+
+Create/modify a road network so that all the cars can reach their destination while meeting certain objectives!
 
 # Quickstart
 
@@ -15,7 +21,7 @@ I strongly recommend you check out the [controls](#controls) section before you 
 For example, if you are using windows, you should download `Windows.zip`.
 
 2) Extract all files into a location of your choice.
-3) Run `main` depending on what OS you have. 
+3) Run `main`. 
 4) Check out the [controls](#controls) section before you play the game!
 
 ## My computer is blocking me from running `main`!

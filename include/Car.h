@@ -18,7 +18,8 @@ enum class carStatus
   ARRIVING,
   ARRIVED,
   NO_ROUTE,
-  MERGING
+  MERGING,
+  DESPAWNING
 };
 
 std::string carStatusToString(carStatus s);
@@ -72,6 +73,10 @@ public:
 
   const Lane* getLastLane() const {return _lastLane;}
   const Road* getLastRoad() const {return _lastRoad;}
+
+  bool isDeleting() const;
+  bool isDeletionGood() const;
+  double getCountdownPercent() const {return _countdownToDeletion / utility::Constants::CAR_DELETION_TIME;}
 
 private:
   void _clipVelocity();
@@ -133,4 +138,7 @@ private:
 
   // for removing after inactivity
   double _timeSinseLastMove = 0.0;
+  
+  bool _deleting = false;
+  double _countdownToDeletion = utility::Constants::CAR_DELETION_TIME;
 };

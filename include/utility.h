@@ -52,6 +52,7 @@ namespace Constants{
   extern const float INTERSECTION_TRANSITION_LENGTH;
   extern const float ROAD_SELECT_SNAP_DIST;
   extern const float CAR_MARGIN;
+  extern const float CAR_DELETION_TIME;
   
   extern const sf::Color BACKGROUND_COLOR;
 }

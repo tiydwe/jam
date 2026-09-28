@@ -107,7 +107,7 @@ jobs:
       - name: Create archive
         shell: bash
         run: |
-          archive="${{ matrix.platform.name }}-${{ matrix.config.name }}.zip"
+          archive="${{ matrix.platform.name }}.zip"
 
           if [[ "$RUNNER_OS" == "Windows" ]]; then
             powershell.exe -NoProfile -Command \

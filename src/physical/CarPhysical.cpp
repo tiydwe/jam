@@ -51,10 +51,10 @@ void CarPhysical::draw(sf::RenderTarget& target,
     float prc = _car->getCountdownPercent();
     if (_car->isDeletionGood()) {
       cpy.setColor(
-          sf::Color(prc * 255.0 / 2.0, prc*1.5 * 255.0, prc * 255.0 / 2.0));
+          sf::Color(prc * 255.0 / 2.0, prc * 255.0, prc * 255.0 / 2.0));
     } else {
       cpy.setColor(
-          sf::Color(prc*1.5 * 255.0, prc * 255.0 / 2.0, prc * 255.0 / 2.0));
+          sf::Color(prc * 255.0, prc * 255.0 / 2.0, prc * 255.0 / 2.0));
     }
     target.draw(cpy);
     return;

@@ -9,8 +9,8 @@ JAM is a video game where you build the road network of a city and manage traffi
 
 # PLEASE READ THIS IF YOU ARE A STARDANCE HACK CLUB REVIEWER
 
-This may have issues on macos. You can review with gameplay video at videos/fullgameplay.mp4.
-If you are one of the community people rating it (for the 18 ratings), I recommend just skip this project.
+## This may have issues on macos. You can review with gameplay video at videos/fullgameplay.mp4.
+If you are one of the community people rating it (for the 18 ratings), I recommend just skip this project if you are on a macos.
 
 <video controls src="videos/fullgameplay.mp4" title="Full gameplay"></video>
 Video in repo at videos/fullgameplay.mp4
